@@ -1,27 +1,20 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import "react";
 import "./App.css";
 // import default from @vimeo/player
 
 import { default as Player } from "@vimeo/player";
 
-
-
 function App() {
-    const options = {
-        id: 795682177,
-        width: 640,
-        loop: true
-    };
+  const options = {
+    id: 795682177,
+    width: 640,
+    loop: true,
+  };
 
-    const player = new Player('playertwo', options);
-    //
-    // player.setVolume(0);
-    //
-    player.on('play', function() {
-        console.log('played the video!');
-    });
+  const player = new Player("playertwo", options);
+  player.on("play", function () {
+    console.log("played the video!");
+  });
   return (
     <>
       <h1>!!!</h1>
