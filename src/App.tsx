@@ -1,32 +1,42 @@
 import "react";
 import "./App.css";
-// import default from @vimeo/player
-
 import { default as Player } from "@vimeo/player";
+import { useEffect } from "react";
+
+function Controls() {
+  return null;
+}
+
+function VideoPlayer() {
+  useEffect(() => {
+    const player = new Player("vimeo-player");
+
+    player.on("play", function () {
+      console.log("played the video!");
+    });
+  }, []);
+
+  return (
+    <div className="video-player-wrapper">
+      <p>video player wrapper</p>
+      <div
+        id="vimeo-player"
+        data-videmo-autoplay="true"
+        data-videmo-portrait="false"
+        data-videmo-title="false"
+        data-videmo-width={640}
+        data-vimeo-url="https://player.vimeo.com/video/795682177?h=015d115cec&background=1"
+      ></div>
+    </div>
+  );
+}
 
 function App() {
-  const options = {
-    id: 795682177,
-    width: 640,
-    loop: true,
-  };
-
-  const player = new Player("playertwo", options);
-  player.on("play", function () {
-    console.log("played the video!");
-  });
   return (
     <>
-      <h1>!!!!!</h1>
-
-      {/*<iframe*/}
-      {/*  src="https://player.vimeo.com/video/76979871?h=8272103f6e"*/}
-      {/*  width="640"*/}
-      {/*  height="360"*/}
-      {/*  frameBorder="0"*/}
-      {/*  allowFullScreen*/}
-      {/*  allow="autoplay; encrypted-media"*/}
-      {/*></iframe>*/}
+      <h1>Virtues</h1>
+      <VideoPlayer />
+      <Controls />
     </>
   );
 }
