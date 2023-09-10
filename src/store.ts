@@ -8,15 +8,16 @@ export const store = createStore();
 // -----
 
 export const playerAtom = atom(Object.create(null));
-export const playingAtom = atom(false);
+export const isPlayingAtom = atom(false);
+export const isMutedAtom = atom(false);
 export const seekableAtom = atom([0, 1483.3815]);
 export const seekPositionAtom = atom(0);
 
 // subscriptions
 // -------------
-store.sub(playingAtom, () => {
+store.sub(isPlayingAtom, () => {
   const player = store.get(playerAtom);
-  if (store.get(playingAtom)) {
+  if (store.get(isPlayingAtom)) {
     player.play().catch(handleError);
   } else {
     player.pause().catch(handleError);
@@ -24,61 +25,62 @@ store.sub(playingAtom, () => {
 });
 store.sub(playerAtom, () => {
   // assuming there is only 1 player url in the store, get the seekable time ranges for a video
-  console.log("___player ref has been set___");
   const player = store.get(playerAtom);
-  // TODO: maybe look into setting seekable
-  // player.getSeekable().then((seekable: Player.VimeoTimeRange[]) => {
-  //   console.log({ seekable });
-  //   store.set(seekableAtom, seekable);
-  // });
+
   player.on("play", () => {
-    store.set(playingAtom, true);
-    console.log(store.get(seekableAtom));
+    store.set(isPlayingAtom, true);
   });
   player.on("pause", () => {
-    store.set(playingAtom, false);
+    store.set(isPlayingAtom, false);
   });
 });
 
 store.sub(seekPositionAtom, () => {
-  console.log("__seeking__");
   // assuming there is only 1 player url in the store, get the seekable time ranges for a video
   const seekPosition = store.get(seekPositionAtom);
+  const playing = store.get(isPlayingAtom);
   const player = store.get(playerAtom);
 
   player
     .setCurrentTime(seekPosition)
     .then((seconds: number) => {
-      // TODO: maybe use seconds to verify seek position
       // seconds = the actual time that the player seeked to
       console.table({
-        seconds,
-        seekPosition: seekPosition,
+        actualSeek: seconds,
+        seekRequested: seekPosition,
         drift: seconds - seekPosition,
       });
-      // console.log(seconds != seekPosition);
     })
     .catch(handleError);
+
+  // begin playing at seek position
+  if (!playing) {
+    store.set(isPlayingAtom, true);
+  }
 });
 
 // handlers
 // --------
 
+export const handleMute = () => {
+  const player = store.get(playerAtom);
+  const isMuted = store.get(isMutedAtom);
+  store.set(isMutedAtom, !isMuted);
+  player.setMuted(!isMuted).catch(handleError);
+};
+
 const handleError = (error: any) => {
   console.error(error);
   switch (error.name) {
     case "RangeError":
-      alert("got RangeError");
       break;
     case "PasswordError":
       // the video is password-protected and the viewer needs to enter the
       // password first
       break;
-
     case "PrivacyError":
       // the video is private
       break;
-
     default:
       // some other error occurred
       break;

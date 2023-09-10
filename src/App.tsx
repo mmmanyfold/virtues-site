@@ -4,7 +4,14 @@ import { Provider, useAtom } from "jotai";
 import { default as Player } from "@vimeo/player";
 import { SetStateAction, useEffect, useRef } from "react";
 import { Seekbar as Seek } from "react-seekbar";
-import { store, playerAtom, playingAtom, seekPositionAtom } from "./store.ts";
+import {
+  store,
+  playerAtom,
+  isPlayingAtom,
+  seekPositionAtom,
+  isMutedAtom,
+  handleMute,
+} from "./store.ts";
 
 function Seekbar() {
   const [position, setSeekPosition] = useAtom(seekPositionAtom);
@@ -24,13 +31,18 @@ function Seekbar() {
 }
 
 function Controls() {
-  const [playing] = useAtom(playingAtom);
+  const [playing] = useAtom(isPlayingAtom);
+  const [muted] = useAtom(isMutedAtom);
+
   return (
     <div>
       <Seekbar />
-      <button onClick={() => store.set(playingAtom, !store.get(playingAtom))}>
+      <button
+        onClick={() => store.set(isPlayingAtom, !store.get(isPlayingAtom))}
+      >
         {playing ? "Pause" : "Play"}
       </button>
+      <button onClick={handleMute}>{muted ? "Unmute" : "Mute"}</button>
     </div>
   );
 }
