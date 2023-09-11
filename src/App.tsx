@@ -11,10 +11,15 @@ import {
   seekPositionAtom,
   isMutedAtom,
   handleMute,
+  handlePlay,
+  handleFullscreen,
+  durationAtom,
+  handleChangeChapter,
 } from "./store.ts";
 
 function Seekbar() {
   const [position, setSeekPosition] = useAtom(seekPositionAtom);
+  const [duration] = useAtom(durationAtom);
 
   const handleSeek = (position: SetStateAction<number>) => {
     setSeekPosition(position);
@@ -23,7 +28,7 @@ function Seekbar() {
   return (
     <Seek
       position={position}
-      duration={1483.3815}
+      duration={duration}
       onSeek={handleSeek}
       fullWidth
     />
@@ -31,18 +36,20 @@ function Seekbar() {
 }
 
 function Controls() {
-  const [playing] = useAtom(isPlayingAtom);
-  const [muted] = useAtom(isMutedAtom);
+  const [isPlaying] = useAtom(isPlayingAtom);
+  const [isMuted] = useAtom(isMutedAtom);
+  const [isFullscreen] = useAtom(isMutedAtom);
 
   return (
     <div>
       <Seekbar />
-      <button
-        onClick={() => store.set(isPlayingAtom, !store.get(isPlayingAtom))}
-      >
-        {playing ? "Pause" : "Play"}
+      <button onClick={() => handleChangeChapter(-1)}>prev chapter</button>
+      <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
+      <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
+      <button onClick={handleFullscreen}>
+        {isFullscreen ? "un-fullscreen" : "fullscreen"}
       </button>
-      <button onClick={handleMute}>{muted ? "Unmute" : "Mute"}</button>
+      <button onClick={() => handleChangeChapter(+1)}>next chapter</button>
     </div>
   );
 }
@@ -65,7 +72,7 @@ function VideoPlayer() {
           data-videmo-portrait="false"
           data-videmo-title="false"
           data-videmo-width={640}
-          data-vimeo-url="https://player.vimeo.com/video/795682177?h=015d115cec&background=1"
+          data-vimeo-url="https://player.vimeo.com/video/653237500?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
         ></div>
         <Controls />
       </Provider>
