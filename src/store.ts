@@ -106,14 +106,41 @@ export const handleFullscreen = () => {
   player.requestFullscreen().catch(handleError);
 };
 
-export const handleChangeChapter = (direction: number) => {
+export const handlePreviousChapter = () => {
   const chapters = store.get(chaptersAtom);
   const chapterIndex = store.get(chapterIndexAtom);
-  const newChapterIndex = chapterIndex + direction;
-  const seekTo = chapters[newChapterIndex % chapters.length];
+  if (chapterIndex === 0) {
+    return;
+  }
+
+  const newChapterIndex = chapterIndex - (1 % chapters.length);
+  const seekTo = chapters[newChapterIndex];
 
   store.set(chapterIndexAtom, newChapterIndex);
   store.set(seekPositionAtom, seekTo.startTime);
+};
+
+export const handleNextChapter = () => {
+  const chapters = store.get(chaptersAtom);
+  const chapterIndex = store.get(chapterIndexAtom);
+  console.log(chapterIndex);
+  const newChapterIndex = (chapterIndex + 1) % chapters.length;
+  const seekTo = chapters[newChapterIndex];
+
+  store.set(chapterIndexAtom, newChapterIndex);
+  store.set(seekPositionAtom, seekTo.startTime);
+};
+
+export const handleRestartPlayback = () => {
+  const player = store.get(playerAtom);
+
+  player
+    .setCurrentTime(0)
+    .then(() => {
+      player.play().catch(handleError);
+      store.set(seekPositionAtom, 1);
+    })
+    .catch(handleError);
 };
 
 const handleError = (error: any) => {

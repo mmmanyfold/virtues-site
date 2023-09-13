@@ -14,7 +14,9 @@ import {
   handlePlay,
   handleFullscreen,
   durationAtom,
-  handleChangeChapter,
+  handlePreviousChapter,
+  handleNextChapter,
+  handleRestartPlayback,
 } from "./store.ts";
 
 function Seekbar() {
@@ -43,13 +45,14 @@ function Controls() {
   return (
     <div>
       <Seekbar />
-      <button onClick={() => handleChangeChapter(-1)}>prev chapter</button>
+      <button onClick={() => handlePreviousChapter()}>prev chapter</button>
       <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
       <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
       <button onClick={handleFullscreen}>
         {isFullscreen ? "un-fullscreen" : "fullscreen"}
       </button>
-      <button onClick={() => handleChangeChapter(+1)}>next chapter</button>
+      <button onClick={handleRestartPlayback}>restart</button>
+      <button onClick={() => handleNextChapter()}>next chapter</button>
     </div>
   );
 }
