@@ -71,13 +71,13 @@ store.sub(seekPositionAtom, () => {
 
   player
     .setCurrentTime(seekPosition)
-    .then((seconds: number) => {
+    .then(() => {
       // seconds = the actual time that the player seeked to
-      console.table({
-        actualSeek: seconds,
-        seekRequested: seekPosition,
-        drift: seconds - seekPosition,
-      });
+      // console.table({
+      //   actualSeek: seconds,
+      //   seekRequested: seekPosition,
+      //   drift: seconds - seekPosition,
+      // });
     })
     .catch(handleError);
 
@@ -123,7 +123,6 @@ export const handlePreviousChapter = () => {
 export const handleNextChapter = () => {
   const chapters = store.get(chaptersAtom);
   const chapterIndex = store.get(chapterIndexAtom);
-  console.log(chapterIndex);
   const newChapterIndex = (chapterIndex + 1) % chapters.length;
   const seekTo = chapters[newChapterIndex];
 
@@ -141,6 +140,19 @@ export const handleRestartPlayback = () => {
       store.set(seekPositionAtom, 1);
     })
     .catch(handleError);
+};
+
+export const handleRandomChapter = () => {
+  const chapters = store.get(chaptersAtom);
+  const currentChapterIndex = store.get(chapterIndexAtom);
+  const randomChapterIndex = Math.floor(Math.random() * chapters.length);
+  const randomChapter = chapters[randomChapterIndex];
+  if (currentChapterIndex === randomChapterIndex) {
+    handleRandomChapter();
+  }
+
+  store.set(chapterIndexAtom, randomChapterIndex);
+  store.set(seekPositionAtom, randomChapter.startTime);
 };
 
 const handleError = (error: any) => {

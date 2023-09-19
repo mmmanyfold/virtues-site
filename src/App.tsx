@@ -17,6 +17,7 @@ import {
   handlePreviousChapter,
   handleNextChapter,
   handleRestartPlayback,
+  handleRandomChapter,
 } from "./store.ts";
 
 function Seekbar() {
@@ -52,6 +53,7 @@ function Controls() {
         {isFullscreen ? "un-fullscreen" : "fullscreen"}
       </button>
       <button onClick={handleRestartPlayback}>restart</button>
+      <button onClick={handleRandomChapter}>random chapter</button>
       <button onClick={() => handleNextChapter()}>next chapter</button>
     </div>
   );
