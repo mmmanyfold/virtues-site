@@ -16,6 +16,7 @@ export const seekPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
 export const chapterIndexAtom = atom<number>(0);
+export const currentChapterAtom = atom<Player.VimeoChapter | null>(null);
 
 // subscriptions
 // -------------
@@ -54,12 +55,17 @@ store.sub(playerAtom, () => {
     })
     .catch(handleError);
 
+  // register event listeners
   player.on("play", () => {
     store.set(isPlayingAtom, true);
   });
 
   player.on("pause", () => {
     store.set(isPlayingAtom, false);
+  });
+
+  player.on("chapterchange", (chapter: Player.VimeoChapter) => {
+    store.set(currentChapterAtom, chapter);
   });
 });
 
@@ -71,14 +77,14 @@ store.sub(seekPositionAtom, () => {
 
   player
     .setCurrentTime(seekPosition)
-    .then(() => {
-      // seconds = the actual time that the player seeked to
-      // console.table({
-      //   actualSeek: seconds,
-      //   seekRequested: seekPosition,
-      //   drift: seconds - seekPosition,
-      // });
-    })
+    // .then((seconds: number) => {
+    // seconds = the actual time that the player seeked to
+    // console.table({
+    //   actualSeek: seconds,
+    //   seekRequested: seekPosition,
+    //   drift: seconds - seekPosition,
+    // });
+    // })
     .catch(handleError);
 
   // begin playing at seek position

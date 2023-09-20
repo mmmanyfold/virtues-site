@@ -18,6 +18,7 @@ import {
   handleNextChapter,
   handleRestartPlayback,
   handleRandomChapter,
+  currentChapterAtom,
 } from "./store.ts";
 
 function Seekbar() {
@@ -59,6 +60,20 @@ function Controls() {
   );
 }
 
+function Stats() {
+  const [chapterIndex] = useAtom(currentChapterAtom);
+  return (
+    <div>
+      <p>
+        <u>
+          <small>stats</small>
+        </u>
+      </p>
+      <pre>chapterIndex: {chapterIndex?.index || 0}</pre>
+    </div>
+  );
+}
+
 function VideoPlayer() {
   const playerRef = useRef(null);
   useEffect(() => {
@@ -80,6 +95,7 @@ function VideoPlayer() {
           data-vimeo-url="https://player.vimeo.com/video/653237500?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
         ></div>
         <Controls />
+        <Stats />
       </Provider>
     </div>
   );
