@@ -1,5 +1,6 @@
 import { atom, createStore } from "jotai";
 import { default as Player } from "@vimeo/player";
+
 // stores
 // -----
 export const store = createStore();
@@ -17,6 +18,21 @@ export const durationAtom = atom<number>(0);
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
 export const chapterIndexAtom = atom<number>(0);
 export const currentChapterAtom = atom<Player.VimeoChapter | null>(null);
+export const playlistsAtom = atom(async (_get, { signal }) => {
+  const response = await fetch(
+    `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
+    { signal },
+  );
+
+  return await response.json();
+});
+
+export const currentVideoIndexAtom = atom<number>(0);
+
+export const readOnlyCurrentSelectionAtom = atom(async (get) => {
+  const playlist = await get(playlistsAtom);
+  return playlist.rows[0].vimeoId || "";
+});
 
 // subscriptions
 // -------------
@@ -30,6 +46,7 @@ store.sub(isPlayingAtom, () => {
     player.pause().catch(handleError);
   }
 });
+
 store.sub(playerAtom, () => {
   // assuming there is only 1 player url in the store, get the seekable time ranges for a video
   const player = store.get(playerAtom);
@@ -159,6 +176,17 @@ export const handleRandomChapter = () => {
 
   store.set(chapterIndexAtom, randomChapterIndex);
   store.set(seekPositionAtom, randomChapter.startTime);
+};
+
+export const handleSetCurrentVideo = (videoId: string) => {
+  const player = store.get(playerAtom);
+
+  player
+    .loadVideo(videoId)
+    .then(() => {
+      player.play().catch(handleError);
+    })
+    .catch(handleError);
 };
 
 const handleError = (error: any) => {

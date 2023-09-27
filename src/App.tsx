@@ -2,7 +2,7 @@ import "react";
 import "./App.css";
 import { Provider, useAtom } from "jotai";
 import { default as Player } from "@vimeo/player";
-import { SetStateAction, useEffect, useRef } from "react";
+import { SetStateAction, useEffect, Suspense } from "react";
 import { Seekbar as Seek } from "react-seekbar";
 import {
   store,
@@ -19,7 +19,12 @@ import {
   handleRestartPlayback,
   handleRandomChapter,
   currentChapterAtom,
+  playlistsAtom,
+  handleSetCurrentVideo,
+  currentVideoIndexAtom,
+  readOnlyCurrentSelectionAtom,
 } from "./store.ts";
+import { PlaylistVideo } from "./types.ts";
 
 function Seekbar() {
   const [position, setSeekPosition] = useAtom(seekPositionAtom);
@@ -47,7 +52,7 @@ function Controls() {
   return (
     <div>
       <Seekbar />
-      <button onClick={() => handlePreviousChapter()}>prev chapter</button>
+      <button onClick={handlePreviousChapter}>prev chapter</button>
       <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
       <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
       <button onClick={handleFullscreen}>
@@ -55,27 +60,59 @@ function Controls() {
       </button>
       <button onClick={handleRestartPlayback}>restart</button>
       <button onClick={handleRandomChapter}>random chapter</button>
-      <button onClick={() => handleNextChapter()}>next chapter</button>
+      <button onClick={handleNextChapter}>next chapter</button>
     </div>
   );
 }
 
 function Stats() {
   const [chapterIndex] = useAtom(currentChapterAtom);
+  const [currentVideoSelection] = useAtom(currentVideoIndexAtom);
+
   return (
     <div>
-      <p>
-        <u>
-          <small>stats</small>
-        </u>
+      <p className="text-2xl">
+        <u>stats</u>
       </p>
       <pre>chapterIndex: {chapterIndex?.index || 0}</pre>
+      <pre>currentVideoSelection: {currentVideoSelection}</pre>
     </div>
   );
 }
 
+function PlaylistPicker() {
+  const [playlists] = useAtom(playlistsAtom);
+  const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
+
+  return (
+    <Suspense fallback={<div>loading...</div>}>
+      <h3>select video</h3>
+      <ul className="list-none">
+        {playlists.rows.map((video: PlaylistVideo) => (
+          <li key={video.uuid}>
+            <a
+              onClick={() => {
+                handleSetCurrentVideo(video.vimeoId);
+              }}
+            >
+              {video.vimeoId}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div
+        id="vimeo-player"
+        data-videmo-autoplay="true"
+        data-videmo-portrait="false"
+        data-videmo-title="false"
+        data-videmo-width={640}
+        data-vimeo-url={`https://player.vimeo.com/video/${firstVideoSelection}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}
+      ></div>
+    </Suspense>
+  );
+}
+
 function VideoPlayer() {
-  const playerRef = useRef(null);
   useEffect(() => {
     const player = new Player("vimeo-player");
     store.set(playerAtom, player);
@@ -83,17 +120,8 @@ function VideoPlayer() {
 
   return (
     <div className="video-player-wrapper">
-      <p>video player wrapper</p>
       <Provider store={store}>
-        <div
-          ref={playerRef}
-          id="vimeo-player"
-          data-videmo-autoplay="true"
-          data-videmo-portrait="false"
-          data-videmo-title="false"
-          data-videmo-width={640}
-          data-vimeo-url="https://player.vimeo.com/video/653237500?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
-        ></div>
+        <PlaylistPicker />
         <Controls />
         <Stats />
       </Provider>
