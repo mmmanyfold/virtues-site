@@ -10,21 +10,23 @@ import {
   isPlayingAtom,
   seekPositionAtom,
   isMutedAtom,
-  handleMute,
-  handlePlay,
-  handleFullscreen,
   durationAtom,
-  handlePreviousChapter,
-  handleNextChapter,
-  handleRestartPlayback,
-  handleRandomChapter,
   currentChapterAtom,
   playlistsAtom,
-  handleSetCurrentVideo,
   currentVideoIndexAtom,
   readOnlyCurrentSelectionAtom,
 } from "./store.ts";
 import { PlaylistVideo } from "./types.ts";
+import {
+  handleFullscreen,
+  handleMute,
+  handleNextChapter,
+  handlePlay,
+  handlePreviousChapter,
+  handleRandomChapter,
+  handleRestartPlayback,
+  handleSetCurrentVideo,
+} from "./handlers.ts";
 
 function Seekbar() {
   const [position, setSeekPosition] = useAtom(seekPositionAtom);
@@ -68,7 +70,7 @@ function Controls() {
 function Stats() {
   const [chapterIndex] = useAtom(currentChapterAtom);
   const [currentVideoSelection] = useAtom(currentVideoIndexAtom);
-
+  const [seekPosition] = useAtom(seekPositionAtom);
   return (
     <div>
       <p className="text-2xl">
@@ -76,6 +78,7 @@ function Stats() {
       </p>
       <pre>chapterIndex: {chapterIndex?.index || 0}</pre>
       <pre>currentVideoSelection: {currentVideoSelection}</pre>
+      <pre>seekPosition: {seekPosition}</pre>
     </div>
   );
 }
