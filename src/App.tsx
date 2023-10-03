@@ -15,6 +15,7 @@ import {
   playlistsAtom,
   currentVideoIndexAtom,
   readOnlyCurrentSelectionAtom,
+  isFullscreenAtom,
 } from "./store.ts";
 import { PlaylistVideo } from "./types.ts";
 import {
@@ -49,7 +50,7 @@ function Seekbar() {
 function Controls() {
   const [isPlaying] = useAtom(isPlayingAtom);
   const [isMuted] = useAtom(isMutedAtom);
-  const [isFullscreen] = useAtom(isMutedAtom);
+  const [isFullscreen] = useAtom(isFullscreenAtom);
 
   return (
     <div>

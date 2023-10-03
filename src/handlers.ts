@@ -39,10 +39,10 @@ export const handlePreviousChapter = () => {
     return;
   }
 
-  const newChapterIndex = chapterIndex - (1 % chapters.length);
-  const seekTo = chapters[newChapterIndex];
+  const previousChapterIndex = (chapterIndex - 1) % chapters.length;
+  const seekTo = chapters[previousChapterIndex];
 
-  store.set(chapterIndexAtom, newChapterIndex);
+  store.set(chapterIndexAtom, previousChapterIndex);
   store.set(seekPositionAtom, seekTo.startTime);
 };
 
