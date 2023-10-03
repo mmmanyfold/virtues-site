@@ -13,7 +13,7 @@ export const playerAtom = atom(Object.create(null));
 export const isPlayingAtom = atom(false);
 export const isMutedAtom = atom(false);
 export const isFullscreen = atom(false);
-export const seekableAtom = atom<Player.VimeoTimeRange[]>([]);
+export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
 export const seekPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
@@ -85,7 +85,7 @@ export const bindEventsToPlayer = () => {
   player
     .getSeekable()
     .then((seekable: Player.VimeoTimeRange[]) => {
-      store.set(seekableAtom, seekable);
+      store.set(seekableTimesAtom, seekable);
     })
     .catch(handleError);
 
@@ -99,6 +99,7 @@ export const bindEventsToPlayer = () => {
   });
 
   player.on("chapterchange", (chapter: Player.VimeoChapter) => {
+
     store.set(currentChapterAtom, chapter);
   });
 };

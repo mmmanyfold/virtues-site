@@ -67,7 +67,7 @@ export const handleRestartPlayback = () => {
     .setCurrentTime(0)
     .then(() => {
       player.play().catch(handleError);
-      store.set(seekPositionAtom, 1);
+      store.set(seekPositionAtom, 0);
     })
     .catch(handleError);
 };
@@ -87,6 +87,7 @@ export const handleRandomChapter = () => {
 
 export const handleSetCurrentVideo = (videoId: string) => {
   const player = store.get(playerAtom);
+  store.set(seekPositionAtom, 0);
 
   player
     .loadVideo(videoId)
