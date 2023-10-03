@@ -49,7 +49,23 @@ store.sub(isPlayingAtom, () => {
 });
 
 store.sub(playerAtom, () => {
-  // assuming there is only 1 player url in the store, get the seekable time ranges for a video
+  bindEventsToPlayer();
+});
+
+store.sub(seekPositionAtom, () => {
+  const seekPosition = store.get(seekPositionAtom);
+  const playing = store.get(isPlayingAtom);
+  const player = store.get(playerAtom);
+
+  player.setCurrentTime(seekPosition).catch(handleError);
+
+  // begin playing at seek position
+  if (!playing) {
+    store.set(isPlayingAtom, true);
+  }
+});
+
+export const bindEventsToPlayer = () => {
   const player = store.get(playerAtom);
 
   player
@@ -85,17 +101,4 @@ store.sub(playerAtom, () => {
   player.on("chapterchange", (chapter: Player.VimeoChapter) => {
     store.set(currentChapterAtom, chapter);
   });
-});
-
-store.sub(seekPositionAtom, () => {
-  const seekPosition = store.get(seekPositionAtom);
-  const playing = store.get(isPlayingAtom);
-  const player = store.get(playerAtom);
-
-  player.setCurrentTime(seekPosition).catch(handleError);
-
-  // begin playing at seek position
-  if (!playing) {
-    store.set(isPlayingAtom, true);
-  }
-});
+};

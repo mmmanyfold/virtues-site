@@ -2,6 +2,7 @@
 // --------
 
 import {
+  bindEventsToPlayer,
   chapterIndexAtom,
   chaptersAtom,
   isMutedAtom,
@@ -29,6 +30,10 @@ export const handleFullscreen = () => {
 
 export const handlePreviousChapter = () => {
   const chapters = store.get(chaptersAtom);
+  if (chapters.length === 0) {
+    return;
+  }
+
   const chapterIndex = store.get(chapterIndexAtom);
   if (chapterIndex === 0) {
     return;
@@ -43,6 +48,10 @@ export const handlePreviousChapter = () => {
 
 export const handleNextChapter = () => {
   const chapters = store.get(chaptersAtom);
+  if (chapters.length === 0) {
+    return;
+  }
+
   const chapterIndex = store.get(chapterIndexAtom);
   const newChapterIndex = (chapterIndex + 1) % chapters.length;
   const seekTo = chapters[newChapterIndex];
@@ -82,6 +91,7 @@ export const handleSetCurrentVideo = (videoId: string) => {
   player
     .loadVideo(videoId)
     .then(() => {
+      bindEventsToPlayer();
       player.play().catch(handleError);
     })
     .catch(handleError);
