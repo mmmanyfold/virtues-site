@@ -28,6 +28,15 @@ export const playlistsAtom = atom(async (_get, { signal }) => {
   return await response.json();
 });
 
+export const aboutPageAtom = atom(async (_get, { signal }) => {
+  const response = await fetch(
+    `https://rami-notion-api.fly.dev/public/virtues-about.json`,
+    { signal },
+  );
+
+  return await response.json();
+});
+
 export const currentVideoIndexAtom = atom<number>(0);
 
 export const readOnlyCurrentSelectionAtom = atom(async (get) => {

@@ -16,8 +16,9 @@ import {
   currentVideoIndexAtom,
   readOnlyCurrentSelectionAtom,
   isFullscreenAtom,
+  aboutPageAtom,
 } from "./store.ts";
-import { PlaylistVideo } from "./types.ts";
+import { Block, PlaylistVideo } from "./types.ts";
 import {
   handleFullscreen,
   handleMute,
@@ -134,10 +135,12 @@ function VideoPlayer() {
 }
 
 function App() {
+  const [aboutPage] = useAtom(aboutPageAtom);
   return (
     <>
       <h1>Virtues</h1>
       <VideoPlayer />
+      <p>{JSON.stringify(aboutPage.blocks.map((block: Block) => block.id))}</p>
     </>
   );
 }
