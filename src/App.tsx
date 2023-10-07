@@ -11,10 +11,10 @@ import {
   seekPositionAtom,
   isMutedAtom,
   durationAtom,
-  currentChapterAtom,
+  // currentChapterAtom,
   playlistsAtom,
   currentVideoIdAtom,
-  currentVideoIndexAtom,
+  // currentVideoIndexAtom,
   readOnlyCurrentSelectionAtom,
   isFullscreenAtom,
   aboutPageAtom,
@@ -29,7 +29,6 @@ import {
   handlePreviousChapter,
   handleRandomChapter,
   handleRestartPlayback,
-  handleSetCurrentVideo,
   handleOpenInfoPanel
 } from "./handlers.ts";
 
@@ -82,43 +81,27 @@ function Controls() {
   );
 }
 
-function Stats() {
-  const [chapterIndex] = useAtom(currentChapterAtom);
-  const [currentVideoSelection] = useAtom(currentVideoIndexAtom);
-  const [seekPosition] = useAtom(seekPositionAtom);
-  return (
-    <div>
-      <p className="text-2xl">
-        <u>stats</u>
-      </p>
-      <pre>chapterIndex: {chapterIndex?.index || 0}</pre>
-      <pre>currentVideoSelection: {currentVideoSelection}</pre>
-      <pre>seekPosition: {seekPosition}</pre>
-    </div>
-  );
-}
+// function Stats() {
+//   const [chapterIndex] = useAtom(currentChapterAtom);
+//   const [currentVideoSelection] = useAtom(currentVideoIndexAtom);
+//   const [seekPosition] = useAtom(seekPositionAtom);
+//   return (
+//     <div>
+//       <p className="text-2xl">
+//         <u>stats</u>
+//       </p>
+//       <pre>chapterIndex: {chapterIndex?.index || 0}</pre>
+//       <pre>currentVideoSelection: {currentVideoSelection}</pre>
+//       <pre>seekPosition: {seekPosition}</pre>
+//     </div>
+//   );
+// }
 
 function PlaylistPicker() {
-  const [playlists] = useAtom(playlistsAtom);
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
-  const [currentVideoId] = useAtom(currentVideoIdAtom);
 
   return (
     <Suspense fallback={<div>loading...</div>}>
-      {/* <h3>select video</h3> */}
-      {/* <ul className="list-none">
-        {playlists.rows.map((video: PlaylistVideo) => (
-          <li key={video.uuid}>
-            <a
-              onClick={() => {
-                handleSetCurrentVideo(video.vimeoId);
-              }}
-            >
-              {video.vimeoId}
-            </a>
-          </li>
-        ))}
-      </ul> */}
       <div>
         <div
           id="vimeo-player"
@@ -197,7 +180,7 @@ function App() {
   return (
     <>
       <VideoPlayer />
-      {/* <p>{JSON.stringify(aboutPage.blocks.map((block: Block) => block.id))}</p> */}
+      <p>{JSON.stringify(aboutPage.blocks.map((block: Block) => block.id))}</p>
     </>
   );
 }
