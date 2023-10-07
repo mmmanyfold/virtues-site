@@ -39,10 +39,18 @@ export const aboutPageAtom = atom(async (_get, { signal }) => {
 
 export const currentVideoIndexAtom = atom<number>(0);
 
+export const currentVideoIdAtom = atom(async (get) => {
+  const index = await get(currentVideoIndexAtom);
+  const playlist = await get(playlistsAtom);
+  return playlist.rows[index].vimeoId;
+})
+
 export const readOnlyCurrentSelectionAtom = atom(async (get) => {
   const playlist = await get(playlistsAtom);
   return playlist.rows[0].vimeoId || "";
 });
+
+export const isInfoPanelOpenAtom = atom<boolean>(false);
 
 // subscriptions
 // -------------

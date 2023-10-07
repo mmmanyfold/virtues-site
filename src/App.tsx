@@ -13,10 +13,12 @@ import {
   durationAtom,
   currentChapterAtom,
   playlistsAtom,
+  currentVideoIdAtom,
   currentVideoIndexAtom,
   readOnlyCurrentSelectionAtom,
   isFullscreenAtom,
   aboutPageAtom,
+  isInfoPanelOpenAtom,
 } from "./store.ts";
 import { Block, PlaylistVideo } from "./types.ts";
 import {
@@ -28,6 +30,7 @@ import {
   handleRandomChapter,
   handleRestartPlayback,
   handleSetCurrentVideo,
+  handleOpenInfoPanel
 } from "./handlers.ts";
 
 function Seekbar() {
@@ -64,6 +67,7 @@ function Controls() {
     <div>
       <Seekbar />
       <div className="controls">
+        <button onClick={handleOpenInfoPanel}>info</button>
         <button onClick={handlePreviousChapter}>prev chapter</button>
         <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
         <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
@@ -97,6 +101,7 @@ function Stats() {
 function PlaylistPicker() {
   const [playlists] = useAtom(playlistsAtom);
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
+  const [currentVideoId] = useAtom(currentVideoIdAtom);
 
   return (
     <Suspense fallback={<div>loading...</div>}>
@@ -118,7 +123,8 @@ function PlaylistPicker() {
         <div
           id="vimeo-player"
           className="iframe-wrapper"
-          data-vimeo-autoplay="true"
+          // TODO: uncomment this
+          // data-vimeo-autoplay="true"
           data-vimeo-portrait="false"
           data-vimeo-title="false"
           data-vimeo-url={`https://player.vimeo.com/video/${firstVideoSelection}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}
@@ -128,16 +134,57 @@ function PlaylistPicker() {
   );
 }
 
+function InfoPanel() {
+  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
+  const [playlists] = useAtom(playlistsAtom);
+  const [currentVideoId] = useAtom(currentVideoIdAtom);
+
+  const currentVideo = playlists.rows.find((video: PlaylistVideo) => video.vimeoId === currentVideoId);
+  const { videoTitle, vimeoChapters } = currentVideo;
+  const chapterIds = Object.keys(vimeoChapters).sort();
+
+  if (!isInfoPanelOpen) {
+    return null;
+  }
+  
+  return (
+    <div className="info-panel absolute bottom-0 bg-white">
+      <h2>{videoTitle}</h2>
+      {chapterIds.map(id => {
+        return (
+          <div key={id}>
+            {vimeoChapters[id]}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function VideoPlayer() {
   useEffect(() => {
     const player = new Player("vimeo-player");
     store.set(playerAtom, player);
   }, []);
 
+function Title() {
+  const [playlists] = useAtom(playlistsAtom);
+  const [currentVideoId] = useAtom(currentVideoIdAtom);
+
+  const currentVideo = playlists.rows.find((video: PlaylistVideo) => video.vimeoId === currentVideoId);
+  const { titleColor } = currentVideo;
+
+  return <h1 className="title" style={{color: titleColor ? titleColor.toLowerCase() : "black"}}>Virtues</h1>
+}
+
   return (
     <div className="video-player-wrapper">
       <Provider store={store}>
-        <PlaylistPicker />
+        <Title />
+        <div className="relative">
+          <PlaylistPicker />
+          <InfoPanel />
+        </div>
         <Controls />
         {/* <Stats /> */}
       </Provider>
@@ -149,7 +196,6 @@ function App() {
   const [aboutPage] = useAtom(aboutPageAtom);
   return (
     <>
-      {/* <h1>Virtues</h1> */}
       <VideoPlayer />
       {/* <p>{JSON.stringify(aboutPage.blocks.map((block: Block) => block.id))}</p> */}
     </>

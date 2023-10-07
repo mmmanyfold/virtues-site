@@ -2,6 +2,7 @@
 // --------
 
 import {
+  isInfoPanelOpenAtom,
   bindEventsToPlayer,
   chapterIndexAtom,
   chaptersAtom,
@@ -11,6 +12,11 @@ import {
   seekPositionAtom,
   store,
 } from "./store.ts";
+
+export const handleOpenInfoPanel = () => {
+  const player = store.get(isInfoPanelOpenAtom);
+  store.set(isInfoPanelOpenAtom, !player);
+}
 
 export const handleMute = () => {
   const player = store.get(playerAtom);
