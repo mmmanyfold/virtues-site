@@ -39,12 +39,19 @@ function Seekbar() {
   };
 
   return (
-    <Seek
-      position={position}
-      duration={duration}
-      onSeek={handleSeek}
-      fullWidth
-    />
+    <div className="seekbar-wrapper">
+      <Seek
+        position={position}
+        duration={duration}
+        onSeek={handleSeek}
+        radius={0}
+        height={15}
+        outerColor="#a9a9a9"
+        innerColor="#6c6c6c"
+        hoverColor="#6c6c6c"
+        fullWidth
+      />
+    </div>
   );
 }
 
@@ -56,15 +63,17 @@ function Controls() {
   return (
     <div>
       <Seekbar />
-      <button onClick={handlePreviousChapter}>prev chapter</button>
-      <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
-      <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
-      <button onClick={handleFullscreen}>
-        {isFullscreen ? "un-fullscreen" : "fullscreen"}
-      </button>
-      <button onClick={handleRestartPlayback}>restart</button>
-      <button onClick={handleRandomChapter}>random chapter</button>
-      <button onClick={handleNextChapter}>next chapter</button>
+      <div className="controls">
+        <button onClick={handlePreviousChapter}>prev chapter</button>
+        <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
+        <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
+        <button onClick={handleFullscreen}>
+          {isFullscreen ? "un-fullscreen" : "fullscreen"}
+        </button>
+        <button onClick={handleRestartPlayback}>restart</button>
+        <button onClick={handleRandomChapter}>random chapter</button>
+        <button onClick={handleNextChapter}>next chapter</button>
+      </div>
     </div>
   );
 }
@@ -91,8 +100,8 @@ function PlaylistPicker() {
 
   return (
     <Suspense fallback={<div>loading...</div>}>
-      <h3>select video</h3>
-      <ul className="list-none">
+      {/* <h3>select video</h3> */}
+      {/* <ul className="list-none">
         {playlists.rows.map((video: PlaylistVideo) => (
           <li key={video.uuid}>
             <a
@@ -104,15 +113,17 @@ function PlaylistPicker() {
             </a>
           </li>
         ))}
-      </ul>
-      <div
-        id="vimeo-player"
-        data-videmo-autoplay="true"
-        data-videmo-portrait="false"
-        data-videmo-title="false"
-        data-videmo-width={640}
-        data-vimeo-url={`https://player.vimeo.com/video/${firstVideoSelection}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}
-      ></div>
+      </ul> */}
+      <div>
+        <div
+          id="vimeo-player"
+          className="iframe-wrapper"
+          data-vimeo-autoplay="true"
+          data-vimeo-portrait="false"
+          data-vimeo-title="false"
+          data-vimeo-url={`https://player.vimeo.com/video/${firstVideoSelection}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}
+        ></div>
+      </div>
     </Suspense>
   );
 }
@@ -128,7 +139,7 @@ function VideoPlayer() {
       <Provider store={store}>
         <PlaylistPicker />
         <Controls />
-        <Stats />
+        {/* <Stats /> */}
       </Provider>
     </div>
   );
@@ -138,9 +149,9 @@ function App() {
   const [aboutPage] = useAtom(aboutPageAtom);
   return (
     <>
-      <h1>Virtues</h1>
+      {/* <h1>Virtues</h1> */}
       <VideoPlayer />
-      <p>{JSON.stringify(aboutPage.blocks.map((block: Block) => block.id))}</p>
+      {/* <p>{JSON.stringify(aboutPage.blocks.map((block: Block) => block.id))}</p> */}
     </>
   );
 }
