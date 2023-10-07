@@ -16,7 +16,7 @@ import {
 export const handleOpenInfoPanel = () => {
   const player = store.get(isInfoPanelOpenAtom);
   store.set(isInfoPanelOpenAtom, !player);
-}
+};
 
 export const handleMute = () => {
   const player = store.get(playerAtom);
@@ -97,7 +97,7 @@ export const handleSetCurrentChapter = (index: number) => {
 
   store.set(chapterIndexAtom, index);
   store.set(seekPositionAtom, newChapter.startTime);
-}
+};
 
 export const handleSetCurrentVideo = (videoId: string) => {
   const player = store.get(playerAtom);

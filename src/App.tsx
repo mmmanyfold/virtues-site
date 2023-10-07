@@ -4,6 +4,7 @@ import { Provider, useAtom } from "jotai";
 import { default as Player } from "@vimeo/player";
 import { SetStateAction, useEffect, Suspense } from "react";
 import { Seekbar as Seek } from "react-seekbar";
+import { RichTextCollection } from "./components/Notion.tsx";
 import {
   store,
   playerAtom,
@@ -30,7 +31,7 @@ import {
   handleRandomChapter,
   handleRestartPlayback,
   handleOpenInfoPanel,
-  handleSetCurrentChapter
+  handleSetCurrentChapter,
 } from "./handlers.ts";
 
 function Seekbar() {
@@ -125,45 +126,58 @@ function InfoPanel() {
   const [currentVideoId] = useAtom(currentVideoIdAtom);
   const [currentChapter] = useAtom(currentChapterAtom);
 
-  const currentVideo = playlists.rows.find((video: PlaylistVideo) => video.vimeoId === currentVideoId);
+  const currentVideo = playlists.rows.find(
+    (video: PlaylistVideo) => video.vimeoId === currentVideoId
+  );
   const { videoTitle, vimeoChapters } = currentVideo;
   const chapterIds = Object.keys(vimeoChapters).sort();
 
-  console.log(currentChapter)
-
   return (
-    <div className="info-panel w-[433px] absolute top-0 z-10 bg-white overflow-y-scroll pl-8 pr-10 pt-10 pb-5">
+    <div className="info-panel w-[433px] absolute top-0 z-10 bg-white overflow-y-scroll px-8 pt-10 pb-5">
       <h2 className="italic text-2xl tracking-wide mb-2">{videoTitle}</h2>
       <div className="divide-y divide-[#a9a9a9] text-sm">
-        {chapterIds.map(id => {
-          const chapterNumber = parseInt(id)
-          const isCurrentChapter = currentChapter ? currentChapter?.index === chapterNumber : chapterNumber === 1;
+        {chapterIds.map((id) => {
+          const chapterNumber = parseInt(id);
+          const isCurrentChapter = currentChapter
+            ? currentChapter?.index === chapterNumber
+            : chapterNumber === 1;
           return (
-            <div 
+            <div
               key={id}
-              role="button" 
-              className="flex gap-x-4 py-6" 
-              style={{ color: isCurrentChapter ? "black" : "#908f8f"}}
+              role="button"
+              className="flex gap-x-4 py-6"
+              style={{ color: isCurrentChapter ? "black" : "#908f8f" }}
               onClick={() => handleSetCurrentChapter(chapterNumber - 1)}
             >
               <div className="italic">#{chapterNumber}</div>
-              <div>{vimeoChapters[id]}</div>
+              <div>
+                <RichTextCollection objects={vimeoChapters[id]} />
+              </div>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
 function Title() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoId] = useAtom(currentVideoIdAtom);
 
-  const currentVideo = playlists.rows.find((video: PlaylistVideo) => video.vimeoId === currentVideoId);
+  const currentVideo = playlists.rows.find(
+    (video: PlaylistVideo) => video.vimeoId === currentVideoId
+  );
   const { titleColor } = currentVideo;
 
-  return <h1 className="title" style={{color: titleColor ? titleColor.toLowerCase() : "black"}}>Virtues</h1>
+  return (
+    <h1
+      className="title"
+      style={{ color: titleColor ? titleColor.toLowerCase() : "black" }}
+    >
+      Virtues
+    </h1>
+  );
 }
 
 function VideoPlayer() {
@@ -178,7 +192,6 @@ function VideoPlayer() {
         <Title />
         <PlaylistPicker />
         <Controls />
-        {/* <Stats /> */}
       </Provider>
     </div>
   );

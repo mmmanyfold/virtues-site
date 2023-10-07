@@ -15,6 +15,16 @@
   -webkit-text-size-adjust: 100%;
 }
 
+pre {
+  margin: 0;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  white-space: pre-line;
+  white-space: -moz-pre-line;
+  white-space: -pre-line;
+  white-space: -o-pre-line;
+  word-wrap: break-word;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -33,7 +43,7 @@ h1.title {
   top: 0.35em;
   left: 0.5em;
   z-index: 1;
-  font-family: 'Archivo Narrow', sans-serif;
+  font-family: "Archivo Narrow", sans-serif;
   letter-spacing: -2px;
 }
 
@@ -41,7 +51,7 @@ h1.title {
   width: 100%;
 }
 
-.iframe-wrapper  {
+.iframe-wrapper {
   position: relative;
   overflow: hidden;
   width: 100%;
