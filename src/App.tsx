@@ -11,7 +11,7 @@ import {
   seekPositionAtom,
   isMutedAtom,
   durationAtom,
-  // currentChapterAtom,
+  currentChapterAtom,
   playlistsAtom,
   currentVideoIdAtom,
   // currentVideoIndexAtom,
@@ -29,7 +29,8 @@ import {
   handlePreviousChapter,
   handleRandomChapter,
   handleRestartPlayback,
-  handleOpenInfoPanel
+  handleOpenInfoPanel,
+  handleSetCurrentChapter
 } from "./handlers.ts";
 
 function Seekbar() {
@@ -65,7 +66,7 @@ function Controls() {
   return (
     <div>
       <Seekbar />
-      <div className="controls">
+      <div className="flex items-center justify-around bg-[#fdfcfa] py-4">
         <button onClick={handleOpenInfoPanel}>info</button>
         <button onClick={handlePreviousChapter}>prev chapter</button>
         <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
@@ -99,10 +100,11 @@ function Controls() {
 
 function PlaylistPicker() {
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
+  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
 
   return (
     <Suspense fallback={<div>loading...</div>}>
-      <div>
+      <div className="relative">
         <div
           id="vimeo-player"
           className="iframe-wrapper"
@@ -112,43 +114,47 @@ function PlaylistPicker() {
           data-vimeo-title="false"
           data-vimeo-url={`https://player.vimeo.com/video/${firstVideoSelection}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}
         ></div>
+        {isInfoPanelOpen && <InfoPanel />}
       </div>
     </Suspense>
   );
 }
 
 function InfoPanel() {
-  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoId] = useAtom(currentVideoIdAtom);
+  const [currentChapter] = useAtom(currentChapterAtom);
 
   const currentVideo = playlists.rows.find((video: PlaylistVideo) => video.vimeoId === currentVideoId);
   const { videoTitle, vimeoChapters } = currentVideo;
   const chapterIds = Object.keys(vimeoChapters).sort();
 
-  if (!isInfoPanelOpen) {
-    return null;
-  }
-  
+  console.log(currentChapter)
+
   return (
-    <div className="info-panel absolute bottom-0 bg-white">
-      <h2>{videoTitle}</h2>
-      {chapterIds.map(id => {
-        return (
-          <div key={id}>
-            {vimeoChapters[id]}
-          </div>
-        )
-      })}
+    <div className="info-panel w-[433px] absolute top-0 z-10 bg-white overflow-y-scroll pl-8 pr-10 pt-10 pb-5">
+      <h2 className="italic text-2xl tracking-wide mb-2">{videoTitle}</h2>
+      <div className="divide-y divide-[#a9a9a9] text-sm">
+        {chapterIds.map(id => {
+          const chapterNumber = parseInt(id)
+          const isCurrentChapter = currentChapter ? currentChapter?.index === chapterNumber : chapterNumber === 1;
+          return (
+            <div 
+              key={id}
+              role="button" 
+              className="flex gap-x-4 py-6" 
+              style={{ color: isCurrentChapter ? "black" : "#908f8f"}}
+              onClick={() => handleSetCurrentChapter(chapterNumber - 1)}
+            >
+              <div className="italic">#{chapterNumber}</div>
+              <div>{vimeoChapters[id]}</div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
-
-function VideoPlayer() {
-  useEffect(() => {
-    const player = new Player("vimeo-player");
-    store.set(playerAtom, player);
-  }, []);
 
 function Title() {
   const [playlists] = useAtom(playlistsAtom);
@@ -160,14 +166,17 @@ function Title() {
   return <h1 className="title" style={{color: titleColor ? titleColor.toLowerCase() : "black"}}>Virtues</h1>
 }
 
+function VideoPlayer() {
+  useEffect(() => {
+    const player = new Player("vimeo-player");
+    store.set(playerAtom, player);
+  }, []);
+
   return (
     <div className="video-player-wrapper">
       <Provider store={store}>
         <Title />
-        <div className="relative">
-          <PlaylistPicker />
-          <InfoPanel />
-        </div>
+        <PlaylistPicker />
         <Controls />
         {/* <Stats /> */}
       </Provider>

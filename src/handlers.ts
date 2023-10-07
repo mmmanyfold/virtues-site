@@ -91,6 +91,14 @@ export const handleRandomChapter = () => {
   store.set(seekPositionAtom, randomChapter.startTime);
 };
 
+export const handleSetCurrentChapter = (index: number) => {
+  const chapters = store.get(chaptersAtom);
+  const newChapter = chapters[index];
+
+  store.set(chapterIndexAtom, index);
+  store.set(seekPositionAtom, newChapter.startTime);
+}
+
 export const handleSetCurrentVideo = (videoId: string) => {
   const player = store.get(playerAtom);
   store.set(seekPositionAtom, 0);

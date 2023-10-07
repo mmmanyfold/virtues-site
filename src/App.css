@@ -37,10 +37,6 @@ h1.title {
   letter-spacing: -2px;
 }
 
-button {
-  cursor: pointer;
-}
-
 .video-player-wrapper {
   width: 100%;
 }
@@ -52,7 +48,7 @@ button {
   padding-top: 41.67%;
 }
 
-.iframe-wrapper  iframe {
+.iframe-wrapper iframe {
   position: absolute;
   top: 0;
   left: 0;
@@ -63,9 +59,16 @@ button {
 }
 
 .info-panel {
-  z-index: 10;
-  width: 350px;
-  height: 100%;
+  height: calc(100% - 1px);
+}
+
+.info-panel::-webkit-scrollbar {
+  width: 9px;
+}
+
+.info-panel::-webkit-scrollbar-thumb {
+  background-color: #a9a9a9;
+  border-radius: 0;
 }
 
 .seekbar-wrapper {
@@ -74,14 +77,6 @@ button {
 
 .seekbar-wrapper div div:nth-child(2) {
   display: none !important;
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 0.5em 0;
-  background-color: #fdfcfa;
 }
 
 .controls button {
