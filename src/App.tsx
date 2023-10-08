@@ -21,6 +21,7 @@ import {
   // aboutPageAtom,
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
+  videoSizeAtom,
 } from "./store.ts";
 import {
   createVimeoPlayerUrl,
@@ -88,13 +89,15 @@ function Controls() {
 function VideoPlayer() {
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
+  const [[width, height]] = useAtom(videoSizeAtom);
 
   return (
     <Suspense fallback={<div>loading...</div>}>
       <div className="relative">
         <div
           id="vimeo-player"
-          className="iframe-wrapper"
+          className="relative overflow-hidden w-[100%]"
+          style={{ paddingTop: `${(height / width) * 100}%` }}
           // TODO: uncomment this
           // data-vimeo-autoplay="true"
           data-vimeo-portrait="false"
@@ -151,9 +154,8 @@ function Title() {
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
 
-  const currentVideo = playlists?.rows[currentVideoIndex];
+  const { titleColor } = playlists?.rows[currentVideoIndex];
 
-  const { titleColor } = currentVideo;
   let color = "black";
 
   if (!isMenuOpen && titleColor) {
@@ -168,7 +170,12 @@ function Title() {
 }
 
 function MenuToggle() {
+  const [playlists] = useAtom(playlistsAtom);
+  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
+
+  const { titleColor } = playlists?.rows[currentVideoIndex];
+
   return (
     <>
       <div
@@ -179,7 +186,7 @@ function MenuToggle() {
         {isMenuOpen ? (
           <X size={35} weight="bold" />
         ) : (
-          <Plus size={35} weight="bold" />
+          <Plus size={35} weight="bold" color={titleColor} />
         )}
       </div>
 

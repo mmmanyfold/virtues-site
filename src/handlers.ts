@@ -26,7 +26,7 @@ export const createVimeoPlayerUrl = (baseUrl: string) => {
   url.searchParams.set("player_id", "0");
   url.searchParams.set("app_id", "58479");
   return url.toString();
-}
+};
 
 export const handleToggleInfoPanel = () => {
   const isOpen = store.get(isInfoPanelOpenAtom);

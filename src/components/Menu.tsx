@@ -15,7 +15,10 @@ export default function Menu() {
     <div className="absolute z-20 w-[100vw] h-[100vh] bg-[#fcf3e9] flex flex-col items-center justify-center text-2xl tracking-wide">
       <div className="max-w-[500px] flex flex-col items-center justify-center gap-y-6 text-center">
         {orderedPlaylists.map(
-          ({ uuid, videoTitle, vimeoPlayerURL }: PlaylistVideo, index: number) => {
+          (
+            { uuid, videoTitle, vimeoPlayerURL }: PlaylistVideo,
+            index: number
+          ) => {
             const isCurrentVideo = index === currentVideoIndex;
             return (
               <div

@@ -48,6 +48,8 @@ export const isInfoPanelOpenAtom = atom<boolean>(false);
 
 export const isMenuOpenAtom = atom<boolean>(false);
 
+export const videoSizeAtom = atom<[number, number]>([100, 100]);
+
 // subscriptions
 // -------------
 
@@ -99,6 +101,12 @@ export const bindEventsToPlayer = () => {
     .getSeekable()
     .then((seekable: Player.VimeoTimeRange[]) => {
       store.set(seekableTimesAtom, seekable);
+    })
+    .catch(handleError);
+
+  Promise.all([player.getVideoWidth(), player.getVideoHeight()])
+    .then((dimensions) => {
+      store.set(videoSizeAtom, dimensions);
     })
     .catch(handleError);
 

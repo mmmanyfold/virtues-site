@@ -50,14 +50,7 @@ h1.title {
   width: 100%;
 }
 
-.iframe-wrapper {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  padding-top: 41.67%;
-}
-
-.iframe-wrapper iframe {
+#vimeo-player iframe {
   position: absolute;
   top: 0;
   left: 0;
