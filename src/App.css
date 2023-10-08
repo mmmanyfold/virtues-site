@@ -52,10 +52,6 @@ h1.title {
   padding: 7.5vw 0.5em;
 }
 
-.video-player-wrapper {
-  width: 100%;
-}
-
 #vimeo-player iframe {
   position: absolute;
   top: 0;
@@ -80,7 +76,7 @@ h1.title {
 }
 
 .seekbar-wrapper {
-  margin: -6px;
+  margin: -6px 0;
 }
 
 .seekbar-wrapper div div:nth-child(2) {

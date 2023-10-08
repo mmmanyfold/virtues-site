@@ -1,12 +1,13 @@
 import { SetStateAction, useEffect, Suspense } from "react";
-import "./App.css";
 import { Provider, useAtom } from "jotai";
+import { useWindowSize } from "@uidotdev/usehooks";
 import { default as Player } from "@vimeo/player";
 import { Seekbar as Seek } from "react-seekbar";
 import { X, Plus } from "@phosphor-icons/react";
 import { RichTextCollection } from "./components/Notion.tsx";
 import Menu from "./components/Menu.tsx";
 import About from "./components/About.tsx";
+import "./App.css";
 import {
   store,
   playerAtom,
@@ -205,6 +206,24 @@ function MenuToggle() {
   );
 }
 
+function Wrapper({ children }: React.PropsWithChildren) {
+  const windowSize = useWindowSize();
+  const [[videoWidth, videoHeight]] = useAtom(videoSizeAtom);
+
+  let wrapperWidth = "100vw";
+
+  if (windowSize.height && videoHeight > windowSize.height - 69) {
+    const videoAspectRatio = videoWidth / videoHeight;
+    wrapperWidth = `${(windowSize.height - 69) * videoAspectRatio}px`;
+  }
+
+  return (
+    <div className="relative" style={{ width: wrapperWidth, margin: "0 auto" }}>
+      {children}
+    </div>
+  );
+}
+
 function App() {
   useEffect(() => {
     const player = new Player("vimeo-player");
@@ -212,15 +231,15 @@ function App() {
   }, []);
 
   return (
-    <div className="video-player-wrapper">
-      <Provider store={store}>
+    <Provider store={store}>
+      <Wrapper>
         <Title />
         <MenuToggle />
         <VideoPlayer />
         <Seekbar />
         <Controls />
-      </Provider>
-    </div>
+      </Wrapper>
+    </Provider>
   );
 }
 
