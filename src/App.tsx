@@ -11,7 +11,7 @@ import {
   store,
   playerAtom,
   isPlayingAtom,
-  seekPositionAtom,
+  seekingPositionAtom,
   isMutedAtom,
   durationAtom,
   currentChapterAtom,
@@ -24,6 +24,7 @@ import {
   isMenuOpenAtom,
   isAboutOpenAtom,
   videoSizeAtom,
+  timeInSecondsUpdateAtom,
 } from "./store.ts";
 import {
   handleFullscreen,
@@ -39,7 +40,8 @@ import {
 } from "./handlers.ts";
 
 function Seekbar() {
-  const [position, setSeekPosition] = useAtom(seekPositionAtom);
+  const [position] = useAtom(timeInSecondsUpdateAtom);
+  const [, setSeekPosition] = useAtom(seekingPositionAtom);
   const [duration] = useAtom(durationAtom);
 
   const handleSeek = (position: SetStateAction<number>) => {
@@ -69,20 +71,17 @@ function Controls() {
   const [isFullscreen] = useAtom(isFullscreenAtom);
 
   return (
-    <div>
-      <Seekbar />
-      <div className="flex items-center justify-around bg-[#fdfcfa] py-4">
-        <button onClick={handleToggleInfoPanel}>info</button>
-        <button onClick={handlePreviousChapter}>prev chapter</button>
-        <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
-        <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
-        <button onClick={handleFullscreen}>
-          {isFullscreen ? "un-fullscreen" : "fullscreen"}
-        </button>
-        <button onClick={handleRestartPlayback}>restart</button>
-        <button onClick={handleRandomChapter}>random chapter</button>
-        <button onClick={handleNextChapter}>next chapter</button>
-      </div>
+    <div className="flex items-center justify-around bg-[#fdfcfa] py-4">
+      <button onClick={handleToggleInfoPanel}>info</button>
+      <button onClick={handlePreviousChapter}>prev chapter</button>
+      <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
+      <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
+      <button onClick={handleFullscreen}>
+        {isFullscreen ? "un-fullscreen" : "fullscreen"}
+      </button>
+      <button onClick={handleRestartPlayback}>restart</button>
+      <button onClick={handleRandomChapter}>random chapter</button>
+      <button onClick={handleNextChapter}>next chapter</button>
     </div>
   );
 }
@@ -219,6 +218,7 @@ function App() {
         <Title />
         <MenuToggle />
         <VideoPlayer />
+        <Seekbar />
         <Controls />
       </Provider>
     </div>

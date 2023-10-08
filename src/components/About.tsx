@@ -14,11 +14,11 @@ const ContentBlock = ({ block, imgShadow }: any) => {
     case "image":
       const caption = block.image.caption;
       return (
-          <img
-            className={`w-[100%] ${imgShadow ? "shadow-xl" : ""}`}
-            src={block.image.file.url}
-            alt={caption ? caption[0].plain_text : ""}
-          />
+        <img
+          className={`w-[100%] ${imgShadow ? "shadow-xl" : ""}`}
+          src={block.image.file.url}
+          alt={caption ? caption[0].plain_text : ""}
+        />
       );
     default:
       return null;
@@ -27,9 +27,15 @@ const ContentBlock = ({ block, imgShadow }: any) => {
 
 function Column({ blocks, imgShadow, className }: any) {
   return (
-    <div className={`flex flex-col gap-y-6 text-lg leading-tight ${className || ""}`}>
+    <div
+      className={`flex flex-col gap-y-6 text-lg leading-tight ${
+        className || ""
+      }`}
+    >
       {blocks.map((block: any) => {
-        return <ContentBlock key={block.id} block={block} imgShadow={imgShadow} />;
+        return (
+          <ContentBlock key={block.id} block={block} imgShadow={imgShadow} />
+        );
       })}
     </div>
   );
@@ -49,7 +55,7 @@ export default function About({ blocks }: any) {
         return acc;
       }
     },
-    [[]]
+    [[]],
   );
 
   return (
@@ -62,9 +68,9 @@ export default function About({ blocks }: any) {
           }
 
           return (
-            <Column 
-              key={`column-${i}`} 
-              blocks={column} 
+            <Column
+              key={`column-${i}`}
+              blocks={column}
               imgShadow={i === 1}
               className={className}
             />

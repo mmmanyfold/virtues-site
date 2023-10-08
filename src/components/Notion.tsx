@@ -14,7 +14,7 @@ function RichTextObject({ object, color }: any) {
     hasNewlines = content.includes("\n");
     const annotations = object.annotations;
     const classes = Object.keys(annotations).filter(
-      (k) => annotations[k] === true
+      (k) => annotations[k] === true,
     );
     className = classes.join(" ");
   }
@@ -59,20 +59,9 @@ function RichTextObject({ object, color }: any) {
 const RichTextCollectionItem = ({ object, color }: any) => {
   switch (object.type) {
     case "text":
-      return (
-        <RichTextObject
-          key={object.id}
-          object={object}
-          color={color}
-        />
-      );
+      return <RichTextObject key={object.id} object={object} color={color} />;
     case "paragraph":
-      return (
-        <ParagraphObject
-          key={object.id}
-          object={object}
-        />
-      );
+      return <ParagraphObject key={object.id} object={object} />;
     case "bulleted_list_item":
       return <BulletedListItem key={object.id} block={object} />;
     case "divider":
@@ -103,7 +92,7 @@ const ParagraphObject = ({ object, color }: any) => {
   if (object.type === "paragraph") {
     const annotations = object.paragraph?.annotations || {};
     const classes = Object.keys(annotations).filter(
-      (k) => annotations[k] === true
+      (k) => annotations[k] === true,
     );
     className = classes.join(" ");
     textObjects = object.paragraph?.rich_text || [];

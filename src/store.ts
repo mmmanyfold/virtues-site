@@ -1,6 +1,7 @@
 import { atom, createStore } from "jotai";
 import { default as Player } from "@vimeo/player";
 import { handleError } from "./handlers.ts";
+import { TimeUpdate } from "./types.ts";
 
 // stores
 // -----
@@ -14,7 +15,7 @@ export const isPlayingAtom = atom(false);
 export const isMutedAtom = atom(false);
 export const isFullscreenAtom = atom(false);
 export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
-export const seekPositionAtom = atom<number>(0);
+export const seekingPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
 export const chapterIndexAtom = atom<number>(0);
@@ -22,16 +23,18 @@ export const currentChapterAtom = atom<Player.VimeoChapter | null>(null);
 export const playlistsAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
-    { signal }
+    { signal },
   );
 
   return await response.json();
 });
 
+export const timeInSecondsUpdateAtom = atom<number>(0);
+
 export const aboutPageAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-about.json`,
-    { signal }
+    { signal },
   );
 
   return await response.json();
@@ -67,17 +70,20 @@ store.sub(playerAtom, () => {
   bindEventsToPlayer();
 });
 
-store.sub(seekPositionAtom, () => {
-  const seekPosition = store.get(seekPositionAtom);
+store.sub(seekingPositionAtom, () => {
+  const seekPosition = store.get(seekingPositionAtom);
   const playing = store.get(isPlayingAtom);
   const player = store.get(playerAtom);
 
-  player.setCurrentTime(seekPosition).catch(handleError);
-
-  // begin playing at seek position
-  if (!playing) {
-    store.set(isPlayingAtom, true);
-  }
+  player
+    .setCurrentTime(seekPosition)
+    .then(() => {
+      // begin playing at seek position
+      if (!playing) {
+        store.set(isPlayingAtom, true);
+      }
+    })
+    .catch(handleError);
 });
 
 export const bindEventsToPlayer = () => {
@@ -122,5 +128,9 @@ export const bindEventsToPlayer = () => {
   player.on("chapterchange", (chapter: Player.VimeoChapter) => {
     store.set(currentChapterAtom, chapter);
     store.set(chapterIndexAtom, chapter.index - 1);
+  });
+
+  player.on("timeupdate", (timeupdate: TimeUpdate) => {
+    store.set(timeInSecondsUpdateAtom, Math.trunc(timeupdate.seconds));
   });
 };

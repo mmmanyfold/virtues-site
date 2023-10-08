@@ -83,3 +83,9 @@ export enum Type {
   Image = "image",
   Paragraph = "paragraph",
 }
+
+export interface TimeUpdate {
+  duration: number;
+  percent: number;
+  seconds: number;
+}

@@ -12,7 +12,7 @@ import {
   isPlayingAtom,
   playerAtom,
   playlistsAtom,
-  seekPositionAtom,
+  seekingPositionAtom,
   store,
   currentVideoIndexAtom,
   isAboutOpenAtom,
@@ -67,7 +67,7 @@ export const handlePreviousChapter = () => {
   const seekTo = chapters[previousChapterIndex];
 
   store.set(chapterIndexAtom, previousChapterIndex);
-  store.set(seekPositionAtom, seekTo.startTime);
+  store.set(seekingPositionAtom, seekTo.startTime);
 };
 
 export const handleNextChapter = () => {
@@ -81,7 +81,7 @@ export const handleNextChapter = () => {
   const seekTo = chapters[newChapterIndex];
 
   store.set(chapterIndexAtom, newChapterIndex);
-  store.set(seekPositionAtom, seekTo.startTime);
+  store.set(seekingPositionAtom, seekTo.startTime);
 };
 
 export const handleRestartPlayback = () => {
@@ -91,7 +91,7 @@ export const handleRestartPlayback = () => {
     .setCurrentTime(0)
     .then(() => {
       player.play().catch(handleError);
-      store.set(seekPositionAtom, 0);
+      store.set(seekingPositionAtom, 0);
     })
     .catch(handleError);
 };
@@ -106,7 +106,7 @@ export const handleRandomChapter = () => {
   }
 
   store.set(chapterIndexAtom, randomChapterIndex);
-  store.set(seekPositionAtom, randomChapter.startTime);
+  store.set(seekingPositionAtom, randomChapter.startTime);
 };
 
 export const handleSetCurrentChapter = (index: number) => {
@@ -114,17 +114,17 @@ export const handleSetCurrentChapter = (index: number) => {
   const newChapter = chapters[index];
 
   store.set(chapterIndexAtom, index);
-  store.set(seekPositionAtom, newChapter.startTime);
+  store.set(seekingPositionAtom, newChapter.startTime);
 };
 
 export const handleSetCurrentVideo = async (videoUrl: string) => {
   const player = store.get(playerAtom);
   const playlists = await store.get(playlistsAtom);
   const newIndex = playlists?.rows?.findIndex(
-    (row: PlaylistVideo) => row.vimeoPlayerURL === videoUrl
+    (row: PlaylistVideo) => row.vimeoPlayerURL === videoUrl,
   );
 
-  store.set(seekPositionAtom, 0);
+  store.set(seekingPositionAtom, 0);
   store.set(currentVideoIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
