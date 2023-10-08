@@ -1,5 +1,7 @@
 import "react";
 import { RichTextObject } from "../components/Notion.tsx";
+import { useAtom } from "jotai";
+import { isMenuOpenAtom } from "../store.ts";
 
 const ContentBlock = ({ block, imgShadow }: any) => {
   switch (block.type) {
@@ -42,6 +44,8 @@ function Column({ blocks, imgShadow, className }: any) {
 }
 
 export default function About({ blocks }: any) {
+  const [isMenuOpen] = useAtom(isMenuOpenAtom);
+  
   if (!blocks) {
     return null;
   }
@@ -59,7 +63,7 @@ export default function About({ blocks }: any) {
   );
 
   return (
-    <div className="about z-20 w-[100vw] min-h-[100vh] bg-[#fcf3e9] overflow-y-scroll">
+    <div className={`about absolute z-20 w-[100%] bg-[#fcf3e9] ${isMenuOpen ? "h-[100vh] overflow-hidden" : "min-h-[100vh]"}`}>
       <div className="grid grid-cols-[4fr_3fr_9fr] gap-x-12 pt-14">
         {columns.map((column: any, i: number) => {
           let className;
