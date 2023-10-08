@@ -212,7 +212,7 @@ function Wrapper({ children }: React.PropsWithChildren) {
 
   let wrapperWidth = "100vw";
 
-  if (windowSize.height && videoHeight > windowSize.height - 69) {
+  if (windowSize.width && windowSize.width > 679 && windowSize.height && videoHeight > windowSize.height - 69) {
     const videoAspectRatio = videoWidth / videoHeight;
     wrapperWidth = `${(windowSize.height - 69) * videoAspectRatio}px`;
   }
@@ -231,15 +231,15 @@ function App() {
   }, []);
 
   return (
-    <Provider store={store}>
-      <Wrapper>
-        <Title />
-        <MenuToggle />
-        <VideoPlayer />
-        <Seekbar />
+      <Provider store={store}>
+        <Wrapper>
+          <Title />
+          <MenuToggle />
+          <VideoPlayer />
+          <Seekbar />
         <Controls />
-      </Wrapper>
-    </Provider>
+        </Wrapper>
+      </Provider>
   );
 }
 
