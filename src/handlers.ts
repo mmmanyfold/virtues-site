@@ -142,8 +142,14 @@ export const handleSetCurrentVideo = async (videoUrl: string) => {
 export const handlePlaylistJump = async () => {
   const player = store.get(playerAtom);
   const playlist = await store.get(playlistsAtom);
+  const currentVideoIndex = store.get(currentVideoIndexAtom);
   const randomChapterIndex = Math.floor(Math.random() * playlist.length);
   const nextPlaylist = playlist[randomChapterIndex];
+
+  if (currentVideoIndex === randomChapterIndex) {
+    await handlePlaylistJump();
+    return;
+  }
 
   store.set(seekingPositionAtom, 0);
   store.set(currentVideoIndexAtom, randomChapterIndex);
