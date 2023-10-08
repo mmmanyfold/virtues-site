@@ -24,7 +24,6 @@ import {
   videoSizeAtom,
 } from "./store.ts";
 import {
-  createVimeoPlayerUrl,
   handleFullscreen,
   handleMute,
   handleNextChapter,
@@ -93,16 +92,12 @@ function VideoPlayer() {
 
   return (
     <Suspense fallback={<div>loading...</div>}>
-      <div className="relative">
+      <div className="relative cursor-pointer" onClick={handlePlay}>
         <div
           id="vimeo-player"
-          className="relative overflow-hidden w-[100%]"
+          className="relative overflow-hidden w-[100%] pointer-events-none"
           style={{ paddingTop: `${(height / width) * 100}%` }}
-          // TODO: uncomment this
-          // data-vimeo-autoplay="true"
-          data-vimeo-portrait="false"
-          data-vimeo-title="false"
-          data-vimeo-url={createVimeoPlayerUrl(firstVideoSelection)}
+          data-vimeo-url={firstVideoSelection}
         ></div>
         {isInfoPanelOpen && <InfoPanel />}
       </div>

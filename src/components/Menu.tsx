@@ -24,7 +24,7 @@ export default function Menu() {
               <div
                 key={uuid}
                 role="button"
-                className={`pb-0.5 border-b border-b-[2.5px] hover:border-b-[#000] ${
+                className={`pb-0.5 border-b border-b-[3px] hover:border-b-[#000] ${
                   isCurrentVideo ? "border-b-[#000]" : "border-b-[#fcf3e9]"
                 }`}
                 onClick={() => handleSetCurrentVideo(vimeoPlayerURL)}
