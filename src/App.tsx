@@ -6,6 +6,7 @@ import { Seekbar as Seek } from "react-seekbar";
 import { X, Plus } from "@phosphor-icons/react";
 import { RichTextCollection } from "./components/Notion.tsx";
 import Menu from "./components/Menu.tsx";
+import About from "./components/About.tsx";
 import {
   store,
   playerAtom,
@@ -18,9 +19,10 @@ import {
   currentVideoIndexAtom,
   readOnlyCurrentSelectionAtom,
   isFullscreenAtom,
-  // aboutPageAtom,
+  aboutPageAtom,
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
+  isAboutOpenAtom,
   videoSizeAtom,
 } from "./store.ts";
 import {
@@ -96,7 +98,9 @@ function VideoPlayer() {
         <div
           id="vimeo-player"
           className="relative overflow-hidden w-[100%] pointer-events-none"
-          style={{ paddingTop: `${(height / width) * 100}%` }}
+          style={{
+            paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
+          }}
           data-vimeo-url={firstVideoSelection}
         ></div>
         {isInfoPanelOpen && <InfoPanel />}
@@ -148,17 +152,22 @@ function Title() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
+  const [isAboutOpen] = useAtom(isAboutOpenAtom);
+  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
 
   const { titleColor } = playlists?.rows[currentVideoIndex];
 
   let color = "black";
 
-  if (!isMenuOpen && titleColor) {
+  if (!isMenuOpen && !isAboutOpen && titleColor) {
     color = titleColor.toLowerCase();
   }
 
   return (
-    <h1 className={`title ${isMenuOpen ? "z-30" : "z-10"}`} style={{ color }}>
+    <h1
+      className={`title ${isInfoPanelOpen ? "z-10" : "z-40"}`}
+      style={{ color }}
+    >
       Virtues
     </h1>
   );
@@ -168,24 +177,32 @@ function MenuToggle() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
+  const [isAboutOpen] = useAtom(isAboutOpenAtom);
+  const [aboutPage] = useAtom(aboutPageAtom);
 
   const { titleColor } = playlists?.rows[currentVideoIndex];
+  let plusColor = "black";
+
+  if (!isMenuOpen && !isAboutOpen && titleColor) {
+    plusColor = titleColor.toLowerCase();
+  }
 
   return (
     <>
       <div
         role="button"
-        className="absolute top-8 right-8 z-30"
+        className="absolute top-8 right-8 z-40"
         onClick={handleToggleMenu}
       >
         {isMenuOpen ? (
           <X size={35} weight="bold" />
         ) : (
-          <Plus size={35} weight="bold" color={titleColor} />
+          <Plus size={35} weight="bold" color={plusColor} />
         )}
       </div>
 
       {isMenuOpen && <Menu />}
+      {isAboutOpen && <About blocks={aboutPage?.blocks} />}
     </>
   );
 }

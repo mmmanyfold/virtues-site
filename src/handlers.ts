@@ -15,6 +15,7 @@ import {
   seekPositionAtom,
   store,
   currentVideoIndexAtom,
+  isAboutOpenAtom,
 } from "./store.ts";
 
 export const handleToggleInfoPanel = () => {
@@ -25,6 +26,14 @@ export const handleToggleInfoPanel = () => {
 export const handleToggleMenu = () => {
   const isOpen = store.get(isMenuOpenAtom);
   store.set(isMenuOpenAtom, !isOpen);
+};
+
+export const handleOpenAbout = () => {
+  const player = store.get(playerAtom);
+
+  store.set(isAboutOpenAtom, true);
+  store.set(isMenuOpenAtom, false);
+  player.pause().catch(handleError);
 };
 
 export const handleMute = () => {
@@ -118,6 +127,7 @@ export const handleSetCurrentVideo = async (videoUrl: string) => {
   store.set(seekPositionAtom, 0);
   store.set(currentVideoIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
+  store.set(isAboutOpenAtom, false);
 
   player
     .loadVideo(videoUrl)

@@ -1,18 +1,38 @@
 import "react";
 import { useAtom } from "jotai";
-import { playlistsAtom, currentVideoIndexAtom } from "../store.ts";
-import { handleSetCurrentVideo } from "../handlers.ts";
+import {
+  playlistsAtom,
+  currentVideoIndexAtom,
+  isAboutOpenAtom,
+} from "../store.ts";
+import { handleSetCurrentVideo, handleOpenAbout } from "../handlers.ts";
 import { PlaylistVideo } from "../types.ts";
+
+function MenuItem({ title, isCurrentView, onClick }: any) {
+  return (
+    <div
+      role="button"
+      className={`pb-0.5 border-b border-b-[3px] hover:border-b-[#000] ${
+        isCurrentView ? "border-b-[#000]" : "border-b-[#fcf3e9]"
+      }`}
+      onClick={onClick}
+    >
+      {title}
+    </div>
+  );
+}
 
 export default function Menu() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
+  const [isAboutOpen] = useAtom(isAboutOpenAtom);
+
   const orderedPlaylists = playlists?.rows.sort(
     (a: PlaylistVideo, b: PlaylistVideo) => a.order - b.order
   );
 
   return (
-    <div className="absolute z-20 w-[100vw] h-[100vh] bg-[#fcf3e9] flex flex-col items-center justify-center text-2xl tracking-wide">
+    <div className="absolute z-30 w-[100vw] h-[100vh] bg-[#fcf3e9] flex flex-col items-center justify-center text-2xl tracking-wide">
       <div className="max-w-[500px] flex flex-col items-center justify-center gap-y-6 text-center">
         {orderedPlaylists.map(
           (
@@ -21,19 +41,20 @@ export default function Menu() {
           ) => {
             const isCurrentVideo = index === currentVideoIndex;
             return (
-              <div
+              <MenuItem
                 key={uuid}
-                role="button"
-                className={`pb-0.5 border-b border-b-[3px] hover:border-b-[#000] ${
-                  isCurrentVideo ? "border-b-[#000]" : "border-b-[#fcf3e9]"
-                }`}
+                title={videoTitle}
+                isCurrentView={!isAboutOpen && isCurrentVideo}
                 onClick={() => handleSetCurrentVideo(vimeoPlayerURL)}
-              >
-                {videoTitle}
-              </div>
+              />
             );
           }
         )}
+        <MenuItem
+          title="About"
+          isCurrentView={isAboutOpen}
+          onClick={handleOpenAbout}
+        />
       </div>
     </div>
   );

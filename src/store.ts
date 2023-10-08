@@ -45,10 +45,10 @@ export const readOnlyCurrentSelectionAtom = atom(async (get) => {
 });
 
 export const isInfoPanelOpenAtom = atom<boolean>(false);
-
 export const isMenuOpenAtom = atom<boolean>(false);
+export const isAboutOpenAtom = atom<boolean>(false);
 
-export const videoSizeAtom = atom<[number, number]>([100, 100]);
+export const videoSizeAtom = atom<[number, number]>([0, 0]);
 
 // subscriptions
 // -------------

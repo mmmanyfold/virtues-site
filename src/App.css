@@ -46,6 +46,12 @@ h1.title {
   letter-spacing: -2px;
 }
 
+.about {
+  position: absolute;
+  font-size: 5.5vw;
+  padding: 7.5vw 0.5em;
+}
+
 .video-player-wrapper {
   width: 100%;
 }
@@ -83,4 +89,20 @@ h1.title {
 
 .controls button {
   color: black;
+}
+
+.bold {
+  font-weight: 800;
+}
+.italic {
+  font-style: italic;
+}
+.strikethrough {
+  text-decoration: line-through;
+}
+.underline {
+  text-decoration: underline;
+}
+.code {
+  font-family: monospace;
 }

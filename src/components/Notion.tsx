@@ -56,7 +56,7 @@ function RichTextObject({ object, color }: any) {
   );
 }
 
-const RichTextCollectionItem = ({ object, color, linkArrow }: any) => {
+const RichTextCollectionItem = ({ object, color }: any) => {
   switch (object.type) {
     case "text":
       return (
@@ -64,7 +64,6 @@ const RichTextCollectionItem = ({ object, color, linkArrow }: any) => {
           key={object.id}
           object={object}
           color={color}
-          linkArrow={linkArrow}
         />
       );
     case "paragraph":
@@ -72,7 +71,6 @@ const RichTextCollectionItem = ({ object, color, linkArrow }: any) => {
         <ParagraphObject
           key={object.id}
           object={object}
-          linkArrow={linkArrow}
         />
       );
     case "bulleted_list_item":
@@ -84,7 +82,7 @@ const RichTextCollectionItem = ({ object, color, linkArrow }: any) => {
   }
 };
 
-function RichTextCollection({ objects, color, linkArrow }: any) {
+function RichTextCollection({ objects, color }: any) {
   return (
     <>
       {objects?.map((object: any, i: any) => (
@@ -92,14 +90,13 @@ function RichTextCollection({ objects, color, linkArrow }: any) {
           key={`${object.type}-${i}`}
           object={object}
           color={color}
-          linkArrow={linkArrow}
         />
       ))}
     </>
   );
 }
 
-const ParagraphObject = ({ object, color, linkArrow }: any) => {
+const ParagraphObject = ({ object, color }: any) => {
   let textObjects;
   let className = "";
 
@@ -123,7 +120,7 @@ const ParagraphObject = ({ object, color, linkArrow }: any) => {
               : { padding: 0, margin: "1rem 0" }
           }
         >
-          <RichTextCollection objects={textObjects} linkArrow={linkArrow} />
+          <RichTextCollection objects={textObjects} />
         </p>
       )}
     </>
