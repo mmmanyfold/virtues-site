@@ -25,8 +25,8 @@ export const playlistsAtom = atom(async (_get, { signal }) => {
     `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
     { signal },
   );
-
-  return await response.json();
+  const { rows } = await response.json();
+  return rows;
 });
 
 export const timeInSecondsUpdateAtom = atom<number>(0);
@@ -43,8 +43,8 @@ export const aboutPageAtom = atom(async (_get, { signal }) => {
 export const currentVideoIndexAtom = atom<number>(0);
 
 export const readOnlyCurrentSelectionAtom = atom(async (get) => {
-  const playlist = await get(playlistsAtom);
-  return playlist.rows[0].vimeoPlayerURL || "";
+  const [first] = await get(playlistsAtom);
+  return first.vimeoPlayerURL || "";
 });
 
 export const isInfoPanelOpenAtom = atom<boolean>(false);
@@ -85,6 +85,18 @@ store.sub(seekingPositionAtom, () => {
     })
     .catch(handleError);
 });
+
+// store.sub(currentVideoIndexAtom, () => {
+//   const player = store.get(playerAtom);
+//
+//   player
+//       .loadVideo(videoUrl)
+//       .then(() => {
+//         bindEventsToPlayer();
+//         player.play().catch(handleError);
+//       })
+//       .catch(handleError);
+// })
 
 export const bindEventsToPlayer = () => {
   const player = store.get(playerAtom);

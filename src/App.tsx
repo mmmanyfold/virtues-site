@@ -31,6 +31,7 @@ import {
   handleMute,
   handleNextChapter,
   handlePlay,
+  handlePlaylistJump,
   handlePreviousChapter,
   handleRandomChapter,
   handleRestartPlayback,
@@ -82,6 +83,7 @@ function Controls() {
       <button onClick={handleRestartPlayback}>restart</button>
       <button onClick={handleRandomChapter}>random chapter</button>
       <button onClick={handleNextChapter}>next chapter</button>
+      <button onClick={handlePlaylistJump}>playlist jump</button>
     </div>
   );
 }
@@ -112,9 +114,7 @@ function InfoPanel() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [currentChapter] = useAtom(currentChapterAtom);
-
-  const currentVideo = playlists?.rows[currentVideoIndex];
-
+  const currentVideo = playlists[currentVideoIndex];
   const { videoTitle, vimeoChapters } = currentVideo;
   const chapterIds = Object.keys(vimeoChapters).sort();
 
@@ -153,8 +153,7 @@ function Title() {
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
-
-  const { titleColor } = playlists?.rows[currentVideoIndex];
+  const { titleColor } = playlists[currentVideoIndex];
 
   let color = "black";
 
@@ -178,8 +177,8 @@ function MenuToggle() {
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
   const [aboutPage] = useAtom(aboutPageAtom);
+  const { titleColor } = playlists[currentVideoIndex];
 
-  const { titleColor } = playlists?.rows[currentVideoIndex];
   let plusColor = "black";
 
   if (!isMenuOpen && !isAboutOpen && titleColor) {

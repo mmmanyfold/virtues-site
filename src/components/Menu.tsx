@@ -26,8 +26,7 @@ export default function Menu() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
-
-  const orderedPlaylists = playlists?.rows.sort(
+  const orderedPlaylists = playlists.sort(
     (a: PlaylistVideo, b: PlaylistVideo) => a.order - b.order,
   );
 
