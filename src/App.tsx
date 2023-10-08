@@ -218,7 +218,7 @@ function Wrapper({ children }: React.PropsWithChildren) {
   }
 
   return (
-    <div className="relative" style={{ width: wrapperWidth, margin: "0 auto" }}>
+    <div className="relative h-[100dvh]" style={{ width: wrapperWidth, margin: "0 auto" }}>
       {children}
     </div>
   );
@@ -237,7 +237,7 @@ function App() {
           <MenuToggle />
           <VideoPlayer />
           <Seekbar />
-        <Controls />
+          <Controls />
         </Wrapper>
       </Provider>
   );
