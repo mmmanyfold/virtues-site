@@ -1,10 +1,11 @@
-import "react";
+import { SetStateAction, useEffect, Suspense } from "react";
 import "./App.css";
 import { Provider, useAtom } from "jotai";
 import { default as Player } from "@vimeo/player";
-import { SetStateAction, useEffect, Suspense } from "react";
 import { Seekbar as Seek } from "react-seekbar";
+import { X, Plus } from "@phosphor-icons/react";
 import { RichTextCollection } from "./components/Notion.tsx";
+import Menu from "./components/Menu.tsx";
 import {
   store,
   playerAtom,
@@ -14,14 +15,13 @@ import {
   durationAtom,
   currentChapterAtom,
   playlistsAtom,
-  currentVideoIdAtom,
-  // currentVideoIndexAtom,
+  currentVideoIndexAtom,
   readOnlyCurrentSelectionAtom,
   isFullscreenAtom,
-  aboutPageAtom,
+  // aboutPageAtom,
   isInfoPanelOpenAtom,
+  isMenuOpenAtom,
 } from "./store.ts";
-import { Block, PlaylistVideo } from "./types.ts";
 import {
   handleFullscreen,
   handleMute,
@@ -30,8 +30,9 @@ import {
   handlePreviousChapter,
   handleRandomChapter,
   handleRestartPlayback,
-  handleOpenInfoPanel,
   handleSetCurrentChapter,
+  handleToggleInfoPanel,
+  handleToggleMenu,
 } from "./handlers.ts";
 
 function Seekbar() {
@@ -68,7 +69,7 @@ function Controls() {
     <div>
       <Seekbar />
       <div className="flex items-center justify-around bg-[#fdfcfa] py-4">
-        <button onClick={handleOpenInfoPanel}>info</button>
+        <button onClick={handleToggleInfoPanel}>info</button>
         <button onClick={handlePreviousChapter}>prev chapter</button>
         <button onClick={handlePlay}>{isPlaying ? "Pause" : "Play"}</button>
         <button onClick={handleMute}>{isMuted ? "Unmute" : "Mute"}</button>
@@ -83,23 +84,7 @@ function Controls() {
   );
 }
 
-// function Stats() {
-//   const [chapterIndex] = useAtom(currentChapterAtom);
-//   const [currentVideoSelection] = useAtom(currentVideoIndexAtom);
-//   const [seekPosition] = useAtom(seekPositionAtom);
-//   return (
-//     <div>
-//       <p className="text-2xl">
-//         <u>stats</u>
-//       </p>
-//       <pre>chapterIndex: {chapterIndex?.index || 0}</pre>
-//       <pre>currentVideoSelection: {currentVideoSelection}</pre>
-//       <pre>seekPosition: {seekPosition}</pre>
-//     </div>
-//   );
-// }
-
-function PlaylistPicker() {
+function VideoPlayer() {
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
 
@@ -123,12 +108,11 @@ function PlaylistPicker() {
 
 function InfoPanel() {
   const [playlists] = useAtom(playlistsAtom);
-  const [currentVideoId] = useAtom(currentVideoIdAtom);
+  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [currentChapter] = useAtom(currentChapterAtom);
 
-  const currentVideo = playlists.rows.find(
-    (video: PlaylistVideo) => video.vimeoId === currentVideoId
-  );
+  const currentVideo = playlists?.rows[currentVideoIndex];
+
   const { videoTitle, vimeoChapters } = currentVideo;
   const chapterIds = Object.keys(vimeoChapters).sort();
 
@@ -163,24 +147,47 @@ function InfoPanel() {
 
 function Title() {
   const [playlists] = useAtom(playlistsAtom);
-  const [currentVideoId] = useAtom(currentVideoIdAtom);
+  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
+  const [isMenuOpen] = useAtom(isMenuOpenAtom);
 
-  const currentVideo = playlists.rows.find(
-    (video: PlaylistVideo) => video.vimeoId === currentVideoId
-  );
+  const currentVideo = playlists?.rows[currentVideoIndex];
+
   const { titleColor } = currentVideo;
+  let color = "black";
+
+  if (!isMenuOpen && titleColor) {
+    color = titleColor.toLowerCase();
+  }
 
   return (
-    <h1
-      className="title"
-      style={{ color: titleColor ? titleColor.toLowerCase() : "black" }}
-    >
+    <h1 className={`title ${isMenuOpen ? "z-30" : "z-10"}`} style={{ color }}>
       Virtues
     </h1>
   );
 }
 
-function VideoPlayer() {
+function MenuToggle() {
+  const [isMenuOpen] = useAtom(isMenuOpenAtom);
+  return (
+    <>
+      <div
+        role="button"
+        className="absolute top-8 right-8 z-30"
+        onClick={handleToggleMenu}
+      >
+        {isMenuOpen ? (
+          <X size={35} weight="bold" />
+        ) : (
+          <Plus size={35} weight="bold" />
+        )}
+      </div>
+
+      {isMenuOpen && <Menu />}
+    </>
+  );
+}
+
+function App() {
   useEffect(() => {
     const player = new Player("vimeo-player");
     store.set(playerAtom, player);
@@ -190,20 +197,11 @@ function VideoPlayer() {
     <div className="video-player-wrapper">
       <Provider store={store}>
         <Title />
-        <PlaylistPicker />
+        <MenuToggle />
+        <VideoPlayer />
         <Controls />
       </Provider>
     </div>
-  );
-}
-
-function App() {
-  const [aboutPage] = useAtom(aboutPageAtom);
-  return (
-    <>
-      <VideoPlayer />
-      <p>{JSON.stringify(aboutPage.blocks.map((block: Block) => block.id))}</p>
-    </>
   );
 }
 

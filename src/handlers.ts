@@ -1,21 +1,30 @@
 // handlers
 // --------
 
+import { PlaylistVideo } from "./types.ts";
 import {
   isInfoPanelOpenAtom,
+  isMenuOpenAtom,
   bindEventsToPlayer,
   chapterIndexAtom,
   chaptersAtom,
   isMutedAtom,
   isPlayingAtom,
   playerAtom,
+  playlistsAtom,
   seekPositionAtom,
   store,
+  currentVideoIndexAtom,
 } from "./store.ts";
 
-export const handleOpenInfoPanel = () => {
-  const player = store.get(isInfoPanelOpenAtom);
-  store.set(isInfoPanelOpenAtom, !player);
+export const handleToggleInfoPanel = () => {
+  const isOpen = store.get(isInfoPanelOpenAtom);
+  store.set(isInfoPanelOpenAtom, !isOpen);
+};
+
+export const handleToggleMenu = () => {
+  const isOpen = store.get(isMenuOpenAtom);
+  store.set(isMenuOpenAtom, !isOpen);
 };
 
 export const handleMute = () => {
@@ -99,9 +108,15 @@ export const handleSetCurrentChapter = (index: number) => {
   store.set(seekPositionAtom, newChapter.startTime);
 };
 
-export const handleSetCurrentVideo = (videoId: string) => {
+export const handleSetCurrentVideo = async (videoId: string) => {
   const player = store.get(playerAtom);
+  const playlists = await store.get(playlistsAtom);
+  const newIndex = playlists?.rows?.findIndex(
+    (row: PlaylistVideo) => row.vimeoId === videoId
+  );
+
   store.set(seekPositionAtom, 0);
+  store.set(currentVideoIndexAtom, newIndex);
 
   player
     .loadVideo(videoId)

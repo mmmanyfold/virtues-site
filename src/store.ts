@@ -22,7 +22,7 @@ export const currentChapterAtom = atom<Player.VimeoChapter | null>(null);
 export const playlistsAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
-    { signal },
+    { signal }
   );
 
   return await response.json();
@@ -31,7 +31,7 @@ export const playlistsAtom = atom(async (_get, { signal }) => {
 export const aboutPageAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-about.json`,
-    { signal },
+    { signal }
   );
 
   return await response.json();
@@ -39,18 +39,14 @@ export const aboutPageAtom = atom(async (_get, { signal }) => {
 
 export const currentVideoIndexAtom = atom<number>(0);
 
-export const currentVideoIdAtom = atom(async (get) => {
-  const index = await get(currentVideoIndexAtom);
-  const playlist = await get(playlistsAtom);
-  return playlist.rows[index].vimeoId;
-})
-
 export const readOnlyCurrentSelectionAtom = atom(async (get) => {
   const playlist = await get(playlistsAtom);
   return playlist.rows[0].vimeoId || "";
 });
 
 export const isInfoPanelOpenAtom = atom<boolean>(false);
+
+export const isMenuOpenAtom = atom<boolean>(false);
 
 // subscriptions
 // -------------

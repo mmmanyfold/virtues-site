@@ -2,6 +2,9 @@ export type PlaylistVideo = {
   uuid: string;
   vimeoId: string;
   videoChapters: object[];
+  order: number;
+  videoTitle: string;
+  titleColor: string;
 };
 
 export interface NotionResponse {
