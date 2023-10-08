@@ -36,12 +36,7 @@ a:hover {
 }
 
 h1.title {
-  font-size: 5.5vw;
   line-height: 1.1;
-  text-transform: uppercase;
-  position: absolute;
-  top: 0.35em;
-  left: 0.5em;
   font-family: "Archivo Narrow", sans-serif;
   letter-spacing: -2px;
 }

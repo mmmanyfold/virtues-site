@@ -27,7 +27,7 @@ const ContentBlock = ({ block, imgShadow }: any) => {
   }
 };
 
-function Column({ blocks, imgShadow, className }: any) {
+function Section({ blocks, imgShadow, className }: any) {
   return (
     <div
       className={`flex flex-col gap-y-6 text-lg leading-tight ${
@@ -50,7 +50,7 @@ export default function About({ blocks }: any) {
     return null;
   }
 
-  const columns = blocks.reduce(
+  const sections = blocks.reduce(
     (acc: any, block: any) => {
       if (block.type === "divider") {
         return [...acc, []];
@@ -63,16 +63,15 @@ export default function About({ blocks }: any) {
   );
 
   return (
-    <div className={`about absolute z-20 w-[100%] bg-[#fcf3e9] ${isMenuOpen ? "h-[100%] overflow-hidden" : "min-h-[100%]"}`}>
-      <div className="grid grid-cols-[4fr_3fr_9fr] gap-x-12 pt-14">
-        {columns.map((column: any, i: number) => {
+    <div className={`about absolute z-20 w-[100%] bg-[#fcf3e9] ${isMenuOpen ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"}`}>
+      <div className="flex flex-col gap-y-12 sm:grid sm:grid-cols-[4fr_3fr_9fr] sm:gap-x-12 pt-14">
+        {sections.map((column: any, i: number) => {
           let className;
           if (i === 2) {
-            className = "pl-6 justify-end";
+            className = "sm:pl-6 justify-end";
           }
-
           return (
-            <Column
+            <Section
               key={`column-${i}`}
               blocks={column}
               imgShadow={i === 1}
