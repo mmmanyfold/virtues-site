@@ -52,9 +52,16 @@ export const isMenuOpenAtom = atom<boolean>(false);
 export const isAboutOpenAtom = atom<boolean>(false);
 
 export const videoSizeAtom = atom<[number, number]>([0, 0]);
+export const wrapperWidthAtom = atom<number>(0);
+export const isMediaSmallAtom = atom<boolean>(true);
 
 // subscriptions
 // -------------
+
+store.sub(wrapperWidthAtom, () => {
+  const wrapperWidth = store.get(wrapperWidthAtom);
+  store.set(isMediaSmallAtom, wrapperWidth < 890);
+});
 
 store.sub(isPlayingAtom, () => {
   const player = store.get(playerAtom);

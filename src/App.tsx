@@ -25,6 +25,8 @@ import {
   isMenuOpenAtom,
   isAboutOpenAtom,
   videoSizeAtom,
+  wrapperWidthAtom,
+  isMediaSmallAtom,
   timeInSecondsUpdateAtom,
 } from "./store.ts";
 import {
@@ -115,12 +117,14 @@ function InfoPanel() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [currentChapter] = useAtom(currentChapterAtom);
+  const [isMediaSmall] = useAtom(isMediaSmallAtom);
+
   const currentVideo = playlists[currentVideoIndex];
   const { videoTitle, vimeoChapters } = currentVideo;
   const chapterIds = Object.keys(vimeoChapters).sort();
 
   return (
-    <div className="info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll p-4 sm:px-8 sm:pt-10 sm:pb-5">
+    <div className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll ${isMediaSmall ? "p-4" : "px-8 pt-10 pb-5"}`}>
       <h2 className="italic text-2xl tracking-wide mb-2">{videoTitle}</h2>
       <div className="divide-y divide-[#a9a9a9] text-sm">
         {chapterIds.map((id) => {
@@ -154,6 +158,8 @@ function Title() {
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
+  const [isMediaSmall] = useAtom(isMediaSmallAtom);
+  
   const { titleColor } = playlists[currentVideoIndex];
 
   let color = "black";
@@ -164,7 +170,7 @@ function Title() {
 
   return (
     <h1
-      className={`title absolute text-[8vw] sm:text-[5.5vw] sm:top-[0.35em] sm:left-[0.5em] top-[0.25em] left-[0.35em] ${isInfoPanelOpen ? "z-10" : "z-40"}`}
+      className={`title absolute ${isInfoPanelOpen ? "z-10" : "z-40"} ${isMediaSmall ? "text-[8vw] top-[0.25em] left-[0.35em]" : "text-[5.5vw] top-[0.35em] left-[0.5em]"}`}
       style={{ color }}
     >
       VIRTUES
@@ -177,9 +183,12 @@ function MenuToggle() {
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
+  const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [aboutPage] = useAtom(aboutPageAtom);
-  const { titleColor } = playlists[currentVideoIndex];
 
+  const { titleColor } = playlists[currentVideoIndex];
+  const iconClass = isMediaSmall ? "text-2xl" : "text-[35px]";
+  
   let plusColor = "black";
 
   if (!isMenuOpen && !isAboutOpen && titleColor) {
@@ -190,13 +199,13 @@ function MenuToggle() {
     <>
       <div
         role="button"
-        className="absolute z-40 top-3 right-3 sm:top-8 sm:right-8"
+        className={`absolute z-40 ${isMediaSmall ? "top-3 right-3" : "top-8 right-8"}`}
         onClick={handleToggleMenu}
       >
         {isMenuOpen ? (
-          <X className="text-2xl sm:text-[35px]" weight="bold" />
+          <X className={iconClass} weight="bold" />
         ) : (
-          <Plus className="text-2xl sm:text-[35px]" weight="bold" color={plusColor} />
+          <Plus className={iconClass} weight="bold" color={plusColor} />
         )}
       </div>
 
@@ -206,19 +215,38 @@ function MenuToggle() {
   );
 }
 
-function Wrapper({ children }: React.PropsWithChildren) {
-  const windowSize = useWindowSize();
-  const [[videoWidth, videoHeight]] = useAtom(videoSizeAtom);
+function getWrapperWidth({videoWidth, videoHeight, windowWidth, windowHeight}: any) {
+  const controlsHeight = 69;
+  const windowHeightWithoutControls = windowHeight - controlsHeight;
+  const windowAspectRatio = windowWidth / windowHeightWithoutControls;
+  const videoAspectRatio = videoWidth / videoHeight;
 
-  let wrapperWidth = "100dvw";
+  let width = windowWidth;
 
-  if (windowSize.width && windowSize.width > 679 && windowSize.height && videoHeight > windowSize.height - 69) {
-    const videoAspectRatio = videoWidth / videoHeight;
-    wrapperWidth = `${(windowSize.height - 69) * videoAspectRatio}px`;
+  if (windowAspectRatio >= videoAspectRatio && videoHeight > windowHeightWithoutControls) {
+    width = (windowHeight - 69) * videoAspectRatio;
   }
 
+  return width;
+}
+
+function Wrapper({ children }: React.PropsWithChildren) {
+  const windowSize = useWindowSize();
+  const [videoSize] = useAtom(videoSizeAtom);
+  const [wrapperWidth] = useAtom(wrapperWidthAtom);
+
+  useEffect(() => {
+    const width = getWrapperWidth({
+      videoWidth: videoSize[0], 
+      videoHeight: videoSize[1], 
+      windowWidth: windowSize.width || 1, 
+      windowHeight: windowSize.height || 1
+    });
+    store.set(wrapperWidthAtom, width);
+  }, [windowSize, videoSize])
+
   return (
-    <div className="relative" style={{ width: wrapperWidth, margin: "0 auto" }}>
+    <div className="relative" style={{ width: `${wrapperWidth}px`, margin: "0 auto" }}>
       {children}
     </div>
   );

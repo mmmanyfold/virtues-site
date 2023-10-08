@@ -1,7 +1,7 @@
 import "react";
 import { RichTextObject } from "../components/Notion.tsx";
 import { useAtom } from "jotai";
-import { isMenuOpenAtom } from "../store.ts";
+import { isMenuOpenAtom, isMediaSmallAtom } from "../store.ts";
 
 const ContentBlock = ({ block, imgShadow }: any) => {
   switch (block.type) {
@@ -45,6 +45,7 @@ function Section({ blocks, imgShadow, className }: any) {
 
 export default function About({ blocks }: any) {
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
+  const [isMediaSmall] = useAtom(isMediaSmallAtom);
   
   if (!blocks) {
     return null;
@@ -64,11 +65,11 @@ export default function About({ blocks }: any) {
 
   return (
     <div className={`about absolute z-20 w-[100%] bg-[#fcf3e9] ${isMenuOpen ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"}`}>
-      <div className="flex flex-col gap-y-12 sm:grid sm:grid-cols-[4fr_3fr_9fr] sm:gap-x-12 pt-14">
+      <div className={`pt-14 ${isMediaSmall ? "flex flex-col gap-y-12" : "grid grid-cols-[4fr_3fr_9fr] gap-x-12"}`}>
         {sections.map((column: any, i: number) => {
           let className;
-          if (i === 2) {
-            className = "sm:pl-6 justify-end";
+          if (i === 2 && !isMediaSmall) {
+            className = "pl-6 justify-end";
           }
           return (
             <Section
