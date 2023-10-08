@@ -3,7 +3,7 @@ import { Provider, useAtom } from "jotai";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { default as Player } from "@vimeo/player";
 import { Seekbar as Seek } from "react-seekbar";
-import { X, Plus } from "@phosphor-icons/react";
+import { X, Plus, Info, SpeakerSimpleHigh, SpeakerSimpleSlash, Shuffle, Rewind, Play, FastForward, Pause, ArrowCounterClockwise, ArrowsDownUp, ArrowsOut, ArrowsIn } from "@phosphor-icons/react";
 import { RichTextCollection } from "./components/Notion.tsx";
 import Menu from "./components/Menu.tsx";
 import About from "./components/About.tsx";
@@ -69,24 +69,69 @@ function Seekbar() {
   );
 }
 
+function ControlButton({ariaLabel, onClick, children}: {ariaLabel: string, onClick: () => void, children: React.ReactNode}) {
+  return (
+    <button aria-label={ariaLabel} className="control-button" onClick={onClick}>
+      {children}
+    </button>
+  )
+}
+
 function Controls() {
   const [isPlaying] = useAtom(isPlayingAtom);
   const [isMuted] = useAtom(isMutedAtom);
   const [isFullscreen] = useAtom(isFullscreenAtom);
+  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
+  const [isMediaSmall] = useAtom(isMediaSmallAtom);
+
+  const iconClass = isMediaSmall ? "text-[20px]" : "text-[30px]";
 
   return (
-    <div className="flex items-center justify-around bg-[#fdfcfa] py-4">
-      <button onClick={handleToggleInfoPanel}>i</button>
-      <button onClick={handlePreviousChapter}>prev</button>
-      <button onClick={handlePlay}>{isPlaying ? "||" : "|>"}</button>
-      <button onClick={handleMute}>{isMuted ? "unmu" : "mu"}</button>
-      <button onClick={handleFullscreen}>
-        {isFullscreen ? "shrink" : "full"}
-      </button>
-      <button onClick={handleRestartPlayback}>re</button>
-      <button onClick={handleRandomChapter}>rand</button>
-      <button onClick={handleNextChapter}>next</button>
-      <button onClick={handlePlaylistJump}>j</button>
+    <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
+      {/* info */}
+      <ControlButton ariaLabel={isInfoPanelOpen ? "Close Tracklist" : "Open Tracklist"} onClick={handleToggleInfoPanel}>
+        <Info className={iconClass} weight="light" />
+      </ControlButton>
+
+      {/* mute */}
+      <ControlButton ariaLabel={isMuted ? "Unmute" : "Mute"} onClick={handleMute}>
+        {isMuted ? <SpeakerSimpleSlash className={iconClass} weight="fill" /> : <SpeakerSimpleHigh className={iconClass} weight="fill" />}
+      </ControlButton>
+
+      {/* random track */}
+      <ControlButton ariaLabel="Random Track" onClick={handleRandomChapter}>
+        <Shuffle className={iconClass} weight="bold" />
+      </ControlButton>
+
+      {/* previous track */}
+      <ControlButton ariaLabel="Previous Track" onClick={handlePreviousChapter}>
+        <Rewind className={iconClass} weight="fill" />
+      </ControlButton>
+
+      {/* play/pause */}
+      <ControlButton ariaLabel={isPlaying ? "Pause" : "Play"} onClick={handlePlay}>
+        {isPlaying ? <Pause className={iconClass} weight="fill" /> : <Play className={iconClass} weight="fill" />}
+      </ControlButton>
+
+      {/* next track */}
+      <ControlButton ariaLabel="Next Track" onClick={handleNextChapter}>
+        <FastForward className={iconClass} weight="fill" />
+      </ControlButton>
+
+      {/* restart playlist */}
+      <ControlButton ariaLabel="Restart Playlist" onClick={handleRestartPlayback}>
+        <ArrowCounterClockwise className={iconClass} weight="bold" />
+      </ControlButton>
+
+      {/* jump to different playlist */}
+      <ControlButton ariaLabel="Jump to Different Playlist" onClick={handlePlaylistJump}>
+        <ArrowsDownUp className={iconClass} weight="bold" />
+      </ControlButton>
+
+      {/* fullscreen */}
+      <ControlButton ariaLabel="Fullscreen" onClick={handleFullscreen}>
+        {isFullscreen ? <ArrowsIn className={iconClass} /> : <ArrowsOut className={iconClass} />}
+      </ControlButton>
     </div>
   );
 }
@@ -215,8 +260,7 @@ function MenuToggle() {
   );
 }
 
-function getWrapperWidth({videoWidth, videoHeight, windowWidth, windowHeight}: any) {
-  const controlsHeight = 69;
+function getWrapperWidth({controlsHeight, videoWidth, videoHeight, windowWidth, windowHeight}: any) {
   const windowHeightWithoutControls = windowHeight - controlsHeight;
   const windowAspectRatio = windowWidth / windowHeightWithoutControls;
   const videoAspectRatio = videoWidth / videoHeight;
@@ -224,7 +268,7 @@ function getWrapperWidth({videoWidth, videoHeight, windowWidth, windowHeight}: a
   let width = windowWidth;
 
   if (windowAspectRatio >= videoAspectRatio && videoHeight > windowHeightWithoutControls) {
-    width = (windowHeight - 69) * videoAspectRatio;
+    width = windowHeightWithoutControls * videoAspectRatio;
   }
 
   return width;
@@ -234,16 +278,18 @@ function Wrapper({ children }: React.PropsWithChildren) {
   const windowSize = useWindowSize();
   const [videoSize] = useAtom(videoSizeAtom);
   const [wrapperWidth] = useAtom(wrapperWidthAtom);
+  const [isMediaSmall] = useAtom(isMediaSmallAtom);
 
   useEffect(() => {
     const width = getWrapperWidth({
+      controlsHeight: isMediaSmall ? 57 : 67,
       videoWidth: videoSize[0], 
       videoHeight: videoSize[1], 
       windowWidth: windowSize.width || 1, 
       windowHeight: windowSize.height || 1
     });
     store.set(wrapperWidthAtom, width);
-  }, [windowSize, videoSize])
+  }, [windowSize, videoSize, isMediaSmall])
 
   return (
     <div className="relative" style={{ width: `${wrapperWidth}px`, margin: "0 auto" }}>
