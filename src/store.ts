@@ -93,20 +93,11 @@ store.sub(seekingPositionAtom, () => {
     .catch(handleError);
 });
 
-// store.sub(currentVideoIndexAtom, () => {
-//   const player = store.get(playerAtom);
-//
-//   player
-//       .loadVideo(videoUrl)
-//       .then(() => {
-//         bindEventsToPlayer();
-//         player.play().catch(handleError);
-//       })
-//       .catch(handleError);
-// })
-
 export const bindEventsToPlayer = () => {
   const player = store.get(playerAtom);
+  const isMuted = store.get(isMutedAtom);
+
+  player.setMuted(isMuted).catch(handleError);
 
   player
     .getDuration()
