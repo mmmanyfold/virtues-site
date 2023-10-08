@@ -23,6 +23,7 @@ import {
   isMenuOpenAtom,
 } from "./store.ts";
 import {
+  createVimeoPlayerUrl,
   handleFullscreen,
   handleMute,
   handleNextChapter,
@@ -98,7 +99,7 @@ function VideoPlayer() {
           // data-vimeo-autoplay="true"
           data-vimeo-portrait="false"
           data-vimeo-title="false"
-          data-vimeo-url={`https://player.vimeo.com/video/${firstVideoSelection}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}
+          data-vimeo-url={createVimeoPlayerUrl(firstVideoSelection)}
         ></div>
         {isInfoPanelOpen && <InfoPanel />}
       </div>

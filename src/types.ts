@@ -1,6 +1,6 @@
 export type PlaylistVideo = {
   uuid: string;
-  vimeoId: string;
+  vimeoPlayerURL: string;
   videoChapters: object[];
   order: number;
   videoTitle: string;

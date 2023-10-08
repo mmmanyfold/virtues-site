@@ -41,7 +41,7 @@ export const currentVideoIndexAtom = atom<number>(0);
 
 export const readOnlyCurrentSelectionAtom = atom(async (get) => {
   const playlist = await get(playlistsAtom);
-  return playlist.rows[0].vimeoId || "";
+  return playlist.rows[0].vimeoPlayerURL || "";
 });
 
 export const isInfoPanelOpenAtom = atom<boolean>(false);

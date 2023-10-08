@@ -17,6 +17,17 @@ import {
   currentVideoIndexAtom,
 } from "./store.ts";
 
+export const createVimeoPlayerUrl = (baseUrl: string) => {
+  const url = new URL(baseUrl);
+  url.searchParams.set("badge", "0");
+  url.searchParams.set("autopause", "0");
+  url.searchParams.set("quality_selector", "1");
+  url.searchParams.set("progress_bar", "1");
+  url.searchParams.set("player_id", "0");
+  url.searchParams.set("app_id", "58479");
+  return url.toString();
+}
+
 export const handleToggleInfoPanel = () => {
   const isOpen = store.get(isInfoPanelOpenAtom);
   store.set(isInfoPanelOpenAtom, !isOpen);
@@ -108,18 +119,19 @@ export const handleSetCurrentChapter = (index: number) => {
   store.set(seekPositionAtom, newChapter.startTime);
 };
 
-export const handleSetCurrentVideo = async (videoId: string) => {
+export const handleSetCurrentVideo = async (videoUrl: string) => {
   const player = store.get(playerAtom);
   const playlists = await store.get(playlistsAtom);
   const newIndex = playlists?.rows?.findIndex(
-    (row: PlaylistVideo) => row.vimeoId === videoId
+    (row: PlaylistVideo) => row.vimeoPlayerURL === videoUrl
   );
 
   store.set(seekPositionAtom, 0);
   store.set(currentVideoIndexAtom, newIndex);
+  store.set(isMenuOpenAtom, false);
 
   player
-    .loadVideo(videoId)
+    .loadVideo(createVimeoPlayerUrl(videoUrl))
     .then(() => {
       bindEventsToPlayer();
       player.play().catch(handleError);
