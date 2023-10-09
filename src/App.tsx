@@ -183,10 +183,16 @@ function InfoPanel() {
       <div className="divide-y divide-[#a9a9a9] text-sm">
         {chapterIds.map((id) => {
           const chapterNumber = parseInt(id);
-          const chapter = chapters[chapterNumber - 1];
-          const nextChapter = chapters.length >= chapterNumber && chapters[chapterNumber];
-          const start = chapter.startTime;
-          const end = nextChapter ? nextChapter.startTime - 1 : duration;
+          
+          let start;
+          let end;
+
+          if (chapters?.length) {
+            const chapter = chapters[chapterNumber - 1];
+            const nextChapter = chapters.length >= chapterNumber && chapters[chapterNumber];
+            start = chapter.startTime;
+            end = nextChapter ? nextChapter.startTime - 1 : duration;
+          }
 
           const isCurrentChapter = currentChapter
             ? currentChapter?.index === chapterNumber
@@ -205,7 +211,7 @@ function InfoPanel() {
                   <RichTextCollection objects={vimeoChapters[id]} />
                 </div>
               </div>
-              <p>{formatTimestamp(start)}—{formatTimestamp(end)}</p>
+              {start !== undefined && end !== undefined && <p>{formatTimestamp(start)}—{formatTimestamp(end)}</p>}
             </div>
           );
         })}
