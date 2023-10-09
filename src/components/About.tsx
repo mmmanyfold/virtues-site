@@ -46,7 +46,7 @@ function Section({ blocks, imgShadow, className }: any) {
 export default function About({ blocks }: any) {
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
-  
+
   if (!blocks) {
     return null;
   }
@@ -60,12 +60,22 @@ export default function About({ blocks }: any) {
         return acc;
       }
     },
-    [[]],
+    [[]]
   );
 
   return (
-    <div className={`about absolute z-20 w-[100%] bg-[#fcf3e9] ${isMenuOpen ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"}`}>
-      <div className={`pt-14 ${isMediaSmall ? "flex flex-col gap-y-12" : "grid grid-cols-[4fr_3fr_9fr] gap-x-12"}`}>
+    <div
+      className={`about absolute z-20 w-[100%] bg-[#fcf3e9] ${
+        isMenuOpen ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"
+      }`}
+    >
+      <div
+        className={`pt-14 ${
+          isMediaSmall
+            ? "flex flex-col gap-y-12"
+            : "grid grid-cols-[4fr_3fr_9fr] gap-x-12"
+        }`}
+      >
         {sections.map((column: any, i: number) => {
           let className;
           if (i === 2 && !isMediaSmall) {

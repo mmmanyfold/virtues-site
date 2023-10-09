@@ -3,7 +3,22 @@ import { Provider, useAtom } from "jotai";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { default as Player } from "@vimeo/player";
 import { Seekbar as Seek } from "react-seekbar";
-import { X, Plus, Info, SpeakerSimpleHigh, SpeakerSimpleSlash, Shuffle, Rewind, Play, FastForward, Pause, ArrowCounterClockwise, ArrowsDownUp, ArrowsOut, ArrowsIn } from "@phosphor-icons/react";
+import {
+  X,
+  Plus,
+  Info,
+  SpeakerSimpleHigh,
+  SpeakerSimpleSlash,
+  Shuffle,
+  Rewind,
+  Play,
+  FastForward,
+  Pause,
+  ArrowCounterClockwise,
+  ArrowsDownUp,
+  ArrowsOut,
+  ArrowsIn,
+} from "@phosphor-icons/react";
 import { RichTextCollection } from "./components/Notion.tsx";
 import Menu from "./components/Menu.tsx";
 import About from "./components/About.tsx";
@@ -70,12 +85,20 @@ function Seekbar() {
   );
 }
 
-function ControlButton({ariaLabel, onClick, children}: {ariaLabel: string, onClick: () => void, children: React.ReactNode}) {
+function ControlButton({
+  ariaLabel,
+  onClick,
+  children,
+}: {
+  ariaLabel: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button aria-label={ariaLabel} className="relative" onClick={onClick}>
       {children}
     </button>
-  )
+  );
 }
 
 function Controls() {
@@ -90,13 +113,23 @@ function Controls() {
   return (
     <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
       {/* info */}
-      <ControlButton ariaLabel={isInfoPanelOpen ? "Close tracklist" : "Open tracklist"} onClick={handleToggleInfoPanel}>
+      <ControlButton
+        ariaLabel={isInfoPanelOpen ? "Close tracklist" : "Open tracklist"}
+        onClick={handleToggleInfoPanel}
+      >
         <Info className={iconClass} weight="light" />
       </ControlButton>
 
       {/* mute */}
-      <ControlButton ariaLabel={isMuted ? "Unmute" : "Mute"} onClick={handleMute}>
-        {isMuted ? <SpeakerSimpleSlash className={iconClass} weight="fill" /> : <SpeakerSimpleHigh className={iconClass} weight="fill" />}
+      <ControlButton
+        ariaLabel={isMuted ? "Unmute" : "Mute"}
+        onClick={handleMute}
+      >
+        {isMuted ? (
+          <SpeakerSimpleSlash className={iconClass} weight="fill" />
+        ) : (
+          <SpeakerSimpleHigh className={iconClass} weight="fill" />
+        )}
       </ControlButton>
 
       {/* random track */}
@@ -110,8 +143,15 @@ function Controls() {
       </ControlButton>
 
       {/* play/pause */}
-      <ControlButton ariaLabel={isPlaying ? "Pause" : "Play"} onClick={handlePlay}>
-        {isPlaying ? <Pause className={iconClass} weight="fill" /> : <Play className={iconClass} weight="fill" />}
+      <ControlButton
+        ariaLabel={isPlaying ? "Pause" : "Play"}
+        onClick={handlePlay}
+      >
+        {isPlaying ? (
+          <Pause className={iconClass} weight="fill" />
+        ) : (
+          <Play className={iconClass} weight="fill" />
+        )}
       </ControlButton>
 
       {/* next track */}
@@ -120,7 +160,10 @@ function Controls() {
       </ControlButton>
 
       {/* restart playlist */}
-      <ControlButton ariaLabel="Restart playlist" onClick={handleRestartPlayback}>
+      <ControlButton
+        ariaLabel="Restart playlist"
+        onClick={handleRestartPlayback}
+      >
         <ArrowCounterClockwise className={iconClass} weight="bold" />
       </ControlButton>
 
@@ -131,7 +174,11 @@ function Controls() {
 
       {/* fullscreen */}
       <ControlButton ariaLabel="Fullscreen" onClick={handleFullscreen}>
-        {isFullscreen ? <ArrowsIn className={iconClass} /> : <ArrowsOut className={iconClass} />}
+        {isFullscreen ? (
+          <ArrowsIn className={iconClass} />
+        ) : (
+          <ArrowsOut className={iconClass} />
+        )}
       </ControlButton>
     </div>
   );
@@ -162,7 +209,11 @@ function VideoPlayer() {
 function formatTimestamp(seconds: number) {
   var minutes = Math.floor(seconds / 60);
   var seconds = seconds % 60;
-  return minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+  return (
+    minutes.toString().padStart(2, "0") +
+    ":" +
+    seconds.toString().padStart(2, "0")
+  );
 }
 
 function InfoPanel() {
@@ -178,18 +229,23 @@ function InfoPanel() {
   const chapterIds = Object.keys(vimeoChapters).sort();
 
   return (
-    <div className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll ${isMediaSmall ? "p-4" : "px-8 pt-10 pb-5"}`}>
+    <div
+      className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll ${
+        isMediaSmall ? "p-4" : "px-8 pt-10 pb-5"
+      }`}
+    >
       <h2 className="italic text-2xl tracking-wide mb-2">{videoTitle}</h2>
       <div className="divide-y divide-[#a9a9a9] text-sm">
         {chapterIds.map((id) => {
           const chapterNumber = parseInt(id);
-          
+
           let start;
           let end;
 
           if (chapters?.length) {
             const chapter = chapters[chapterNumber - 1];
-            const nextChapter = chapters.length >= chapterNumber && chapters[chapterNumber];
+            const nextChapter =
+              chapters.length >= chapterNumber && chapters[chapterNumber];
             start = chapter.startTime;
             end = nextChapter ? nextChapter.startTime - 1 : duration;
           }
@@ -211,7 +267,11 @@ function InfoPanel() {
                   <RichTextCollection objects={vimeoChapters[id]} />
                 </div>
               </div>
-              {start !== undefined && end !== undefined && <p>{formatTimestamp(start)}—{formatTimestamp(end)}</p>}
+              {start !== undefined && end !== undefined && (
+                <p>
+                  {formatTimestamp(start)}—{formatTimestamp(end)}
+                </p>
+              )}
             </div>
           );
         })}
@@ -227,7 +287,7 @@ function Title() {
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
-  
+
   const { titleColor } = playlists[currentVideoIndex];
 
   let color = "black";
@@ -238,7 +298,11 @@ function Title() {
 
   return (
     <h1
-      className={`title absolute ${isInfoPanelOpen ? "z-10" : "z-40"} ${isMediaSmall ? "text-[3rem] top-[0.25em] left-[0.35em]" : "text-[5.5vw] top-[0.35em] left-[0.5em]"}`}
+      className={`title absolute ${isInfoPanelOpen ? "z-10" : "z-40"} ${
+        isMediaSmall
+          ? "text-[3rem] top-[0.25em] left-[0.35em]"
+          : "text-[5.5vw] top-[0.35em] left-[0.5em]"
+      }`}
       style={{ color }}
     >
       VIRTUES
@@ -256,7 +320,7 @@ function MenuToggle() {
 
   const { titleColor } = playlists[currentVideoIndex];
   const iconClass = isMediaSmall ? "text-[2rem]" : "text-[35px]";
-  
+
   let plusColor = "black";
 
   if (!isMenuOpen && !isAboutOpen && titleColor) {
@@ -267,7 +331,9 @@ function MenuToggle() {
     <>
       <div
         role="button"
-        className={`absolute z-40 ${isMediaSmall ? "top-3 right-3" : "top-8 right-8"}`}
+        className={`absolute z-40 ${
+          isMediaSmall ? "top-3 right-3" : "top-8 right-8"
+        }`}
         onClick={handleToggleMenu}
       >
         {isMenuOpen ? (
@@ -283,14 +349,23 @@ function MenuToggle() {
   );
 }
 
-function getWrapperWidth({controlsHeight, videoWidth, videoHeight, windowWidth, windowHeight}: any) {
+function getWrapperWidth({
+  controlsHeight,
+  videoWidth,
+  videoHeight,
+  windowWidth,
+  windowHeight,
+}: any) {
   const windowHeightWithoutControls = windowHeight - controlsHeight;
   const windowAspectRatio = windowWidth / windowHeightWithoutControls;
   const videoAspectRatio = videoWidth / videoHeight;
 
   let width = windowWidth;
 
-  if (windowAspectRatio >= videoAspectRatio && videoHeight > windowHeightWithoutControls) {
+  if (
+    windowAspectRatio >= videoAspectRatio &&
+    videoHeight > windowHeightWithoutControls
+  ) {
     width = windowHeightWithoutControls * videoAspectRatio;
   }
 
@@ -306,16 +381,19 @@ function Wrapper({ children }: React.PropsWithChildren) {
   useEffect(() => {
     const width = getWrapperWidth({
       controlsHeight: isMediaSmall ? 57 : 67,
-      videoWidth: videoSize[0], 
-      videoHeight: videoSize[1], 
-      windowWidth: windowSize.width || 1, 
-      windowHeight: windowSize.height || 1
+      videoWidth: videoSize[0],
+      videoHeight: videoSize[1],
+      windowWidth: windowSize.width || 1,
+      windowHeight: windowSize.height || 1,
     });
     store.set(wrapperWidthAtom, width);
-  }, [windowSize, videoSize, isMediaSmall])
+  }, [windowSize, videoSize, isMediaSmall]);
 
   return (
-    <div className="relative" style={{ width: `${wrapperWidth}px`, margin: "0 auto" }}>
+    <div
+      className="relative"
+      style={{ width: `${wrapperWidth}px`, margin: "0 auto" }}
+    >
       {children}
     </div>
   );

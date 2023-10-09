@@ -122,7 +122,7 @@ export const handleSetCurrentVideo = async (videoUrl: string) => {
   const player = store.get(playerAtom);
   const playlists = await store.get(playlistsAtom);
   const newIndex = playlists?.findIndex(
-    (row: PlaylistVideo) => row.vimeoPlayerURL === videoUrl,
+    (row: PlaylistVideo) => row.vimeoPlayerURL === videoUrl
   );
 
   store.set(seekingPositionAtom, 0);

@@ -23,7 +23,7 @@ export const currentChapterAtom = atom<Player.VimeoChapter | null>(null);
 export const playlistsAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
-    { signal },
+    { signal }
   );
   const { rows } = await response.json();
   return rows;
@@ -34,7 +34,7 @@ export const timeInSecondsUpdateAtom = atom<number>(0);
 export const aboutPageAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-about.json`,
-    { signal },
+    { signal }
   );
 
   return await response.json();

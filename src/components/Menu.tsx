@@ -27,7 +27,7 @@ export default function Menu() {
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
   const orderedPlaylists = playlists.sort(
-    (a: PlaylistVideo, b: PlaylistVideo) => a.order - b.order,
+    (a: PlaylistVideo, b: PlaylistVideo) => a.order - b.order
   );
 
   return (
@@ -36,7 +36,7 @@ export default function Menu() {
         {orderedPlaylists.map(
           (
             { uuid, videoTitle, vimeoPlayerURL }: PlaylistVideo,
-            index: number,
+            index: number
           ) => {
             const isCurrentVideo = index === currentVideoIndex;
             return (
@@ -47,7 +47,7 @@ export default function Menu() {
                 onClick={() => handleSetCurrentVideo(vimeoPlayerURL)}
               />
             );
-          },
+          }
         )}
         <MenuItem
           title="About"

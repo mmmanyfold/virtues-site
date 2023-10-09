@@ -105,8 +105,8 @@ button[aria-label]:hover:after {
   display: block;
   overflow: hidden;
   text-wrap: nowrap;
-  border-radius: .2em;
-  padding: 0 .6em;
+  border-radius: 0.2em;
+  padding: 0 0.6em;
   content: attr(aria-label);
   color: #fff;
   background: #000;
