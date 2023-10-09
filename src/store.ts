@@ -143,4 +143,8 @@ export const bindEventsToPlayer = () => {
   player.on("timeupdate", (timeupdate: TimeUpdate) => {
     store.set(timeInSecondsUpdateAtom, Math.trunc(timeupdate.seconds));
   });
+
+  player.on("fullscreenchange", ({ fullscreen }: any) => {
+    store.set(isFullscreenAtom, fullscreen);
+  });
 };

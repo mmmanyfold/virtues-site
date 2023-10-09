@@ -96,3 +96,21 @@ h1.title {
 .code {
   font-family: monospace;
 }
+
+button[aria-label]:hover:after {
+  position: absolute;
+  z-index: 10;
+  top: -2.2em;
+  left: -25%;
+  display: block;
+  overflow: hidden;
+  text-wrap: nowrap;
+  border-radius: .2em;
+  padding: 0 .6em;
+  content: attr(aria-label);
+  color: #fff;
+  background: #000;
+  font-size: 0.75em;
+  line-height: 2em;
+  text-align: center;
+}

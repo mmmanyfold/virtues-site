@@ -71,7 +71,7 @@ function Seekbar() {
 
 function ControlButton({ariaLabel, onClick, children}: {ariaLabel: string, onClick: () => void, children: React.ReactNode}) {
   return (
-    <button aria-label={ariaLabel} className="control-button" onClick={onClick}>
+    <button aria-label={ariaLabel} className="relative" onClick={onClick}>
       {children}
     </button>
   )
@@ -89,7 +89,7 @@ function Controls() {
   return (
     <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
       {/* info */}
-      <ControlButton ariaLabel={isInfoPanelOpen ? "Close Tracklist" : "Open Tracklist"} onClick={handleToggleInfoPanel}>
+      <ControlButton ariaLabel={isInfoPanelOpen ? "Close tracklist" : "Open tracklist"} onClick={handleToggleInfoPanel}>
         <Info className={iconClass} weight="light" />
       </ControlButton>
 
@@ -99,12 +99,12 @@ function Controls() {
       </ControlButton>
 
       {/* random track */}
-      <ControlButton ariaLabel="Random Track" onClick={handleRandomChapter}>
+      <ControlButton ariaLabel="Random track" onClick={handleRandomChapter}>
         <Shuffle className={iconClass} weight="bold" />
       </ControlButton>
 
       {/* previous track */}
-      <ControlButton ariaLabel="Previous Track" onClick={handlePreviousChapter}>
+      <ControlButton ariaLabel="Previous track" onClick={handlePreviousChapter}>
         <Rewind className={iconClass} weight="fill" />
       </ControlButton>
 
@@ -114,17 +114,17 @@ function Controls() {
       </ControlButton>
 
       {/* next track */}
-      <ControlButton ariaLabel="Next Track" onClick={handleNextChapter}>
+      <ControlButton ariaLabel="Next track" onClick={handleNextChapter}>
         <FastForward className={iconClass} weight="fill" />
       </ControlButton>
 
       {/* restart playlist */}
-      <ControlButton ariaLabel="Restart Playlist" onClick={handleRestartPlayback}>
+      <ControlButton ariaLabel="Restart playlist" onClick={handleRestartPlayback}>
         <ArrowCounterClockwise className={iconClass} weight="bold" />
       </ControlButton>
 
       {/* jump to different playlist */}
-      <ControlButton ariaLabel="Jump to Different Playlist" onClick={handlePlaylistJump}>
+      <ControlButton ariaLabel="Jump to playlist" onClick={handlePlaylistJump}>
         <ArrowsDownUp className={iconClass} weight="bold" />
       </ControlButton>
 
@@ -146,7 +146,7 @@ function VideoPlayer() {
       <div className="relative cursor-pointer" onClick={handlePlay}>
         <div
           id="vimeo-player"
-          className="relative overflow-hidden w-[100%] pointer-events-none"
+          className={`relative overflow-hidden w-[100%]`}
           style={{
             paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
           }}
