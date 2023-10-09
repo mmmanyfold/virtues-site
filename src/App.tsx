@@ -15,6 +15,7 @@ import {
   seekingPositionAtom,
   isMutedAtom,
   durationAtom,
+  chaptersAtom,
   currentChapterAtom,
   playlistsAtom,
   currentVideoIndexAtom,
@@ -158,11 +159,19 @@ function VideoPlayer() {
   );
 }
 
+function formatTimestamp(seconds: number) {
+  var minutes = Math.floor(seconds / 60);
+  var seconds = seconds % 60;
+  return minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+}
+
 function InfoPanel() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
   const [currentChapter] = useAtom(currentChapterAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
+  const [chapters] = useAtom(chaptersAtom);
+  const [duration] = useAtom(durationAtom);
 
   const currentVideo = playlists[currentVideoIndex];
   const { videoTitle, vimeoChapters } = currentVideo;
@@ -174,6 +183,11 @@ function InfoPanel() {
       <div className="divide-y divide-[#a9a9a9] text-sm">
         {chapterIds.map((id) => {
           const chapterNumber = parseInt(id);
+          const chapter = chapters[chapterNumber - 1];
+          const nextChapter = chapters.length >= chapterNumber && chapters[chapterNumber];
+          const start = chapter.startTime;
+          const end = nextChapter ? nextChapter.startTime - 1 : duration;
+
           const isCurrentChapter = currentChapter
             ? currentChapter?.index === chapterNumber
             : chapterNumber === 1;
@@ -181,14 +195,17 @@ function InfoPanel() {
             <div
               key={id}
               role="button"
-              className="flex gap-x-4 py-6"
+              className="py-6"
               style={{ color: isCurrentChapter ? "black" : "#908f8f" }}
               onClick={() => handleSetCurrentChapter(chapterNumber - 1)}
             >
-              <div className="italic">#{chapterNumber}</div>
-              <div>
-                <RichTextCollection objects={vimeoChapters[id]} />
+              <div className="flex gap-x-4 mb-6">
+                <div className="italic">#{chapterNumber}</div>
+                <div>
+                  <RichTextCollection objects={vimeoChapters[id]} />
+                </div>
               </div>
+              <p>{formatTimestamp(start)}—{formatTimestamp(end)}</p>
             </div>
           );
         })}
