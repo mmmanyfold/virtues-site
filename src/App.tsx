@@ -215,7 +215,7 @@ function Title() {
 
   return (
     <h1
-      className={`title absolute ${isInfoPanelOpen ? "z-10" : "z-40"} ${isMediaSmall ? "text-[8vw] top-[0.25em] left-[0.35em]" : "text-[5.5vw] top-[0.35em] left-[0.5em]"}`}
+      className={`title absolute ${isInfoPanelOpen ? "z-10" : "z-40"} ${isMediaSmall ? "text-[3rem] top-[0.25em] left-[0.35em]" : "text-[5.5vw] top-[0.35em] left-[0.5em]"}`}
       style={{ color }}
     >
       VIRTUES
@@ -232,7 +232,7 @@ function MenuToggle() {
   const [aboutPage] = useAtom(aboutPageAtom);
 
   const { titleColor } = playlists[currentVideoIndex];
-  const iconClass = isMediaSmall ? "text-2xl" : "text-[35px]";
+  const iconClass = isMediaSmall ? "text-[2rem]" : "text-[35px]";
   
   let plusColor = "black";
 
