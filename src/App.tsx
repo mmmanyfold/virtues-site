@@ -359,15 +359,15 @@ function MenuToggle() {
 }
 
 function getWrapperWidth({
-  controlsHeight,
-  videoWidth,
-  videoHeight,
+  // controlsHeight,
+  // videoWidth,
+  // videoHeight,
   windowWidth,
-  windowHeight,
+  // windowHeight,
 }: any) {
-  const windowHeightWithoutControls = windowHeight - controlsHeight;
-  const windowAspectRatio = windowWidth / windowHeightWithoutControls;
-  const videoAspectRatio = videoWidth / videoHeight;
+  // const windowHeightWithoutControls = windowHeight - controlsHeight;
+  // const windowAspectRatio = windowWidth / windowHeightWithoutControls;
+  // const videoAspectRatio = videoWidth / videoHeight;
 
   let width = windowWidth;
 
