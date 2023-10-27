@@ -65,7 +65,7 @@ export default function About({ blocks }: any) {
 
   return (
     <div
-      className={`about absolute z-20 w-[100%] bg-[#fcf3e9] ${
+      className={`about absolute z-20 w-[100%] h-[100dvh] overflow-scroll bg-[#fcf3e9] ${
         isMenuOpen ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"
       }`}
     >

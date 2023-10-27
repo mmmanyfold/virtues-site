@@ -362,12 +362,12 @@ function getWrapperWidth({
 
   let width = windowWidth;
 
-  if (
-    windowAspectRatio >= videoAspectRatio &&
-    videoHeight > windowHeightWithoutControls
-  ) {
-    width = windowHeightWithoutControls * videoAspectRatio;
-  }
+  // if (
+  //   windowAspectRatio >= videoAspectRatio &&
+  //   videoHeight > windowHeightWithoutControls
+  // ) {
+  //   width = windowHeightWithoutControls * videoAspectRatio;
+  // }
 
   return width;
 }
