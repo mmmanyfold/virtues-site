@@ -280,6 +280,15 @@ function InfoPanel() {
   );
 }
 
+function VideoFooter() {
+  return (
+    <div className="sticky bottom-0 z-10">
+      <Seekbar />
+      <Controls />
+    </div>
+  );
+}
+
 function Title() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
@@ -411,8 +420,7 @@ function App() {
         <Title />
         <MenuToggle />
         <VideoPlayer />
-        <Seekbar />
-        <Controls />
+        <VideoFooter />
       </Wrapper>
     </Provider>
   );
