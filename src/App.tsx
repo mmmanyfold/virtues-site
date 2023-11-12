@@ -231,7 +231,7 @@ function InfoPanel() {
 
   return (
     <div
-      className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll ${
+      className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll opacity-90 ${
         isMediaSmall ? "p-4" : "px-8 pt-10 pb-5"
       }`}
     >
@@ -308,7 +308,7 @@ function Title() {
 
   return (
     <h1
-      className={`title absolute ${isInfoPanelOpen ? "z-10" : "z-40"} ${
+      className={`title absolute ${isInfoPanelOpen ? "hidden" : "z-40"} ${
         isMediaSmall
           ? "text-[3rem] top-[0.25em] left-[0.35em]"
           : "text-[5.5vw] top-[0.35em] left-[0.5em]"
@@ -378,12 +378,13 @@ function getWrapperWidth({
   return width;
 }
 
-function VideoWrapper({ children }: React.PropsWithChildren) {
+function VideoWrapper() {
   const windowSize = useWindowSize();
   const [windowWidth] = useAtom(windowWidthAtom);
   const [videoSize] = useAtom(videoSizeAtom);
   const [wrapperWidth] = useAtom(wrapperWidthAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
+  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
 
   useEffect(() => {
     const width = getWrapperWidth({
@@ -400,12 +401,15 @@ function VideoWrapper({ children }: React.PropsWithChildren) {
   const positionLeft = wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
 
   return (
-    <div
-      className="relative"
-      style={{ width: `${wrapperWidth}px`, left: positionLeft }}
-    >
-      {children}
-    </div>
+    <>
+      <div
+        className="relative"
+        style={{ width: `${wrapperWidth}px`, left: positionLeft }}
+      >
+        <VideoPlayer />
+      </div>
+      {isInfoPanelOpen && <InfoPanel />}
+    </>
   );
 }
 
@@ -419,9 +423,7 @@ function App() {
     <Provider store={store}>
       <Title />
       <MenuToggle />
-      <VideoWrapper>
-        <VideoPlayer />
-      </VideoWrapper>
+      <VideoWrapper />
       <VideoFooter />
     </Provider>
   );
