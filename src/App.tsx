@@ -378,7 +378,7 @@ function getWrapperWidth({
   return width;
 }
 
-function Wrapper({ children }: React.PropsWithChildren) {
+function VideoWrapper({ children }: React.PropsWithChildren) {
   const windowSize = useWindowSize();
   const [windowWidth] = useAtom(windowWidthAtom);
   const [videoSize] = useAtom(videoSizeAtom);
@@ -417,11 +417,11 @@ function App() {
 
   return (
     <Provider store={store}>
-      <Wrapper>
-        <Title />
-        <MenuToggle />
+      <Title />
+      <MenuToggle />
+      <VideoWrapper>
         <VideoPlayer />
-      </Wrapper>
+      </VideoWrapper>
       <VideoFooter />
     </Provider>
   );
