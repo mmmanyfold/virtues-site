@@ -42,6 +42,7 @@ import {
   isAboutOpenAtom,
   videoSizeAtom,
   wrapperWidthAtom,
+  windowWidthAtom,
   isMediaSmallAtom,
   timeInSecondsUpdateAtom,
 } from "./store.ts";
@@ -379,6 +380,7 @@ function getWrapperWidth({
 
 function Wrapper({ children }: React.PropsWithChildren) {
   const windowSize = useWindowSize();
+  const [windowWidth] = useAtom(windowWidthAtom);
   const [videoSize] = useAtom(videoSizeAtom);
   const [wrapperWidth] = useAtom(wrapperWidthAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
@@ -392,9 +394,9 @@ function Wrapper({ children }: React.PropsWithChildren) {
       windowHeight: windowSize.height || 1,
     });
     store.set(wrapperWidthAtom, width);
+    store.set(windowWidthAtom, windowSize.width || 1);
   }, [windowSize, videoSize, isMediaSmall]);
 
-  const windowWidth = windowSize.width || 1;
   const positionLeft = wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
 
   return (
