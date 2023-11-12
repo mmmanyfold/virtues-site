@@ -359,24 +359,20 @@ function MenuToggle() {
 }
 
 function getWrapperWidth({
-  // controlsHeight,
-  // videoWidth,
-  // videoHeight,
+  controlsHeight,
+  videoWidth,
+  videoHeight,
   windowWidth,
-  // windowHeight,
+  windowHeight,
 }: any) {
-  // const windowHeightWithoutControls = windowHeight - controlsHeight;
-  // const windowAspectRatio = windowWidth / windowHeightWithoutControls;
-  // const videoAspectRatio = videoWidth / videoHeight;
+  const windowHeightWithoutControls = windowHeight - controlsHeight;
+  const videoAspectRatio = videoWidth / videoHeight;
 
-  let width = windowWidth;
+  let width = windowHeightWithoutControls * videoAspectRatio;
 
-  // if (
-  //   windowAspectRatio >= videoAspectRatio &&
-  //   videoHeight > windowHeightWithoutControls
-  // ) {
-  //   width = windowHeightWithoutControls * videoAspectRatio;
-  // }
+  if (width < windowWidth) {
+    width = windowWidth;
+  }
 
   return width;
 }
@@ -398,10 +394,13 @@ function Wrapper({ children }: React.PropsWithChildren) {
     store.set(wrapperWidthAtom, width);
   }, [windowSize, videoSize, isMediaSmall]);
 
+  const windowWidth = windowSize.width || 1;
+  const positionLeft = wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
+
   return (
     <div
       className="relative"
-      style={{ width: `${wrapperWidth}px`, margin: "0 auto" }}
+      style={{ width: `${wrapperWidth}px`, left: positionLeft }}
     >
       {children}
     </div>
@@ -420,8 +419,8 @@ function App() {
         <Title />
         <MenuToggle />
         <VideoPlayer />
-        <VideoFooter />
       </Wrapper>
+      <VideoFooter />
     </Provider>
   );
 }
