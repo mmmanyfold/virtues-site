@@ -106,9 +106,9 @@ function ControlButton({
 
 const getRandomInt = (max: number) => {
   return Math.floor(Math.random() * max);
-}
+};
 
-function ShowcaseControls({currentVideo}: {currentVideo: any}) {
+function ShowcaseControls({ currentVideo }: { currentVideo: any }) {
   const [isPlaying] = useAtom(isPlayingAtom);
   const [isMuted] = useAtom(isMutedAtom);
   const [isFullscreen] = useAtom(isFullscreenAtom);
@@ -120,14 +120,17 @@ function ShowcaseControls({currentVideo}: {currentVideo: any}) {
   const showcaseTotal = currentVideo.videoShowCasePayload.total;
 
   const handleNext = () => {
-    const i = showcaseItemIndex === showcaseTotal - 1 ? showcaseItemIndex : showcaseItemIndex + 1;
+    const i =
+      showcaseItemIndex === showcaseTotal - 1
+        ? showcaseItemIndex
+        : showcaseItemIndex + 1;
     handleSetCurrentShowcaseItem(i);
-  }
+  };
 
   const handlePrevious = () => {
     const i = showcaseItemIndex > 0 ? showcaseItemIndex - 1 : showcaseItemIndex;
     handleSetCurrentShowcaseItem(i);
-  }
+  };
 
   const handleRandom = () => {
     let i = getRandomInt(showcaseTotal);
@@ -135,11 +138,11 @@ function ShowcaseControls({currentVideo}: {currentVideo: any}) {
       i = getRandomInt(showcaseTotal);
     }
     handleSetCurrentShowcaseItem(i);
-  }
+  };
 
   const handleRestart = () => {
     handleSetCurrentShowcaseItem(0);
-  }
+  };
 
   return (
     <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
@@ -191,10 +194,7 @@ function ShowcaseControls({currentVideo}: {currentVideo: any}) {
       </ControlButton>
 
       {/* restart playlist */}
-      <ControlButton
-        ariaLabel="Restart playlist"
-        onClick={handleRestart}
-      >
+      <ControlButton ariaLabel="Restart playlist" onClick={handleRestart}>
         <ArrowCounterClockwise className={iconClass} weight="bold" />
       </ControlButton>
 
@@ -302,7 +302,9 @@ function VideoPlayer() {
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
   const [[width, height]] = useAtom(videoSizeAtom);
 
-  const firstVideoUrl = !!firstVideoSelection.videoShowCasePayload.data ? firstVideoSelection.videoShowCasePayload.data[0].player_embed_url : firstVideoSelection.vimeoPlayerURL;
+  const firstVideoUrl = !!firstVideoSelection.videoShowCasePayload.data
+    ? firstVideoSelection.videoShowCasePayload.data[0].player_embed_url
+    : firstVideoSelection.vimeoPlayerURL;
 
   return (
     <Suspense fallback={<div>loading...</div>}>
@@ -522,7 +524,8 @@ function VideoWrapper() {
     store.set(windowWidthAtom, windowSize.width || 1);
   }, [windowSize, videoSize, isMediaSmall]);
 
-  const positionLeft = wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
+  const positionLeft =
+    wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
 
   return (
     <>

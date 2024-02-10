@@ -123,7 +123,9 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
   const player = store.get(playerAtom);
   const playlists = await store.get(playlistsAtom);
   const { vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
-  const videoUrl = !!videoShowCasePayload.data ? videoShowCasePayload.data[0].player_embed_url : vimeoPlayerURL;
+  const videoUrl = !!videoShowCasePayload.data
+    ? videoShowCasePayload.data[0].player_embed_url
+    : vimeoPlayerURL;
 
   store.set(seekingPositionAtom, 0);
   store.set(currentVideoIndexAtom, newIndex);

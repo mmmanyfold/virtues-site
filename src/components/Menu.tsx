@@ -35,10 +35,7 @@ export default function Menu() {
       <div className="w-full h-100 overflow-scroll py-20">
         <div className="w-full flex flex-col items-center justify-center gap-y-6 text-center">
           {orderedPlaylists.map(
-            (
-              { uuid, videoTitle }: PlaylistVideo,
-              index: number
-            ) => {
+            ({ uuid, videoTitle }: PlaylistVideo, index: number) => {
               const isCurrentVideo = index === currentVideoIndex;
               return (
                 <MenuItem
