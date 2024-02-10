@@ -207,9 +207,9 @@ function VideoPlayer() {
   );
 }
 
-function formatTimestamp(seconds: number) {
-  var minutes = Math.floor(seconds / 60);
-  var seconds = seconds % 60;
+function formatTimestamp(timestamp: number) {
+  const minutes = Math.floor(timestamp / 60);
+  const seconds = timestamp % 60;
   return (
     minutes.toString().padStart(2, "0") +
     ":" +
@@ -353,7 +353,11 @@ function MenuToggle() {
         )}
       </div>
 
-      {isMenuOpen && <Menu />}
+      {isMenuOpen && (
+        <Suspense fallback={<div>...</div>}>
+          <Menu />
+        </Suspense>
+      )}
       {isAboutOpen && <About blocks={aboutPage?.blocks} />}
     </>
   );
@@ -398,7 +402,8 @@ function VideoWrapper() {
     store.set(windowWidthAtom, windowSize.width || 1);
   }, [windowSize, videoSize, isMediaSmall]);
 
-  const positionLeft = wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
+  const positionLeft =
+    wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
 
   return (
     <>
