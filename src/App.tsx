@@ -45,6 +45,7 @@ import {
   windowWidthAtom,
   isMediaSmallAtom,
   timeInSecondsUpdateAtom,
+  showcaseItemIndexAtom,
 } from "./store.ts";
 import {
   handleFullscreen,
@@ -58,6 +59,7 @@ import {
   handleSetCurrentChapter,
   handleToggleInfoPanel,
   handleToggleMenu,
+  handleSetCurrentShowcaseItem,
 } from "./handlers.ts";
 
 function Seekbar() {
@@ -99,6 +101,117 @@ function ControlButton({
     <button aria-label={ariaLabel} className="relative" onClick={onClick}>
       {children}
     </button>
+  );
+}
+
+const getRandomInt = (max: number) => {
+  return Math.floor(Math.random() * max);
+}
+
+function ShowcaseControls({currentVideo}: {currentVideo: any}) {
+  const [isPlaying] = useAtom(isPlayingAtom);
+  const [isMuted] = useAtom(isMutedAtom);
+  const [isFullscreen] = useAtom(isFullscreenAtom);
+  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
+  const [isMediaSmall] = useAtom(isMediaSmallAtom);
+  const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
+
+  const iconClass = isMediaSmall ? "text-[20px]" : "text-[30px]";
+  const showcaseTotal = currentVideo.videoShowCasePayload.total;
+
+  const handleNext = () => {
+    const i = showcaseItemIndex === showcaseTotal - 1 ? showcaseItemIndex : showcaseItemIndex + 1;
+    handleSetCurrentShowcaseItem(i);
+  }
+
+  const handlePrevious = () => {
+    const i = showcaseItemIndex > 0 ? showcaseItemIndex - 1 : showcaseItemIndex;
+    handleSetCurrentShowcaseItem(i);
+  }
+
+  const handleRandom = () => {
+    let i = getRandomInt(showcaseTotal);
+    while (i === showcaseItemIndex) {
+      i = getRandomInt(showcaseTotal);
+    }
+    handleSetCurrentShowcaseItem(i);
+  }
+
+  const handleRestart = () => {
+    handleSetCurrentShowcaseItem(0);
+  }
+
+  return (
+    <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
+      {/* info */}
+      <ControlButton
+        ariaLabel={isInfoPanelOpen ? "Close tracklist" : "Open tracklist"}
+        onClick={handleToggleInfoPanel}
+      >
+        <Info className={iconClass} weight="light" />
+      </ControlButton>
+
+      {/* mute */}
+      <ControlButton
+        ariaLabel={isMuted ? "Unmute" : "Mute"}
+        onClick={handleMute}
+      >
+        {isMuted ? (
+          <SpeakerSimpleSlash className={iconClass} weight="fill" />
+        ) : (
+          <SpeakerSimpleHigh className={iconClass} weight="fill" />
+        )}
+      </ControlButton>
+
+      {/* random track */}
+      <ControlButton ariaLabel="Random track" onClick={handleRandom}>
+        <Shuffle className={iconClass} weight="bold" />
+      </ControlButton>
+
+      {/* previous track */}
+      <ControlButton ariaLabel="Previous track" onClick={handlePrevious}>
+        <Rewind className={iconClass} weight="fill" />
+      </ControlButton>
+
+      {/* play/pause */}
+      <ControlButton
+        ariaLabel={isPlaying ? "Pause" : "Play"}
+        onClick={handlePlay}
+      >
+        {isPlaying ? (
+          <Pause className={iconClass} weight="fill" />
+        ) : (
+          <Play className={iconClass} weight="fill" />
+        )}
+      </ControlButton>
+
+      {/* next track */}
+      <ControlButton ariaLabel="Next track" onClick={handleNext}>
+        <FastForward className={iconClass} weight="fill" />
+      </ControlButton>
+
+      {/* restart playlist */}
+      <ControlButton
+        ariaLabel="Restart playlist"
+        onClick={handleRestart}
+      >
+        <ArrowCounterClockwise className={iconClass} weight="bold" />
+      </ControlButton>
+
+      {/* jump to different playlist */}
+      <ControlButton ariaLabel="Jump to playlist" onClick={handlePlaylistJump}>
+        <ArrowsDownUp className={iconClass} weight="bold" />
+      </ControlButton>
+
+      {/* fullscreen */}
+      <ControlButton ariaLabel="Fullscreen" onClick={handleFullscreen}>
+        {isFullscreen ? (
+          <ArrowsIn className={iconClass} />
+        ) : (
+          <ArrowsOut className={iconClass} />
+        )}
+      </ControlButton>
+    </div>
   );
 }
 
@@ -187,8 +300,9 @@ function Controls() {
 
 function VideoPlayer() {
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
-  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
   const [[width, height]] = useAtom(videoSizeAtom);
+
+  const firstVideoUrl = !!firstVideoSelection.videoShowCasePayload.data ? firstVideoSelection.videoShowCasePayload.data[0].player_embed_url : firstVideoSelection.vimeoPlayerURL;
 
   return (
     <Suspense fallback={<div>loading...</div>}>
@@ -199,9 +313,11 @@ function VideoPlayer() {
           style={{
             paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
           }}
-          data-vimeo-url={firstVideoSelection}
+          data-vimeo-url={firstVideoUrl}
+          data-vimeo-background="1"
+          data-vimeo-allow="autoplay"
+          data-vimeo-muted="1"
         ></div>
-        {isInfoPanelOpen && <InfoPanel />}
       </div>
     </Suspense>
   );
@@ -282,10 +398,18 @@ function InfoPanel() {
 }
 
 function VideoFooter() {
+  const [playlists] = useAtom(playlistsAtom);
+  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
+  const currentVideo = playlists[currentVideoIndex];
+
   return (
     <div className="sticky bottom-0 z-10">
       <Seekbar />
-      <Controls />
+      {!!currentVideo.videoShowCasePayload?.data ? (
+        <ShowcaseControls currentVideo={currentVideo} />
+      ) : (
+        <Controls />
+      )}
     </div>
   );
 }

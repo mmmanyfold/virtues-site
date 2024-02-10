@@ -5,7 +5,7 @@ import {
   currentVideoIndexAtom,
   isAboutOpenAtom,
 } from "../store.ts";
-import { handleSetCurrentVideo, handleOpenAbout } from "../handlers.ts";
+import { handleOpenAbout, handleSetCurrentPlaylist } from "../handlers.ts";
 import { PlaylistVideo } from "../types.ts";
 
 function MenuItem({ title, isCurrentView, onClick }: any) {
@@ -36,7 +36,7 @@ export default function Menu() {
         <div className="w-full flex flex-col items-center justify-center gap-y-6 text-center">
           {orderedPlaylists.map(
             (
-              { uuid, videoTitle, vimeoPlayerURL }: PlaylistVideo,
+              { uuid, videoTitle }: PlaylistVideo,
               index: number
             ) => {
               const isCurrentVideo = index === currentVideoIndex;
@@ -45,7 +45,7 @@ export default function Menu() {
                   key={uuid}
                   title={videoTitle}
                   isCurrentView={!isAboutOpen && isCurrentVideo}
-                  onClick={() => handleSetCurrentVideo(vimeoPlayerURL)}
+                  onClick={() => handleSetCurrentPlaylist(index)}
                 />
               );
             }

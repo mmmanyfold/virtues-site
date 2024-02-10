@@ -16,6 +16,7 @@ import {
   store,
   currentVideoIndexAtom,
   isAboutOpenAtom,
+  showcaseItemIndexAtom,
 } from "./store.ts";
 
 export const handleToggleInfoPanel = () => {
@@ -118,12 +119,11 @@ export const handleSetCurrentChapter = (index: number) => {
   store.set(seekingPositionAtom, newChapter.startTime);
 };
 
-export const handleSetCurrentVideo = async (videoUrl: string) => {
+export const handleSetCurrentPlaylist = async (newIndex: number) => {
   const player = store.get(playerAtom);
   const playlists = await store.get(playlistsAtom);
-  const newIndex = playlists?.findIndex(
-    (row: PlaylistVideo) => row.vimeoPlayerURL === videoUrl
-  );
+  const { vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
+  const videoUrl = !!videoShowCasePayload.data ? videoShowCasePayload.data[0].player_embed_url : vimeoPlayerURL;
 
   store.set(seekingPositionAtom, 0);
   store.set(currentVideoIndexAtom, newIndex);
@@ -132,6 +132,27 @@ export const handleSetCurrentVideo = async (videoUrl: string) => {
 
   player
     .loadVideo(videoUrl)
+    .then(() => {
+      bindEventsToPlayer();
+      player.play().catch(handleError);
+    })
+    .catch(handleError);
+};
+
+export const handleSetCurrentShowcaseItem = async (index: number) => {
+  const player = store.get(playerAtom);
+  const currentVideoIndex = store.get(currentVideoIndexAtom);
+  const playlists = await store.get(playlistsAtom);
+  const newVideo =
+    playlists[currentVideoIndex].videoShowCasePayload.data[index];
+
+  store.set(seekingPositionAtom, 0);
+  store.set(showcaseItemIndexAtom, index);
+  store.set(isMenuOpenAtom, false);
+  store.set(isAboutOpenAtom, false);
+
+  player
+    .loadVideo(newVideo.player_embed_url)
     .then(() => {
       bindEventsToPlayer();
       player.play().catch(handleError);

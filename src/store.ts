@@ -17,9 +17,15 @@ export const isFullscreenAtom = atom(false);
 export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
 export const seekingPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
+
+// chapter-based control
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
 export const chapterIndexAtom = atom<number>(0);
 export const currentChapterAtom = atom<Player.VimeoChapter | null>(null);
+
+// showcase-based control
+export const showcaseItemIndexAtom = atom<number>(0);
+
 export const playlistsAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
@@ -44,7 +50,7 @@ export const currentVideoIndexAtom = atom<number>(0);
 
 export const readOnlyCurrentSelectionAtom = atom(async (get) => {
   const [first] = await get(playlistsAtom);
-  return first.vimeoPlayerURL || "";
+  return first;
 });
 
 export const isInfoPanelOpenAtom = atom<boolean>(false);
