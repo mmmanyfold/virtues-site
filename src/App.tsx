@@ -3,22 +3,8 @@ import { Provider, useAtom } from "jotai";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { default as Player } from "@vimeo/player";
 import { Seekbar as Seek } from "react-seekbar";
-import {
-  X,
-  Plus,
-  Info,
-  SpeakerSimpleHigh,
-  SpeakerSimpleSlash,
-  Shuffle,
-  Rewind,
-  Play,
-  FastForward,
-  Pause,
-  ArrowCounterClockwise,
-  ArrowsDownUp,
-  ArrowsOut,
-  ArrowsIn,
-} from "@phosphor-icons/react";
+import { X, Plus } from "@phosphor-icons/react";
+import Controls from "./components/Controls.tsx";
 import { RichTextCollection } from "./components/Notion.tsx";
 import Menu from "./components/Menu.tsx";
 import About from "./components/About.tsx";
@@ -26,16 +12,13 @@ import "./App.css";
 import {
   store,
   playerAtom,
-  isPlayingAtom,
   seekingPositionAtom,
-  isMutedAtom,
   durationAtom,
   chaptersAtom,
   currentChapterAtom,
   playlistsAtom,
   currentVideoIndexAtom,
   readOnlyCurrentSelectionAtom,
-  isFullscreenAtom,
   aboutPageAtom,
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
@@ -45,21 +28,11 @@ import {
   windowWidthAtom,
   isMediaSmallAtom,
   timeInSecondsUpdateAtom,
-  showcaseItemIndexAtom,
 } from "./store.ts";
 import {
-  handleFullscreen,
-  handleMute,
-  handleNextChapter,
   handlePlay,
-  handlePlaylistJump,
-  handlePreviousChapter,
-  handleRandomChapter,
-  handleRestartPlayback,
   handleSetCurrentChapter,
-  handleToggleInfoPanel,
   handleToggleMenu,
-  handleSetCurrentShowcaseItem,
 } from "./handlers.ts";
 
 function Seekbar() {
@@ -84,216 +57,6 @@ function Seekbar() {
         hoverColor="#6c6c6c"
         fullWidth
       />
-    </div>
-  );
-}
-
-function ControlButton({
-  ariaLabel,
-  onClick,
-  children,
-}: {
-  ariaLabel: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button aria-label={ariaLabel} className="relative" onClick={onClick}>
-      {children}
-    </button>
-  );
-}
-
-const getRandomInt = (max: number) => {
-  return Math.floor(Math.random() * max);
-};
-
-function ShowcaseControls({ currentVideo }: { currentVideo: any }) {
-  const [isPlaying] = useAtom(isPlayingAtom);
-  const [isMuted] = useAtom(isMutedAtom);
-  const [isFullscreen] = useAtom(isFullscreenAtom);
-  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
-  const [isMediaSmall] = useAtom(isMediaSmallAtom);
-  const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
-
-  const iconClass = isMediaSmall ? "text-[20px]" : "text-[30px]";
-  const showcaseTotal = currentVideo.videoShowCasePayload.total;
-
-  const handleNext = () => {
-    const i =
-      showcaseItemIndex === showcaseTotal - 1
-        ? showcaseItemIndex
-        : showcaseItemIndex + 1;
-    handleSetCurrentShowcaseItem(i);
-  };
-
-  const handlePrevious = () => {
-    const i = showcaseItemIndex > 0 ? showcaseItemIndex - 1 : showcaseItemIndex;
-    handleSetCurrentShowcaseItem(i);
-  };
-
-  const handleRandom = () => {
-    let i = getRandomInt(showcaseTotal);
-    while (i === showcaseItemIndex) {
-      i = getRandomInt(showcaseTotal);
-    }
-    handleSetCurrentShowcaseItem(i);
-  };
-
-  const handleRestart = () => {
-    handleSetCurrentShowcaseItem(0);
-  };
-
-  return (
-    <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
-      {/* info */}
-      <ControlButton
-        ariaLabel={isInfoPanelOpen ? "Close tracklist" : "Open tracklist"}
-        onClick={handleToggleInfoPanel}
-      >
-        <Info className={iconClass} weight="light" />
-      </ControlButton>
-
-      {/* mute */}
-      <ControlButton
-        ariaLabel={isMuted ? "Unmute" : "Mute"}
-        onClick={handleMute}
-      >
-        {isMuted ? (
-          <SpeakerSimpleSlash className={iconClass} weight="fill" />
-        ) : (
-          <SpeakerSimpleHigh className={iconClass} weight="fill" />
-        )}
-      </ControlButton>
-
-      {/* random track */}
-      <ControlButton ariaLabel="Random track" onClick={handleRandom}>
-        <Shuffle className={iconClass} weight="bold" />
-      </ControlButton>
-
-      {/* previous track */}
-      <ControlButton ariaLabel="Previous track" onClick={handlePrevious}>
-        <Rewind className={iconClass} weight="fill" />
-      </ControlButton>
-
-      {/* play/pause */}
-      <ControlButton
-        ariaLabel={isPlaying ? "Pause" : "Play"}
-        onClick={handlePlay}
-      >
-        {isPlaying ? (
-          <Pause className={iconClass} weight="fill" />
-        ) : (
-          <Play className={iconClass} weight="fill" />
-        )}
-      </ControlButton>
-
-      {/* next track */}
-      <ControlButton ariaLabel="Next track" onClick={handleNext}>
-        <FastForward className={iconClass} weight="fill" />
-      </ControlButton>
-
-      {/* restart playlist */}
-      <ControlButton ariaLabel="Restart playlist" onClick={handleRestart}>
-        <ArrowCounterClockwise className={iconClass} weight="bold" />
-      </ControlButton>
-
-      {/* jump to different playlist */}
-      <ControlButton ariaLabel="Jump to playlist" onClick={handlePlaylistJump}>
-        <ArrowsDownUp className={iconClass} weight="bold" />
-      </ControlButton>
-
-      {/* fullscreen */}
-      <ControlButton ariaLabel="Fullscreen" onClick={handleFullscreen}>
-        {isFullscreen ? (
-          <ArrowsIn className={iconClass} />
-        ) : (
-          <ArrowsOut className={iconClass} />
-        )}
-      </ControlButton>
-    </div>
-  );
-}
-
-function Controls() {
-  const [isPlaying] = useAtom(isPlayingAtom);
-  const [isMuted] = useAtom(isMutedAtom);
-  const [isFullscreen] = useAtom(isFullscreenAtom);
-  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
-  const [isMediaSmall] = useAtom(isMediaSmallAtom);
-
-  const iconClass = isMediaSmall ? "text-[20px]" : "text-[30px]";
-
-  return (
-    <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
-      {/* info */}
-      <ControlButton
-        ariaLabel={isInfoPanelOpen ? "Close tracklist" : "Open tracklist"}
-        onClick={handleToggleInfoPanel}
-      >
-        <Info className={iconClass} weight="light" />
-      </ControlButton>
-
-      {/* mute */}
-      <ControlButton
-        ariaLabel={isMuted ? "Unmute" : "Mute"}
-        onClick={handleMute}
-      >
-        {isMuted ? (
-          <SpeakerSimpleSlash className={iconClass} weight="fill" />
-        ) : (
-          <SpeakerSimpleHigh className={iconClass} weight="fill" />
-        )}
-      </ControlButton>
-
-      {/* random track */}
-      <ControlButton ariaLabel="Random track" onClick={handleRandomChapter}>
-        <Shuffle className={iconClass} weight="bold" />
-      </ControlButton>
-
-      {/* previous track */}
-      <ControlButton ariaLabel="Previous track" onClick={handlePreviousChapter}>
-        <Rewind className={iconClass} weight="fill" />
-      </ControlButton>
-
-      {/* play/pause */}
-      <ControlButton
-        ariaLabel={isPlaying ? "Pause" : "Play"}
-        onClick={handlePlay}
-      >
-        {isPlaying ? (
-          <Pause className={iconClass} weight="fill" />
-        ) : (
-          <Play className={iconClass} weight="fill" />
-        )}
-      </ControlButton>
-
-      {/* next track */}
-      <ControlButton ariaLabel="Next track" onClick={handleNextChapter}>
-        <FastForward className={iconClass} weight="fill" />
-      </ControlButton>
-
-      {/* restart playlist */}
-      <ControlButton
-        ariaLabel="Restart playlist"
-        onClick={handleRestartPlayback}
-      >
-        <ArrowCounterClockwise className={iconClass} weight="bold" />
-      </ControlButton>
-
-      {/* jump to different playlist */}
-      <ControlButton ariaLabel="Jump to playlist" onClick={handlePlaylistJump}>
-        <ArrowsDownUp className={iconClass} weight="bold" />
-      </ControlButton>
-
-      {/* fullscreen */}
-      <ControlButton ariaLabel="Fullscreen" onClick={handleFullscreen}>
-        {isFullscreen ? (
-          <ArrowsIn className={iconClass} />
-        ) : (
-          <ArrowsOut className={iconClass} />
-        )}
-      </ControlButton>
     </div>
   );
 }
@@ -407,11 +170,7 @@ function VideoFooter() {
   return (
     <div className="sticky bottom-0 z-10">
       <Seekbar />
-      {!!currentVideo.videoShowCasePayload?.data ? (
-        <ShowcaseControls currentVideo={currentVideo} />
-      ) : (
-        <Controls />
-      )}
+      <Controls playlist={currentVideo} />
     </div>
   );
 }
