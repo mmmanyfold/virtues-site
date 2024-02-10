@@ -13,7 +13,6 @@ import {
   ArrowsOut,
   ArrowsIn,
 } from "@phosphor-icons/react";
-import "../App.css";
 import {
   isMediaSmallAtom,
   isPlayingAtom,

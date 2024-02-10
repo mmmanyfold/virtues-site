@@ -128,6 +128,7 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
     : vimeoPlayerURL;
 
   store.set(seekingPositionAtom, 0);
+  store.set(showcaseItemIndexAtom, 0);
   store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
@@ -148,10 +149,7 @@ export const handleSetCurrentShowcaseItem = async (index: number) => {
   const newVideo =
     playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
 
-  store.set(seekingPositionAtom, 0);
   store.set(showcaseItemIndexAtom, index);
-  store.set(isMenuOpenAtom, false);
-  store.set(isAboutOpenAtom, false);
 
   player
     .loadVideo(newVideo.player_embed_url)

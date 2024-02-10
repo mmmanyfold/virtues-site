@@ -5,7 +5,7 @@ import { default as Player } from "@vimeo/player";
 import { Seekbar as Seek } from "react-seekbar";
 import { X, Plus } from "@phosphor-icons/react";
 import Controls from "./components/Controls.tsx";
-import { RichTextCollection } from "./components/Notion.tsx";
+import InfoPanel from "./components/InfoPanel.tsx";
 import Menu from "./components/Menu.tsx";
 import About from "./components/About.tsx";
 import "./App.css";
@@ -14,8 +14,6 @@ import {
   playerAtom,
   seekingPositionAtom,
   durationAtom,
-  chaptersAtom,
-  currentChapterAtom,
   playlistsAtom,
   currentPlaylistIndexAtom,
   readOnlyCurrentSelectionAtom,
@@ -29,11 +27,7 @@ import {
   isMediaSmallAtom,
   timeInSecondsUpdateAtom,
 } from "./store.ts";
-import {
-  handlePlay,
-  handleSetCurrentChapter,
-  handleToggleMenu,
-} from "./handlers.ts";
+import { handlePlay, handleToggleMenu } from "./handlers.ts";
 
 function Seekbar() {
   const [position] = useAtom(timeInSecondsUpdateAtom);
@@ -85,80 +79,6 @@ function VideoPlayer() {
         ></div>
       </div>
     </Suspense>
-  );
-}
-
-function formatTimestamp(seconds: number) {
-  var minutes = Math.floor(seconds / 60);
-  var seconds = seconds % 60;
-  return (
-    minutes.toString().padStart(2, "0") +
-    ":" +
-    seconds.toString().padStart(2, "0")
-  );
-}
-
-function InfoPanel() {
-  const [playlists] = useAtom(playlistsAtom);
-  const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
-  const [currentChapter] = useAtom(currentChapterAtom);
-  const [isMediaSmall] = useAtom(isMediaSmallAtom);
-  const [chapters] = useAtom(chaptersAtom);
-  const [duration] = useAtom(durationAtom);
-
-  const currentPlaylist = playlists[currentPlaylistIndex];
-  const { videoTitle, vimeoChapters } = currentPlaylist;
-  const chapterIds = Object.keys(vimeoChapters).sort();
-
-  return (
-    <div
-      className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll opacity-90 ${
-        isMediaSmall ? "p-4" : "px-8 pt-10 pb-5"
-      }`}
-    >
-      <h2 className="italic text-2xl tracking-wide mb-2">{videoTitle}</h2>
-      <div className="divide-y divide-[#a9a9a9] text-sm">
-        {chapterIds.map((id) => {
-          const chapterNumber = parseInt(id);
-
-          let start;
-          let end;
-
-          if (chapters?.length) {
-            const chapter = chapters[chapterNumber - 1];
-            const nextChapter =
-              chapters.length >= chapterNumber && chapters[chapterNumber];
-            start = chapter.startTime;
-            end = nextChapter ? nextChapter.startTime - 1 : duration;
-          }
-
-          const isCurrentChapter = currentChapter
-            ? currentChapter?.index === chapterNumber
-            : chapterNumber === 1;
-          return (
-            <div
-              key={id}
-              role="button"
-              className="py-6"
-              style={{ color: isCurrentChapter ? "black" : "#908f8f" }}
-              onClick={() => handleSetCurrentChapter(chapterNumber - 1)}
-            >
-              <div className="flex gap-x-4 mb-6">
-                <div className="italic">#{chapterNumber}</div>
-                <div>
-                  <RichTextCollection objects={vimeoChapters[id]} />
-                </div>
-              </div>
-              {start !== undefined && end !== undefined && (
-                <p>
-                  {formatTimestamp(start)}—{formatTimestamp(end)}
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
