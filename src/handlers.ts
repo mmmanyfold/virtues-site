@@ -14,7 +14,7 @@ import {
   playlistsAtom,
   seekingPositionAtom,
   store,
-  currentVideoIndexAtom,
+  currentPlaylistIndexAtom,
   isAboutOpenAtom,
   showcaseItemIndexAtom,
 } from "./store.ts";
@@ -128,7 +128,7 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
     : vimeoPlayerURL;
 
   store.set(seekingPositionAtom, 0);
-  store.set(currentVideoIndexAtom, newIndex);
+  store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
 
@@ -143,10 +143,10 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
 
 export const handleSetCurrentShowcaseItem = async (index: number) => {
   const player = store.get(playerAtom);
-  const currentVideoIndex = store.get(currentVideoIndexAtom);
+  const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
   const newVideo =
-    playlists[currentVideoIndex].videoShowCasePayload.data[index];
+    playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
 
   store.set(seekingPositionAtom, 0);
   store.set(showcaseItemIndexAtom, index);
@@ -165,17 +165,17 @@ export const handleSetCurrentShowcaseItem = async (index: number) => {
 export const handlePlaylistJump = async () => {
   const player = store.get(playerAtom);
   const playlist = await store.get(playlistsAtom);
-  const currentVideoIndex = store.get(currentVideoIndexAtom);
+  const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const randomChapterIndex = Math.floor(Math.random() * playlist.length);
   const nextPlaylist = playlist[randomChapterIndex];
 
-  if (currentVideoIndex === randomChapterIndex) {
+  if (currentPlaylistIndex === randomChapterIndex) {
     await handlePlaylistJump();
     return;
   }
 
   store.set(seekingPositionAtom, 0);
-  store.set(currentVideoIndexAtom, randomChapterIndex);
+  store.set(currentPlaylistIndexAtom, randomChapterIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
 

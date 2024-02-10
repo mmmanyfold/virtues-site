@@ -17,7 +17,7 @@ import {
   chaptersAtom,
   currentChapterAtom,
   playlistsAtom,
-  currentVideoIndexAtom,
+  currentPlaylistIndexAtom,
   readOnlyCurrentSelectionAtom,
   aboutPageAtom,
   isInfoPanelOpenAtom,
@@ -100,14 +100,14 @@ function formatTimestamp(seconds: number) {
 
 function InfoPanel() {
   const [playlists] = useAtom(playlistsAtom);
-  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
+  const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [currentChapter] = useAtom(currentChapterAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [chapters] = useAtom(chaptersAtom);
   const [duration] = useAtom(durationAtom);
 
-  const currentVideo = playlists[currentVideoIndex];
-  const { videoTitle, vimeoChapters } = currentVideo;
+  const currentPlaylist = playlists[currentPlaylistIndex];
+  const { videoTitle, vimeoChapters } = currentPlaylist;
   const chapterIds = Object.keys(vimeoChapters).sort();
 
   return (
@@ -164,26 +164,26 @@ function InfoPanel() {
 
 function VideoFooter() {
   const [playlists] = useAtom(playlistsAtom);
-  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
-  const currentVideo = playlists[currentVideoIndex];
+  const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
+  const currentPlaylist = playlists[currentPlaylistIndex];
 
   return (
     <div className="sticky bottom-0 z-10">
       <Seekbar />
-      <Controls playlist={currentVideo} />
+      <Controls playlist={currentPlaylist} />
     </div>
   );
 }
 
 function Title() {
   const [playlists] = useAtom(playlistsAtom);
-  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
+  const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
 
-  const { titleColor } = playlists[currentVideoIndex];
+  const { titleColor } = playlists[currentPlaylistIndex];
 
   let color = "black";
 
@@ -207,13 +207,13 @@ function Title() {
 
 function MenuToggle() {
   const [playlists] = useAtom(playlistsAtom);
-  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
+  const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [aboutPage] = useAtom(aboutPageAtom);
 
-  const { titleColor } = playlists[currentVideoIndex];
+  const { titleColor } = playlists[currentPlaylistIndex];
   const iconClass = isMediaSmall ? "text-[2rem]" : "text-[35px]";
 
   let plusColor = "black";

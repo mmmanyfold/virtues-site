@@ -46,7 +46,7 @@ export const aboutPageAtom = atom(async (_get, { signal }) => {
   return await response.json();
 });
 
-export const currentVideoIndexAtom = atom<number>(0);
+export const currentPlaylistIndexAtom = atom<number>(0);
 
 export const readOnlyCurrentSelectionAtom = atom(async (get) => {
   const [first] = await get(playlistsAtom);
