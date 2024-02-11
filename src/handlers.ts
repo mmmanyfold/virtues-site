@@ -1,7 +1,6 @@
 // handlers
 // --------
 
-import { PlaylistVideo } from "./types.ts";
 import {
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
@@ -31,11 +30,9 @@ export const handleToggleMenu = () => {
 };
 
 export const handleOpenAbout = () => {
-  const player = store.get(playerAtom);
-
   store.set(isAboutOpenAtom, true);
   store.set(isMenuOpenAtom, false);
-  player.pause().catch(handleError);
+  store.set(isPlayingAtom, false);
 };
 
 export const handleMute = () => {
@@ -70,6 +67,7 @@ export const handlePreviousChapter = () => {
 
   store.set(chapterIndexAtom, previousChapterIndex);
   store.set(seekingPositionAtom, seekTo.startTime);
+  store.set(isPlayingAtom, true);
 };
 
 export const handleNextChapter = () => {
@@ -84,18 +82,12 @@ export const handleNextChapter = () => {
 
   store.set(chapterIndexAtom, newChapterIndex);
   store.set(seekingPositionAtom, seekTo.startTime);
+  store.set(isPlayingAtom, true);
 };
 
 export const handleRestartPlayback = () => {
-  const player = store.get(playerAtom);
-
-  player
-    .setCurrentTime(0)
-    .then(() => {
-      player.play().catch(handleError);
-      store.set(seekingPositionAtom, 0);
-    })
-    .catch(handleError);
+  store.set(seekingPositionAtom, 0);
+  store.set(isPlayingAtom, true);
 };
 
 export const handleRandomChapter = () => {
@@ -109,6 +101,7 @@ export const handleRandomChapter = () => {
 
   store.set(chapterIndexAtom, randomChapterIndex);
   store.set(seekingPositionAtom, randomChapter.startTime);
+  store.set(isPlayingAtom, true);
 };
 
 export const handleSetCurrentChapter = (index: number) => {
@@ -117,6 +110,7 @@ export const handleSetCurrentChapter = (index: number) => {
 
   store.set(chapterIndexAtom, index);
   store.set(seekingPositionAtom, newChapter.startTime);
+  store.set(isPlayingAtom, true);
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
@@ -142,7 +136,7 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
     .catch(handleError);
 };
 
-export const handleSetCurrentShowcaseItem = async (index: number) => {
+export const handleSetCurrentShowcaseItem = async (index: number, pos: number = 0) => {
   const player = store.get(playerAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
@@ -150,6 +144,7 @@ export const handleSetCurrentShowcaseItem = async (index: number) => {
     playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
 
   store.set(showcaseItemIndexAtom, index);
+  store.set(seekingPositionAtom, pos);
 
   player
     .loadVideo(newVideo.player_embed_url)

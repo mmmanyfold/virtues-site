@@ -86,17 +86,10 @@ store.sub(playerAtom, () => {
 
 store.sub(seekingPositionAtom, () => {
   const seekPosition = store.get(seekingPositionAtom);
-  const playing = store.get(isPlayingAtom);
   const player = store.get(playerAtom);
 
   player
     .setCurrentTime(seekPosition)
-    .then(() => {
-      // begin playing at seek position
-      if (!playing) {
-        store.set(isPlayingAtom, true);
-      }
-    })
     .catch(handleError);
 });
 
