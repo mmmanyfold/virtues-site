@@ -78,7 +78,7 @@ h1.title {
 }
 
 .seekbar-loading {
-  background-color: red;
+  background-color: #a9a9a9;
   height: 15px;
   width: 100%;
   overflow: hidden;

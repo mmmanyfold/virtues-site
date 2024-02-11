@@ -36,8 +36,6 @@ export const playlistsAtom = atom(async (_get, { signal }) => {
   return rows;
 });
 
-export const timeInSecondsUpdateAtom = atom<number>(0);
-
 export const aboutPageAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-about.json`,
@@ -73,18 +71,6 @@ store.sub(windowWidthAtom, () => {
 
 store.sub(playerAtom, () => {
   bindEventsToPlayer();
-});
-
-store.sub(seekingPositionAtom, () => {
-  const seekPosition = store.get(seekingPositionAtom);
-  const player = store.get(playerAtom);
-
-  player
-    .setCurrentTime(seekPosition)
-    .then(() => {
-      store.set(isSeekLoadingAtom, false);
-    })
-    .catch(handleError);
 });
 
 export const bindEventsToPlayer = () => {
@@ -135,7 +121,8 @@ export const bindEventsToPlayer = () => {
   });
 
   player.on("timeupdate", (timeupdate: TimeUpdate) => {
-    store.set(timeInSecondsUpdateAtom, Math.trunc(timeupdate.seconds));
+    store.set(seekingPositionAtom, Math.trunc(timeupdate.seconds));
+    store.set(isSeekLoadingAtom, false);
   });
 
   player.on("fullscreenchange", ({ fullscreen }: any) => {

@@ -1,29 +1,22 @@
-import { SetStateAction } from "react";
 import { useAtom } from "jotai";
 import { Seekbar as Seek } from "react-seekbar";
 import {
   seekingPositionAtom,
   durationAtom,
-  timeInSecondsUpdateAtom,
   showcaseItemIndexAtom,
   windowWidthAtom,
   isSeekLoadingAtom,
 } from "../store.ts";
-import { handleSetCurrentShowcaseItem } from "../handlers.ts";
+import { handleSetCurrentShowcaseItem, handleSeek } from "../handlers.ts";
 
 function SeekChapter() {
-  const [position] = useAtom(timeInSecondsUpdateAtom);
-  const [, setSeekPosition] = useAtom(seekingPositionAtom);
+  const [seekPosition] = useAtom(seekingPositionAtom);
   const [duration] = useAtom(durationAtom);
-
-  const handleSeek = (position: SetStateAction<number>) => {
-    setSeekPosition(position);
-  };
 
   return (
     <div className="seekbar-wrapper">
       <Seek
-        position={position}
+        position={seekPosition}
         duration={duration}
         onSeek={handleSeek}
         radius={0}
@@ -40,21 +33,20 @@ function SeekChapter() {
 function ShowcaseSeekItem({
   item,
   index,
-  activeIndex,
-  position,
+  seekPosition,
   showcaseDuration,
   windowWidth,
-  handleSeek,
+  setLoading,
 }: {
   item: any;
   index: number;
-  activeIndex: number;
-  position: number;
+  seekPosition: number;
   duration: number;
   showcaseDuration: number;
   windowWidth: number;
-  handleSeek: (position: SetStateAction<number>) => void;
+  setLoading: () => void;
 }) {
+  const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const width = (windowWidth / showcaseDuration) * item.duration;
   const seekProps = {
     duration: item.duration,
@@ -66,16 +58,27 @@ function ShowcaseSeekItem({
     width,
   };
 
-  if (index === activeIndex) {
-    return <Seek position={position} onSeek={handleSeek} {...seekProps} />;
+  const isActive = index === showcaseItemIndex;
+  let position = seekPosition;
+
+  if (!isActive) {
+    position = index > showcaseItemIndex ? 0 : item.duration
+  }
+
+  const onSeek = (pos: number) => {
+    if (isActive) {
+      handleSeek(pos);
+    } else {
+      setLoading();
+      // setShowcaseItemIndex(index);
+      handleSetCurrentShowcaseItem(index, pos);
+    }
   }
 
   return (
     <Seek
-      position={index > activeIndex ? 0 : item.duration}
-      onSeek={(pos) => {
-        handleSetCurrentShowcaseItem(index, pos);
-      }}
+      position={position}
+      onSeek={onSeek}
       {...seekProps}
     />
   );
@@ -83,23 +86,17 @@ function ShowcaseSeekItem({
 
 function SeekShowcase({ items }: { items: any[] }) {
   const [windowWidth] = useAtom(windowWidthAtom);
-  const [position] = useAtom(timeInSecondsUpdateAtom);
-  const [, setSeekPosition] = useAtom(seekingPositionAtom);
+  const [seekPosition] = useAtom(seekingPositionAtom);
   const [duration] = useAtom(durationAtom);
-  const [isSeekLoading] = useAtom(isSeekLoadingAtom);
-  const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
+  const [isSeekLoading, setIsSeekLoading] = useAtom(isSeekLoadingAtom);
 
   const showcaseDuration = items.reduce((acc, item) => acc + item.duration, 0);
-
-  const handleSeek = (position: SetStateAction<number>) => {
-    setSeekPosition(position);
-  };
 
   if (isSeekLoading) {
     return (
       <div className="seekbar-wrapper">
         <div className="flex items-center relative h-[25px]">
-          <div className="seekbar-loading"></div>
+          <div className="seekbar-loading animate-pulse"></div>
         </div>
       </div>
     );
@@ -112,12 +109,11 @@ function SeekShowcase({ items }: { items: any[] }) {
           key={item.uri}
           item={item}
           index={index}
-          activeIndex={showcaseItemIndex}
-          position={position}
+          seekPosition={seekPosition}
           duration={duration}
           showcaseDuration={showcaseDuration}
           windowWidth={windowWidth}
-          handleSeek={handleSeek}
+          setLoading={() => setIsSeekLoading(true)}
         />
       ))}
     </div>
