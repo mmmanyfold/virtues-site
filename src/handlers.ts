@@ -43,7 +43,14 @@ export const handleMute = () => {
 };
 
 export const handlePlay = () => {
-  store.set(isPlayingAtom, !store.get(isPlayingAtom));
+  const player = store.get(playerAtom);
+  const isPlaying = store.get(isPlayingAtom);
+
+  if (isPlaying) {
+    player.pause().catch(handleError);
+  } else {
+    player.play().catch(handleError);
+  }
 };
 
 export const handleFullscreen = () => {
@@ -136,7 +143,7 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
     .catch(handleError);
 };
 
-export const handleSetCurrentShowcaseItem = async (index: number, pos: number = 0) => {
+export const handleSetCurrentShowcaseItem = async (index: number, pos: number) => {
   const player = store.get(playerAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
@@ -144,13 +151,12 @@ export const handleSetCurrentShowcaseItem = async (index: number, pos: number = 
     playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
 
   store.set(showcaseItemIndexAtom, index);
-  store.set(seekingPositionAtom, pos);
 
   player
     .loadVideo(newVideo.player_embed_url)
     .then(() => {
       bindEventsToPlayer();
-      player.play().catch(handleError);
+      store.set(seekingPositionAtom, pos);
     })
     .catch(handleError);
 };

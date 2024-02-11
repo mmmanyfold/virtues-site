@@ -184,12 +184,12 @@ function ShowcaseControls({ playlist }: { playlist: any }) {
       showcaseItemIndex === showcaseTotal - 1
         ? showcaseItemIndex
         : showcaseItemIndex + 1;
-    handleSetCurrentShowcaseItem(i);
+    handleSetCurrentShowcaseItem(i, 0);
   };
 
   const handlePrevious = () => {
     const i = showcaseItemIndex > 0 ? showcaseItemIndex - 1 : showcaseItemIndex;
-    handleSetCurrentShowcaseItem(i);
+    handleSetCurrentShowcaseItem(i, 0);
   };
 
   const handleRandom = () => {
@@ -197,11 +197,11 @@ function ShowcaseControls({ playlist }: { playlist: any }) {
     while (i === showcaseItemIndex) {
       i = getRandomInt(showcaseTotal);
     }
-    handleSetCurrentShowcaseItem(i);
+    handleSetCurrentShowcaseItem(i, 0);
   };
 
   const handleRestart = () => {
-    handleSetCurrentShowcaseItem(0);
+    handleSetCurrentShowcaseItem(0, 0);
   };
 
   return (

@@ -70,16 +70,6 @@ store.sub(windowWidthAtom, () => {
   store.set(isMediaSmallAtom, windowWidth < 890);
 });
 
-store.sub(isPlayingAtom, () => {
-  const player = store.get(playerAtom);
-
-  if (store.get(isPlayingAtom)) {
-    player.play().catch(handleError);
-  } else {
-    player.pause().catch(handleError);
-  }
-});
-
 store.sub(playerAtom, () => {
   bindEventsToPlayer();
 });

@@ -116,7 +116,7 @@ function ShowcaseList({
             role="button"
             className="py-6"
             style={{ color: isCurrentItem ? "black" : "#908f8f" }}
-            onClick={() => handleSetCurrentShowcaseItem(metaIndex)}
+            onClick={() => handleSetCurrentShowcaseItem(metaIndex, 0)}
           >
             <div className="flex gap-x-4 mb-6">
               <div className="italic">#{metaIndex + 1}</div>

@@ -57,12 +57,12 @@ function ShowcaseSeekItem({
         onSeek={handleSeek}
         radius={0}
         height={15}
-        // outerColor="#a9a9a9"
-        // innerColor="#6c6c6c"
-        // hoverColor="#6c6c6c"
-        outerColor="#ff0000"
-        innerColor="#00ff00"
-        hoverColor="#00ff00"
+        outerColor="#a9a9a9"
+        innerColor="#6c6c6c"
+        hoverColor="#6c6c6c"
+        // outerColor="#ff0000"
+        // innerColor="#00ff00"
+        // hoverColor="#00ff00"
         // fullWidth
       />
     );
