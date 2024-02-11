@@ -1,9 +1,9 @@
-import { SetStateAction, useEffect, Suspense } from "react";
+import { useEffect, Suspense } from "react";
 import { Provider, useAtom } from "jotai";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { default as Player } from "@vimeo/player";
-import { Seekbar as Seek } from "react-seekbar";
 import { X, Plus } from "@phosphor-icons/react";
+import Seekbar from "./components/Seekbar.tsx";
 import Controls from "./components/Controls.tsx";
 import InfoPanel from "./components/InfoPanel.tsx";
 import Menu from "./components/Menu.tsx";
@@ -12,8 +12,6 @@ import "./App.css";
 import {
   store,
   playerAtom,
-  seekingPositionAtom,
-  durationAtom,
   playlistsAtom,
   currentPlaylistIndexAtom,
   readOnlyCurrentSelectionAtom,
@@ -25,35 +23,8 @@ import {
   wrapperWidthAtom,
   windowWidthAtom,
   isMediaSmallAtom,
-  timeInSecondsUpdateAtom,
 } from "./store.ts";
 import { handlePlay, handleToggleMenu } from "./handlers.ts";
-
-function Seekbar() {
-  const [position] = useAtom(timeInSecondsUpdateAtom);
-  const [, setSeekPosition] = useAtom(seekingPositionAtom);
-  const [duration] = useAtom(durationAtom);
-
-  const handleSeek = (position: SetStateAction<number>) => {
-    setSeekPosition(position);
-  };
-
-  return (
-    <div className="seekbar-wrapper">
-      <Seek
-        position={position}
-        duration={duration}
-        onSeek={handleSeek}
-        radius={0}
-        height={15}
-        outerColor="#a9a9a9"
-        innerColor="#6c6c6c"
-        hoverColor="#6c6c6c"
-        fullWidth
-      />
-    </div>
-  );
-}
 
 function VideoPlayer() {
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
@@ -89,7 +60,7 @@ function VideoFooter() {
 
   return (
     <div className="sticky bottom-0 z-10">
-      <Seekbar />
+      <Seekbar playlist={currentPlaylist} />
       <Controls playlist={currentPlaylist} />
     </div>
   );
