@@ -145,12 +145,12 @@ export const handleSetCurrentShowcaseItem = async (index: number, pos: number) =
     playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
 
   store.set(showcaseItemIndexAtom, index);
-  store.set(seekingPositionAtom, pos);
 
   player
     .loadVideo(newVideo.player_embed_url)
     .then(() => {
       bindEventsToPlayer();
+      store.set(seekingPositionAtom, pos);
     })
     .catch(handleError);
 };

@@ -6,6 +6,7 @@ import {
   durationAtom,
   timeInSecondsUpdateAtom,
   showcaseItemIndexAtom,
+  windowWidthAtom
 } from "../store.ts";
 import { handleSetCurrentShowcaseItem } from "../handlers.ts";
 
@@ -40,6 +41,8 @@ function ShowcaseSeekItem({
   index,
   activeIndex,
   position,
+  showcaseDuration,
+  windowWidth,
   handleSeek,
 }: {
   item: any;
@@ -47,23 +50,27 @@ function ShowcaseSeekItem({
   activeIndex: number;
   position: number;
   duration: number;
+  showcaseDuration: number;
+  windowWidth: number;
   handleSeek: (position: SetStateAction<number>) => void;
 }) {
+  const width = windowWidth / showcaseDuration * item.duration;
+  const seekProps = {
+    duration: item.duration,
+    radius: 0,
+    height: 15,
+    outerColor: "#a9a9a9",
+    innerColor: "#6c6c6c",
+    hoverColor: "#6c6c6c",
+    width,
+  }
+
   if (index === activeIndex) {
     return (
       <Seek
         position={position}
-        duration={item.duration}
         onSeek={handleSeek}
-        radius={0}
-        height={15}
-        outerColor="#a9a9a9"
-        innerColor="#6c6c6c"
-        hoverColor="#6c6c6c"
-        // outerColor="#ff0000"
-        // innerColor="#00ff00"
-        // hoverColor="#00ff00"
-        // fullWidth
+        {...seekProps}
       />
     );
   }
@@ -71,32 +78,26 @@ function ShowcaseSeekItem({
   return (
     <Seek
       position={index > activeIndex ? 0 : item.duration}
-      duration={item.duration}
       onSeek={(pos) => {
-        console.log("Seeking to", index);
-        console.log("position", pos);
         handleSetCurrentShowcaseItem(index, pos);
       }}
-      radius={0}
-      height={15}
-      outerColor="#a9a9a9"
-      innerColor="#6c6c6c"
-      hoverColor="#6c6c6c"
-    //   fullWidth
+      {...seekProps}
     />
   );
 }
 
 function SeekShowcase({ items }: { items: any[] }) {
+  const [windowWidth] = useAtom(windowWidthAtom);
   const [position] = useAtom(timeInSecondsUpdateAtom);
   const [, setSeekPosition] = useAtom(seekingPositionAtom);
   const [duration] = useAtom(durationAtom);
+  const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
+
+  const showcaseDuration = items.reduce((acc, item) => acc + item.duration, 0);
 
   const handleSeek = (position: SetStateAction<number>) => {
     setSeekPosition(position);
   };
-
-  const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
 
   return (
     <div className="seekbar-wrapper flex">
@@ -108,6 +109,8 @@ function SeekShowcase({ items }: { items: any[] }) {
           activeIndex={showcaseItemIndex}
           position={position}
           duration={duration}
+          showcaseDuration={showcaseDuration}
+          windowWidth={windowWidth}
           handleSeek={handleSeek}
         />
       ))}
