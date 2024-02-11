@@ -160,12 +160,14 @@ export const handlePlaylistJump = async () => {
   const playlist = await store.get(playlistsAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const randomChapterIndex = Math.floor(Math.random() * playlist.length);
-  const nextPlaylist = playlist[randomChapterIndex];
 
   if (currentPlaylistIndex === randomChapterIndex) {
     await handlePlaylistJump();
     return;
   }
+
+  const { videoShowCasePayload, vimeoPlayerURL } = playlist[randomChapterIndex];
+  const nextVideoUrl = !!videoShowCasePayload.data ? videoShowCasePayload.data[0].player_embed_url : vimeoPlayerURL;
 
   store.set(seekingPositionAtom, 0);
   store.set(currentPlaylistIndexAtom, randomChapterIndex);
@@ -173,7 +175,7 @@ export const handlePlaylistJump = async () => {
   store.set(isAboutOpenAtom, false);
 
   player
-    .loadVideo(nextPlaylist.vimeoPlayerURL)
+    .loadVideo(nextVideoUrl)
     .then(() => {
       bindEventsToPlayer();
       player.play().catch(handleError);
