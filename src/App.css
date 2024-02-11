@@ -77,6 +77,13 @@ h1.title {
   display: none !important;
 }
 
+.seekbar-loading {
+  background-color: red;
+  height: 15px;
+  width: 100%;
+  overflow: hidden;
+}
+
 .controls button {
   color: black;
 }

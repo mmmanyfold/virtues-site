@@ -17,6 +17,7 @@ export const isFullscreenAtom = atom(false);
 export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
 export const seekingPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
+export const isSeekLoadingAtom = atom(false);
 
 // chapter-based control
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
@@ -78,7 +79,12 @@ store.sub(seekingPositionAtom, () => {
   const seekPosition = store.get(seekingPositionAtom);
   const player = store.get(playerAtom);
 
-  player.setCurrentTime(seekPosition).catch(handleError);
+  player
+    .setCurrentTime(seekPosition)
+    .then(() => {
+      store.set(isSeekLoadingAtom, false);
+    })
+    .catch(handleError);
 });
 
 export const bindEventsToPlayer = () => {

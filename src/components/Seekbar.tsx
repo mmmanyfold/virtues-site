@@ -7,6 +7,7 @@ import {
   timeInSecondsUpdateAtom,
   showcaseItemIndexAtom,
   windowWidthAtom,
+  isSeekLoadingAtom,
 } from "../store.ts";
 import { handleSetCurrentShowcaseItem } from "../handlers.ts";
 
@@ -85,6 +86,7 @@ function SeekShowcase({ items }: { items: any[] }) {
   const [position] = useAtom(timeInSecondsUpdateAtom);
   const [, setSeekPosition] = useAtom(seekingPositionAtom);
   const [duration] = useAtom(durationAtom);
+  const [isSeekLoading] = useAtom(isSeekLoadingAtom);
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
 
   const showcaseDuration = items.reduce((acc, item) => acc + item.duration, 0);
@@ -92,6 +94,16 @@ function SeekShowcase({ items }: { items: any[] }) {
   const handleSeek = (position: SetStateAction<number>) => {
     setSeekPosition(position);
   };
+
+  if (isSeekLoading) {
+    return (
+      <div className="seekbar-wrapper">
+        <div className="flex items-center relative h-[25px]">
+          <div className="seekbar-loading"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="seekbar-wrapper flex">

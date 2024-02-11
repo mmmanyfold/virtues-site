@@ -16,6 +16,7 @@ import {
   currentPlaylistIndexAtom,
   isAboutOpenAtom,
   showcaseItemIndexAtom,
+  isSeekLoadingAtom,
 } from "./store.ts";
 
 export const handleToggleInfoPanel = () => {
@@ -148,6 +149,9 @@ export const handleSetCurrentShowcaseItem = async (
     playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
 
   store.set(showcaseItemIndexAtom, index);
+  if (pos > 0) {
+    store.set(isSeekLoadingAtom, true);
+  }
 
   player
     .loadVideo(newVideo.player_embed_url)
