@@ -103,12 +103,10 @@ function ShowcaseList({
         let start = 0;
         let end;
 
-        if (showcaseItems?.length) {
-          if (metaIndex > 0) {
-            start = durationOfPrevShowcaseItems(showcaseItems, metaIndex) + 1;
-          }
-          end = start + showcaseItems[metaIndex].duration;
+        if (metaIndex > 0) {
+          start = durationOfPrevShowcaseItems(showcaseItems, metaIndex) + 1;
         }
+        end = start + showcaseItems[metaIndex].duration;
 
         return (
           <div
@@ -124,11 +122,7 @@ function ShowcaseList({
                 <RichTextCollection objects={metadata[id]} />
               </div>
             </div>
-            {!!start && !!end && (
-              <p>
-                {formatTimestamp(start)}—{formatTimestamp(end)}
-              </p>
-            )}
+            <p>{formatTimestamp(start)}—{formatTimestamp(end)}</p>
           </div>
         );
       })}
