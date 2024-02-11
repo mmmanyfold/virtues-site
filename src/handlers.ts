@@ -137,7 +137,10 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
     .catch(handleError);
 };
 
-export const handleSetCurrentShowcaseItem = async (index: number, pos: number) => {
+export const handleSetCurrentShowcaseItem = async (
+  index: number,
+  pos: number
+) => {
   const player = store.get(playerAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
@@ -167,7 +170,9 @@ export const handlePlaylistJump = async () => {
   }
 
   const { videoShowCasePayload, vimeoPlayerURL } = playlist[randomChapterIndex];
-  const nextVideoUrl = !!videoShowCasePayload.data ? videoShowCasePayload.data[0].player_embed_url : vimeoPlayerURL;
+  const nextVideoUrl = !!videoShowCasePayload.data
+    ? videoShowCasePayload.data[0].player_embed_url
+    : vimeoPlayerURL;
 
   store.set(seekingPositionAtom, 0);
   store.set(currentPlaylistIndexAtom, randomChapterIndex);

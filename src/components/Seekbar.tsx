@@ -6,7 +6,7 @@ import {
   durationAtom,
   timeInSecondsUpdateAtom,
   showcaseItemIndexAtom,
-  windowWidthAtom
+  windowWidthAtom,
 } from "../store.ts";
 import { handleSetCurrentShowcaseItem } from "../handlers.ts";
 
@@ -54,7 +54,7 @@ function ShowcaseSeekItem({
   windowWidth: number;
   handleSeek: (position: SetStateAction<number>) => void;
 }) {
-  const width = windowWidth / showcaseDuration * item.duration;
+  const width = (windowWidth / showcaseDuration) * item.duration;
   const seekProps = {
     duration: item.duration,
     radius: 0,
@@ -63,18 +63,12 @@ function ShowcaseSeekItem({
     innerColor: "#6c6c6c",
     hoverColor: "#6c6c6c",
     width,
-  }
+  };
 
   if (index === activeIndex) {
-    return (
-      <Seek
-        position={position}
-        onSeek={handleSeek}
-        {...seekProps}
-      />
-    );
+    return <Seek position={position} onSeek={handleSeek} {...seekProps} />;
   }
-  
+
   return (
     <Seek
       position={index > activeIndex ? 0 : item.duration}

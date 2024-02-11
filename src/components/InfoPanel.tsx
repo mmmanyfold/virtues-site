@@ -122,7 +122,9 @@ function ShowcaseList({
                 <RichTextCollection objects={metadata[id]} />
               </div>
             </div>
-            <p>{formatTimestamp(start)}—{formatTimestamp(end)}</p>
+            <p>
+              {formatTimestamp(start)}—{formatTimestamp(end)}
+            </p>
           </div>
         );
       })}

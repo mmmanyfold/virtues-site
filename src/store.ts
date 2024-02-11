@@ -78,9 +78,7 @@ store.sub(seekingPositionAtom, () => {
   const seekPosition = store.get(seekingPositionAtom);
   const player = store.get(playerAtom);
 
-  player
-    .setCurrentTime(seekPosition)
-    .catch(handleError);
+  player.setCurrentTime(seekPosition).catch(handleError);
 });
 
 export const bindEventsToPlayer = () => {
