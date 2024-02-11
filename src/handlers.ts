@@ -74,7 +74,6 @@ export const handlePreviousChapter = () => {
 
   store.set(chapterIndexAtom, previousChapterIndex);
   store.set(seekingPositionAtom, seekTo.startTime);
-  store.set(isPlayingAtom, true);
 };
 
 export const handleNextChapter = () => {
@@ -89,12 +88,10 @@ export const handleNextChapter = () => {
 
   store.set(chapterIndexAtom, newChapterIndex);
   store.set(seekingPositionAtom, seekTo.startTime);
-  store.set(isPlayingAtom, true);
 };
 
 export const handleRestartPlayback = () => {
   store.set(seekingPositionAtom, 0);
-  store.set(isPlayingAtom, true);
 };
 
 export const handleRandomChapter = () => {
@@ -108,7 +105,6 @@ export const handleRandomChapter = () => {
 
   store.set(chapterIndexAtom, randomChapterIndex);
   store.set(seekingPositionAtom, randomChapter.startTime);
-  store.set(isPlayingAtom, true);
 };
 
 export const handleSetCurrentChapter = (index: number) => {
@@ -117,7 +113,6 @@ export const handleSetCurrentChapter = (index: number) => {
 
   store.set(chapterIndexAtom, index);
   store.set(seekingPositionAtom, newChapter.startTime);
-  store.set(isPlayingAtom, true);
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
@@ -138,7 +133,6 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
     .loadVideo(videoUrl)
     .then(() => {
       bindEventsToPlayer();
-      player.play().catch(handleError);
     })
     .catch(handleError);
 };
@@ -151,12 +145,12 @@ export const handleSetCurrentShowcaseItem = async (index: number, pos: number) =
     playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
 
   store.set(showcaseItemIndexAtom, index);
+  store.set(seekingPositionAtom, pos);
 
   player
     .loadVideo(newVideo.player_embed_url)
     .then(() => {
       bindEventsToPlayer();
-      store.set(seekingPositionAtom, pos);
     })
     .catch(handleError);
 };
@@ -184,7 +178,6 @@ export const handlePlaylistJump = async () => {
     .loadVideo(nextVideoUrl)
     .then(() => {
       bindEventsToPlayer();
-      player.play().catch(handleError);
     })
     .catch(handleError);
 };
