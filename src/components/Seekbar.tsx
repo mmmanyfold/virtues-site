@@ -1,4 +1,5 @@
 import { useAtom } from "jotai";
+import { useEffect } from "react";
 import { Seekbar as Seek } from "react-seekbar";
 import {
   seekingPositionAtom,
@@ -65,6 +66,12 @@ function SeekShowcase({ items }: { items: any[] }) {
   const [currentVideoIndex] = useAtom(showcaseItemIndexAtom);
   const [currentVideoSeekPosition] = useAtom(seekingPositionAtom);
 
+  useEffect(() => {
+    if (currentVideoSeekPosition === items[currentVideoIndex].duration) {
+      handleSetCurrentShowcaseItem(currentVideoIndex + 1, 1);
+    }
+  }, [currentVideoSeekPosition, currentVideoIndex]);
+
   const videoStartTimes = items.map((_, index) => {
     return items.slice(0, index).reduce((acc, item) => {
       const sum = acc + item.duration;
@@ -95,7 +102,7 @@ function SeekShowcase({ items }: { items: any[] }) {
 function Seekbar({ playlist }: { playlist: any }) {
   const [isSeekLoading] = useAtom(isSeekLoadingAtom);
 
-  if (isSeekLoading) {
+  if (isSeekLoading || !playlist) {
     return (
       <div className="seekbar-wrapper">
         <div className="flex items-center relative h-[25px]">
@@ -105,8 +112,9 @@ function Seekbar({ playlist }: { playlist: any }) {
     );
   }
 
-  if (playlist.videoShowCasePayload.data) {
-    return <SeekShowcase items={playlist.videoShowCasePayload.data} />;
+  const showcaseItems = playlist.videoShowCasePayload.data;
+  if (showcaseItems) {
+    return <SeekShowcase items={showcaseItems} />;
   }
 
   return <SeekChapter />;

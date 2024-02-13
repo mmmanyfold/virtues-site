@@ -146,7 +146,9 @@ export const handleSetCurrentShowcaseItem = async (
   index: number,
   pos: number
 ) => {
-  store.set(isSeekLoadingAtom, true);
+  if (pos > 0) {
+    store.set(isSeekLoadingAtom, true);
+  }
 
   const player = store.get(playerAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
