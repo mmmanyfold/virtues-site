@@ -142,7 +142,7 @@ function InfoPanel() {
 
   return (
     <div
-      className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll opacity-90 ${
+      className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll opacity-80 ${
         isMediaSmall ? "p-4" : "px-8 pt-10 pb-5"
       }`}
     >
