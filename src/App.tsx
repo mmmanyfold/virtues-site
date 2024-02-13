@@ -185,7 +185,11 @@ function VideoWrapper() {
     <>
       <div
         className="relative"
-        style={{ width: `${wrapperWidth}px`, left: positionLeft }}
+        style={{
+          width: `${wrapperWidth}px`,
+          left: positionLeft,
+          height: "100dvh",
+        }}
       >
         <VideoPlayer />
       </div>
