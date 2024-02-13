@@ -81,6 +81,13 @@ h1.title {
   display: none !important;
 }
 
+.seekbar-loading {
+  background-color: #a9a9a9;
+  height: 15px;
+  width: 100%;
+  overflow: hidden;
+}
+
 .controls button {
   color: black;
 }
@@ -101,7 +108,7 @@ h1.title {
   font-family: monospace;
 }
 
-button[aria-label]:after {
+/* button[aria-label]:after {
   position: absolute;
   z-index: 10;
   top: -2.2em;
@@ -122,4 +129,4 @@ button[aria-label]:after {
 button[aria-label]:hover:after {
   opacity: 1;
   transition: opacity 0.8s 0.8s ease;
-}
+} */

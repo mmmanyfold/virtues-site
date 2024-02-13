@@ -1,0 +1,123 @@
+import { useAtom } from "jotai";
+import { useEffect } from "react";
+import { Seekbar as Seek } from "react-seekbar";
+import {
+  seekingPositionAtom,
+  durationAtom,
+  showcaseItemIndexAtom,
+  isSeekLoadingAtom,
+} from "../store.ts";
+import { handleSetCurrentShowcaseItem, handleSeek } from "../handlers.ts";
+
+const seekbarProps = {
+  radius: 0,
+  height: 15,
+  outerColor: "#a9a9a9",
+  innerColor: "#6c6c6c",
+  hoverColor: "#6c6c6c",
+  fullWidth: true,
+};
+
+function SeekChapter() {
+  const [seekPosition] = useAtom(seekingPositionAtom);
+  const [duration] = useAtom(durationAtom);
+
+  return (
+    <div className="seekbar-wrapper">
+      <Seek
+        position={seekPosition}
+        duration={duration}
+        onSeek={handleSeek}
+        {...seekbarProps}
+      />
+    </div>
+  );
+}
+
+function showcaseVideoIndexFromPosition(
+  position: number,
+  startTimes: number[]
+) {
+  let index = 0;
+  for (let i = 0; i < startTimes.length; i++) {
+    if (position > startTimes[i]) {
+      index = i;
+    }
+  }
+  return index;
+}
+
+function handleShowcaseSeek(
+  pos: number,
+  currentIndex: number,
+  startTimes: number[]
+) {
+  const videoIndex = showcaseVideoIndexFromPosition(pos, startTimes);
+  const videoPosition = pos - startTimes[videoIndex];
+
+  if (videoIndex === currentIndex) {
+    handleSeek(videoPosition);
+    return;
+  }
+  handleSetCurrentShowcaseItem(videoIndex, videoPosition);
+}
+
+function SeekShowcase({ items }: { items: any[] }) {
+  const [currentVideoIndex] = useAtom(showcaseItemIndexAtom);
+  const [currentVideoSeekPosition] = useAtom(seekingPositionAtom);
+
+  useEffect(() => {
+    if (currentVideoSeekPosition === items[currentVideoIndex].duration) {
+      handleSetCurrentShowcaseItem(currentVideoIndex + 1, 1);
+    }
+  }, [currentVideoSeekPosition, currentVideoIndex]);
+
+  const videoStartTimes = items.map((_, index) => {
+    return items.slice(0, index).reduce((acc, item) => {
+      const sum = acc + item.duration;
+      return index === 0 ? 0 : sum + 1;
+    }, 0);
+  });
+
+  const currentVideoStartTime = videoStartTimes[currentVideoIndex];
+  const showcasePosition = currentVideoStartTime + currentVideoSeekPosition;
+  const showcaseDuration = items.reduce((acc, item) => acc + item.duration, 0);
+
+  const onSeek = (pos: number) => {
+    handleShowcaseSeek(pos, currentVideoIndex, videoStartTimes);
+  };
+
+  return (
+    <div className="seekbar-wrapper">
+      <Seek
+        position={showcasePosition}
+        duration={showcaseDuration}
+        onSeek={onSeek}
+        {...seekbarProps}
+      />
+    </div>
+  );
+}
+
+function Seekbar({ playlist }: { playlist: any }) {
+  const [isSeekLoading] = useAtom(isSeekLoadingAtom);
+
+  if (isSeekLoading || !playlist) {
+    return (
+      <div className="seekbar-wrapper">
+        <div className="flex items-center relative h-[25px]">
+          <div className="seekbar-loading animate-pulse"></div>
+        </div>
+      </div>
+    );
+  }
+
+  const showcaseItems = playlist.videoShowCasePayload.data;
+  if (showcaseItems) {
+    return <SeekShowcase items={showcaseItems} />;
+  }
+
+  return <SeekChapter />;
+}
+
+export default Seekbar;

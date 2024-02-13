@@ -17,9 +17,16 @@ export const isFullscreenAtom = atom(false);
 export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
 export const seekingPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
+export const isSeekLoadingAtom = atom(false);
+
+// chapter-based control
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
 export const chapterIndexAtom = atom<number>(0);
 export const currentChapterAtom = atom<Player.VimeoChapter | null>(null);
+
+// showcase-based control
+export const showcaseItemIndexAtom = atom<number>(0);
+
 export const playlistsAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
     `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
@@ -28,8 +35,6 @@ export const playlistsAtom = atom(async (_get, { signal }) => {
   const { rows } = await response.json();
   return rows;
 });
-
-export const timeInSecondsUpdateAtom = atom<number>(0);
 
 export const aboutPageAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
@@ -40,11 +45,11 @@ export const aboutPageAtom = atom(async (_get, { signal }) => {
   return await response.json();
 });
 
-export const currentVideoIndexAtom = atom<number>(0);
+export const currentPlaylistIndexAtom = atom<number>(0);
 
 export const readOnlyCurrentSelectionAtom = atom(async (get) => {
   const [first] = await get(playlistsAtom);
-  return first.vimeoPlayerURL || "";
+  return first;
 });
 
 export const isInfoPanelOpenAtom = atom<boolean>(false);
@@ -73,34 +78,8 @@ store.sub(windowWidthAtom, () => {
   store.set(isMediaSmallAtom, windowWidth < 890);
 });
 
-store.sub(isPlayingAtom, () => {
-  const player = store.get(playerAtom);
-
-  if (store.get(isPlayingAtom)) {
-    player.play().catch(handleError);
-  } else {
-    player.pause().catch(handleError);
-  }
-});
-
 store.sub(playerAtom, () => {
   bindEventsToPlayer();
-});
-
-store.sub(seekingPositionAtom, () => {
-  const seekPosition = store.get(seekingPositionAtom);
-  const playing = store.get(isPlayingAtom);
-  const player = store.get(playerAtom);
-
-  player
-    .setCurrentTime(seekPosition)
-    .then(() => {
-      // begin playing at seek position
-      if (!playing) {
-        store.set(isPlayingAtom, true);
-      }
-    })
-    .catch(handleError);
 });
 
 export const bindEventsToPlayer = () => {
@@ -151,7 +130,7 @@ export const bindEventsToPlayer = () => {
   });
 
   player.on("timeupdate", (timeupdate: TimeUpdate) => {
-    store.set(timeInSecondsUpdateAtom, Math.trunc(timeupdate.seconds));
+    store.set(seekingPositionAtom, Math.trunc(timeupdate.seconds));
   });
 
   player.on("fullscreenchange", ({ fullscreen }: any) => {

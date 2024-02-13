@@ -3,11 +3,11 @@ import { useAtom } from "jotai";
 import { ArrowUpRight } from "@phosphor-icons/react";
 import {
   playlistsAtom,
-  currentVideoIndexAtom,
+  currentPlaylistIndexAtom,
   isAboutOpenAtom,
   externalLinksPageAtom,
 } from "../store.ts";
-import { handleSetCurrentVideo, handleOpenAbout } from "../handlers.ts";
+import { handleOpenAbout, handleSetCurrentPlaylist } from "../handlers.ts";
 import { PlaylistVideo } from "../types.ts";
 
 function MenuItem({ title, isCurrentView, onClick, isSecondary }: any) {
@@ -42,7 +42,7 @@ function ExternalLink({ link, text }: any) {
 
 export default function Menu() {
   const [playlists] = useAtom(playlistsAtom);
-  const [currentVideoIndex] = useAtom(currentVideoIndexAtom);
+  const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
   const orderedPlaylists = playlists.sort(
     (a: PlaylistVideo, b: PlaylistVideo) => a.order - b.order,
@@ -54,17 +54,14 @@ export default function Menu() {
       <div className="w-full h-100 overflow-auto py-20">
         <div className="w-full flex flex-col items-center justify-center gap-y-6 text-center">
           {orderedPlaylists.map(
-            (
-              { uuid, videoTitle, vimeoPlayerURL }: PlaylistVideo,
-              index: number,
-            ) => {
-              const isCurrentVideo = index === currentVideoIndex;
+            ({ uuid, videoTitle }: PlaylistVideo, index: number) => {
+              const isCurrentVideo = index === currentPlaylistIndex;
               return (
                 <MenuItem
                   key={uuid}
                   title={videoTitle}
                   isCurrentView={!isAboutOpen && isCurrentVideo}
-                  onClick={() => handleSetCurrentVideo(vimeoPlayerURL)}
+                  onClick={() => handleSetCurrentPlaylist(index)}
                 />
               );
             },
