@@ -144,7 +144,7 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
 
 export const handleSetCurrentShowcaseItem = async (
   index: number,
-  pos: number
+  pos: number = 0,
 ) => {
   if (pos > 0) {
     store.set(isSeekLoadingAtom, true);
