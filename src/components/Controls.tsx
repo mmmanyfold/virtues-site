@@ -221,7 +221,7 @@ function ShowcaseControls({ playlist }: { playlist: any }) {
 
 function ChapterControls() {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
-  const iconClass = isMediaSmall ? "text-[20px]" : "text-[30px]";
+  const iconClass = isMediaSmall ? "text-[10px]" : "text-[30px]";
 
   return (
     <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
