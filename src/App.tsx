@@ -101,6 +101,7 @@ function MenuToggle() {
   const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
+  const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [aboutPage] = useAtom(aboutPageAtom);
 
@@ -117,7 +118,7 @@ function MenuToggle() {
     <>
       <div
         role="button"
-        className={`absolute z-40 ${
+        className={`absolute ${isInfoPanelOpen ? "hidden" : "z-40"} ${
           isMediaSmall ? "top-3 right-3" : "top-8 right-8"
         }`}
         onClick={handleToggleMenu}
@@ -188,7 +189,7 @@ function VideoWrapper() {
         style={{
           width: `${wrapperWidth}px`,
           left: positionLeft,
-          height: "100dvh",
+          height: "100%",
         }}
       >
         <VideoPlayer />
