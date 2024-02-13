@@ -16,6 +16,7 @@ import {
   currentPlaylistIndexAtom,
   isAboutOpenAtom,
   showcaseItemIndexAtom,
+  isSeekLoadingAtom,
 } from "./store.ts";
 
 export const handleToggleInfoPanel = () => {
@@ -71,9 +72,7 @@ export const handlePreviousChapter = () => {
   const seekTo = chapters[previousChapterIndex];
 
   store.set(chapterIndexAtom, previousChapterIndex);
-  player
-    .setCurrentTime(seekTo.startTime)
-    .catch(handleError);
+  player.setCurrentTime(seekTo.startTime).catch(handleError);
 };
 
 export const handleNextChapter = () => {
@@ -88,45 +87,37 @@ export const handleNextChapter = () => {
   const seekTo = chapters[newChapterIndex];
 
   store.set(chapterIndexAtom, newChapterIndex);
-  player
-    .setCurrentTime(seekTo.startTime)
-    .catch(handleError);
+  player.setCurrentTime(seekTo.startTime).catch(handleError);
 };
 
 export const handleRestartPlayback = () => {
   const player = store.get(playerAtom);
-  player
-    .setCurrentTime(0)
-    .catch(handleError);
+  player.setCurrentTime(0).catch(handleError);
 };
 
 export const handleRandomChapter = () => {
   const player = store.get(playerAtom);
   const chapters = store.get(chaptersAtom);
   const currentChapterIndex = store.get(chapterIndexAtom);
-  
+
   const randomChapterIndex = Math.floor(Math.random() * chapters.length);
   const randomChapter = chapters[randomChapterIndex];
-  
+
   if (currentChapterIndex === randomChapterIndex) {
     handleRandomChapter();
   }
 
   store.set(chapterIndexAtom, randomChapterIndex);
-  player
-    .setCurrentTime(randomChapter.startTime)
-    .catch(handleError);
+  player.setCurrentTime(randomChapter.startTime).catch(handleError);
 };
 
 export const handleSetCurrentChapter = (index: number) => {
   const player = store.get(playerAtom);
   const chapters = store.get(chaptersAtom);
   const newChapter = chapters[index];
-  
-  store.set(chapterIndexAtom, index);  
-  player
-    .setCurrentTime(newChapter.startTime)
-    .catch(handleError);
+
+  store.set(chapterIndexAtom, index);
+  player.setCurrentTime(newChapter.startTime).catch(handleError);
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
@@ -155,7 +146,7 @@ export const handleSetCurrentShowcaseItem = async (
   index: number,
   pos: number
 ) => {
-  store.set(showcaseItemIndexAtom, index);
+  store.set(isSeekLoadingAtom, true);
 
   const player = store.get(playerAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
@@ -166,9 +157,15 @@ export const handleSetCurrentShowcaseItem = async (
   player
     .loadVideo(newVideo.player_embed_url)
     .then(() => {
-      bindEventsToPlayer();
       store.set(seekingPositionAtom, pos);
-      player.setCurrentTime(pos).catch(handleError);
+      store.set(showcaseItemIndexAtom, index);
+      bindEventsToPlayer();
+      player
+        .setCurrentTime(pos)
+        .then(() => {
+          store.set(isSeekLoadingAtom, false);
+        })
+        .catch(handleError);
     })
     .catch(handleError);
 };
@@ -205,10 +202,8 @@ export const handlePlaylistJump = async () => {
 export const handleSeek = (position: number) => {
   const player = store.get(playerAtom);
   store.set(seekingPositionAtom, position);
-  player
-    .setCurrentTime(position)
-    .catch(handleError);
-}
+  player.setCurrentTime(position).catch(handleError);
+};
 
 export const handleError = (error: Error) => {
   console.error(error);

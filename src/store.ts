@@ -122,7 +122,6 @@ export const bindEventsToPlayer = () => {
 
   player.on("timeupdate", (timeupdate: TimeUpdate) => {
     store.set(seekingPositionAtom, Math.trunc(timeupdate.seconds));
-    store.set(isSeekLoadingAtom, false);
   });
 
   player.on("fullscreenchange", ({ fullscreen }: any) => {

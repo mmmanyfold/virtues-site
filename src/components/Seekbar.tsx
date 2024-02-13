@@ -4,10 +4,18 @@ import {
   seekingPositionAtom,
   durationAtom,
   showcaseItemIndexAtom,
-  windowWidthAtom,
   isSeekLoadingAtom,
 } from "../store.ts";
 import { handleSetCurrentShowcaseItem, handleSeek } from "../handlers.ts";
+
+const seekbarProps = {
+  radius: 0,
+  height: 15,
+  outerColor: "#a9a9a9",
+  innerColor: "#6c6c6c",
+  hoverColor: "#6c6c6c",
+  fullWidth: true,
+};
 
 function SeekChapter() {
   const [seekPosition] = useAtom(seekingPositionAtom);
@@ -19,78 +27,73 @@ function SeekChapter() {
         position={seekPosition}
         duration={duration}
         onSeek={handleSeek}
-        radius={0}
-        height={15}
-        outerColor="#a9a9a9"
-        innerColor="#6c6c6c"
-        hoverColor="#6c6c6c"
-        fullWidth
+        {...seekbarProps}
       />
     </div>
   );
 }
 
-function ShowcaseSeekItem({
-  item,
-  index,
-  seekPosition,
-  showcaseDuration,
-  windowWidth,
-  setLoading,
-}: {
-  item: any;
-  index: number;
-  seekPosition: number;
-  duration: number;
-  showcaseDuration: number;
-  windowWidth: number;
-  setLoading: () => void;
-}) {
-  const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
-  const width = (windowWidth / showcaseDuration) * item.duration;
-  const seekProps = {
-    duration: item.duration,
-    radius: 0,
-    height: 15,
-    outerColor: "#a9a9a9",
-    innerColor: "#6c6c6c",
-    hoverColor: "#6c6c6c",
-    width,
-  };
-
-  const isActive = index === showcaseItemIndex;
-  let position = seekPosition;
-
-  if (!isActive) {
-    position = index > showcaseItemIndex ? 0 : item.duration
-  }
-
-  const onSeek = (pos: number) => {
-    if (isActive) {
-      handleSeek(pos);
-    } else {
-      setLoading();
-      // setShowcaseItemIndex(index);
-      handleSetCurrentShowcaseItem(index, pos);
+function showcaseVideoIndexFromPosition(
+  position: number,
+  startTimes: number[]
+) {
+  let index = 0;
+  for (let i = 0; i < startTimes.length; i++) {
+    if (position > startTimes[i]) {
+      index = i;
     }
   }
+  return index;
+}
 
-  return (
-    <Seek
-      position={position}
-      onSeek={onSeek}
-      {...seekProps}
-    />
-  );
+function handleShowcaseSeek(
+  pos: number,
+  currentIndex: number,
+  startTimes: number[]
+) {
+  const videoIndex = showcaseVideoIndexFromPosition(pos, startTimes);
+  const videoPosition = pos - startTimes[videoIndex];
+
+  if (videoIndex === currentIndex) {
+    handleSeek(videoPosition);
+    return;
+  }
+  handleSetCurrentShowcaseItem(videoIndex, videoPosition);
 }
 
 function SeekShowcase({ items }: { items: any[] }) {
-  const [windowWidth] = useAtom(windowWidthAtom);
-  const [seekPosition] = useAtom(seekingPositionAtom);
-  const [duration] = useAtom(durationAtom);
-  const [isSeekLoading, setIsSeekLoading] = useAtom(isSeekLoadingAtom);
+  const [currentVideoIndex] = useAtom(showcaseItemIndexAtom);
+  const [currentVideoSeekPosition] = useAtom(seekingPositionAtom);
 
+  const videoStartTimes = items.map((_, index) => {
+    return items.slice(0, index).reduce((acc, item) => {
+      const sum = acc + item.duration;
+      return index === 0 ? 0 : sum + 1;
+    }, 0);
+  });
+
+  const currentVideoStartTime = videoStartTimes[currentVideoIndex];
+  const showcasePosition = currentVideoStartTime + currentVideoSeekPosition;
   const showcaseDuration = items.reduce((acc, item) => acc + item.duration, 0);
+
+  const onSeek = (pos: number) => {
+    handleShowcaseSeek(pos, currentVideoIndex, videoStartTimes);
+  };
+
+  return (
+    <div className="seekbar-wrapper">
+      <Seek
+        position={showcasePosition}
+        duration={showcaseDuration}
+        onSeek={onSeek}
+        {...seekbarProps}
+      />
+    </div>
+  );
+}
+
+function Seekbar({ playlist }: { playlist: any }) {
+  const [isSeekLoading] = useAtom(isSeekLoadingAtom);
 
   if (isSeekLoading) {
     return (
@@ -102,28 +105,10 @@ function SeekShowcase({ items }: { items: any[] }) {
     );
   }
 
-  return (
-    <div className="seekbar-wrapper flex">
-      {items.map((item, index) => (
-        <ShowcaseSeekItem
-          key={item.uri}
-          item={item}
-          index={index}
-          seekPosition={seekPosition}
-          duration={duration}
-          showcaseDuration={showcaseDuration}
-          windowWidth={windowWidth}
-          setLoading={() => setIsSeekLoading(true)}
-        />
-      ))}
-    </div>
-  );
-}
-
-function Seekbar({ playlist }: { playlist: any }) {
   if (playlist.videoShowCasePayload.data) {
     return <SeekShowcase items={playlist.videoShowCasePayload.data} />;
   }
+
   return <SeekChapter />;
 }
 
