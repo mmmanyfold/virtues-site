@@ -172,11 +172,8 @@ const getRandomInt = (max: number) => {
   return Math.floor(Math.random() * max);
 };
 
-function ShowcaseControls({ playlist }: { playlist: any }) {
-  const [isMediaSmall] = useAtom(isMediaSmallAtom);
+function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: string }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
-
-  const iconClass = isMediaSmall ? "text-[20px]" : "text-[30px]";
   const showcaseTotal = playlist.videoShowCasePayload.total;
 
   const handleNext = () => {
@@ -219,10 +216,7 @@ function ShowcaseControls({ playlist }: { playlist: any }) {
   );
 }
 
-function ChapterControls() {
-  const [isMediaSmall] = useAtom(isMediaSmallAtom);
-  const iconClass = isMediaSmall ? "text-[10px]" : "text-[30px]";
-
+function ChapterControls({ iconClass }: { iconClass: string }) {
   return (
     <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
       <ControlInfoPanel iconClass={iconClass} />
@@ -239,10 +233,13 @@ function ChapterControls() {
 }
 
 function Controls({ playlist }: { playlist: any }) {
+  const [isMediaSmall] = useAtom(isMediaSmallAtom);
+  const iconClass = isMediaSmall ? "text-20px]" : "text-[30px]";
+
   if (playlist.videoShowCasePayload?.data) {
-    return <ShowcaseControls playlist={playlist} />;
+    return <ShowcaseControls playlist={playlist} iconClass={iconClass} />;
   }
-  return <ChapterControls />;
+  return <ChapterControls iconClass={iconClass} />;
 }
 
 export default Controls;
