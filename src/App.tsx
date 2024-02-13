@@ -129,7 +129,11 @@ function MenuToggle() {
         )}
       </div>
 
-      {isMenuOpen && <Menu />}
+      {isMenuOpen && (
+        <Suspense fallback={<div>...</div>}>
+          <Menu />
+        </Suspense>
+      )}
       {isAboutOpen && <About blocks={aboutPage?.blocks} />}
     </>
   );

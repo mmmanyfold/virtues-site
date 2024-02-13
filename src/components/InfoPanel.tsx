@@ -14,9 +14,9 @@ import {
   handleSetCurrentShowcaseItem,
 } from "../handlers.ts";
 
-function formatTimestamp(seconds: number) {
-  var minutes = Math.floor(seconds / 60);
-  var seconds = seconds % 60;
+function formatTimestamp(timestamp: number) {
+  const minutes = Math.floor(timestamp / 60);
+  const seconds = timestamp % 60;
   return (
     minutes.toString().padStart(2, "0") +
     ":" +
