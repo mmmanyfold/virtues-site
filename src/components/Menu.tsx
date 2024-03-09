@@ -7,7 +7,7 @@ import {
   isAboutOpenAtom,
   externalLinksPageAtom,
 } from "../store.ts";
-import { handleOpenAbout, handleSetCurrentPlaylist } from "../handlers.ts";
+import { handleOpenAbout, handleSetCurrentPlaylist, handleToggleMenu } from "../handlers.ts";
 import { PlaylistVideo } from "../types.ts";
 
 function MenuItem({ title, isCurrentView, onClick, isSecondary }: any) {
@@ -19,7 +19,7 @@ function MenuItem({ title, isCurrentView, onClick, isSecondary }: any) {
           ? "border-b-[#000] text-[#000]"
           : `border-b-[#fcf3e9] ${isSecondary ? "light-gray" : ""}`
       }`}
-      onClick={onClick}
+      onClick={isCurrentView ? handleToggleMenu : onClick}
     >
       {title}
     </div>
@@ -50,7 +50,7 @@ export default function Menu() {
   const [externalLinks] = useAtom(externalLinksPageAtom);
 
   return (
-    <div className="absolute z-30 w-[100%] h-[100dvh] bg-[#fcf3e9] flex flex-col items-center justify-center text-2xl tracking-wide">
+    <div className="absolute z-30 w-[100%] h-[100dvh] bg-cream flex flex-col items-center justify-center text-2xl tracking-wide">
       <div className="w-full h-100 overflow-auto py-20">
         <div className="w-full flex flex-col items-center justify-center gap-y-6 text-center">
           {orderedPlaylists.map(

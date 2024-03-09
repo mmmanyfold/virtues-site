@@ -202,7 +202,7 @@ function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: s
   };
 
   return (
-    <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
+    <div className="flex items-center justify-around bg-cream py-3">
       <ControlInfoPanel iconClass={iconClass} />
       <ControlMute iconClass={iconClass} />
       <ControlRandom iconClass={iconClass} onClick={handleRandom} />
@@ -218,7 +218,7 @@ function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: s
 
 function ChapterControls({ iconClass }: { iconClass: string }) {
   return (
-    <div className="flex items-center justify-around bg-[#fdfcfa] py-3">
+    <div className="flex items-center justify-around bg-cream py-3">
       <ControlInfoPanel iconClass={iconClass} />
       <ControlMute iconClass={iconClass} />
       <ControlRandom iconClass={iconClass} onClick={handleRandomChapter} />

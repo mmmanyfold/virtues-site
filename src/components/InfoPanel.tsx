@@ -142,12 +142,12 @@ function InfoPanel() {
 
   return (
     <div
-      className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-white overflow-y-scroll opacity-80 ${
-        isMediaSmall ? "p-4" : "px-8 pt-10 pb-5"
+      className={`info-panel w-[433px] max-w-[100%] absolute top-0 z-10 bg-cream overflow-y-scroll opacity-80 ${
+        isMediaSmall ? "p-4" : "px-8 pt-10 pb-20"
       }`}
     >
       <h2 className="italic text-2xl tracking-wide mb-2">{videoTitle}</h2>
-      <div className="divide-y divide-[#a9a9a9] text-sm">
+      <div className="divide-y divide-[#a9a9a9] text-lg tracklist">
         {!!videoShowCasePayload?.data ? (
           <ShowcaseList
             metadata={vimeoChapters}

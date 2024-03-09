@@ -123,7 +123,7 @@ function MenuToggle() {
         }`}
         onClick={handleToggleMenu}
       >
-        {isMenuOpen ? (
+        {isMenuOpen || isAboutOpen ? (
           <X className={iconClass} weight="bold" />
         ) : (
           <Plus className={iconClass} weight="bold" color={plusColor} />

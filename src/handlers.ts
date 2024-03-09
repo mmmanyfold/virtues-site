@@ -28,6 +28,7 @@ export const handleToggleMenu = () => {
   const isOpen = store.get(isMenuOpenAtom);
   store.set(isMenuOpenAtom, !isOpen);
   store.set(isInfoPanelOpenAtom, false);
+  store.set(isAboutOpenAtom, false);
 };
 
 export const handleOpenAbout = () => {
