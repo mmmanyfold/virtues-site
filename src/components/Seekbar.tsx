@@ -68,7 +68,7 @@ function SeekShowcase({ items }: { items: any[] }) {
 
   useEffect(() => {
     if (currentVideoSeekPosition === items[currentVideoIndex].duration) {
-      handleSetCurrentShowcaseItem(currentVideoIndex + 1, 1);
+      handleSetCurrentShowcaseItem(currentVideoIndex + 1, 0.5);
     }
   }, [currentVideoSeekPosition, currentVideoIndex]);
 
