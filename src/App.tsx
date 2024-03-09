@@ -45,8 +45,6 @@ function VideoPlayer() {
           }}
           data-vimeo-url={firstVideoUrl}
           data-vimeo-background="1"
-          data-vimeo-allow="autoplay"
-          data-vimeo-muted="1"
         ></div>
       </div>
     </Suspense>

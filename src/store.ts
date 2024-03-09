@@ -80,6 +80,13 @@ store.sub(windowWidthAtom, () => {
 
 store.sub(playerAtom, () => {
   bindEventsToPlayer();
+  const player = store.get(playerAtom);
+  player.setMuted(true)
+    .then(() => {
+      player.play().catch(handleError);
+      store.set(isMutedAtom, true);
+    })
+    .catch(handleError);
 });
 
 export const bindEventsToPlayer = () => {
