@@ -92,6 +92,7 @@ store.sub(playerAtom, () => {
 export const bindEventsToPlayer = () => {
   const player = store.get(playerAtom);
   const isMuted = store.get(isMutedAtom);
+  const isPlaying = store.get(isPlayingAtom);
 
   player.setMuted(isMuted).catch(handleError);
 
@@ -142,5 +143,8 @@ export const bindEventsToPlayer = () => {
 
   player.on("fullscreenchange", ({ fullscreen }: any) => {
     store.set(isFullscreenAtom, fullscreen);
+    if (isPlaying) {
+      player.play().catch(handleError);
+    }
   });
 };
