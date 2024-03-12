@@ -105,9 +105,16 @@ function Seekbar({ playlist }: { playlist: any }) {
 
   if (isSeekLoading || !playlist) {
     return (
-      <div className="seekbar-wrapper">
-        <div className="flex items-center relative h-[25px]">
-          <div className="seekbar-loading animate-pulse"></div>
+      <div className="relative">
+        <div className="absolute w-full">
+          <div className="flex items-center h-[25px]">
+            <div className="seekbar-loading !bg-[#242424]"></div>
+          </div>
+        </div>
+        <div className="seekbar-wrapper">
+          <div className="flex items-center h-[25px]">
+            <div className="seekbar-loading animate-pulse duration-75"></div>
+          </div>
         </div>
       </div>
     );
