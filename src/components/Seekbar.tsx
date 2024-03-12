@@ -67,8 +67,9 @@ function SeekShowcase({ items }: { items: any[] }) {
   const [currentVideoSeekPosition] = useAtom(seekingPositionAtom);
 
   useEffect(() => {
-    if (currentVideoSeekPosition === items[currentVideoIndex].duration) {
-      handleSetCurrentShowcaseItem(currentVideoIndex + 1, 0.5);
+    if (currentVideoSeekPosition === items[currentVideoIndex].duration - 1) {
+      const isLast = currentVideoIndex === items.length - 1
+      handleSetCurrentShowcaseItem(isLast ? 0 : currentVideoIndex + 1);
     }
   }, [currentVideoSeekPosition, currentVideoIndex]);
 
@@ -81,7 +82,7 @@ function SeekShowcase({ items }: { items: any[] }) {
 
   const currentVideoStartTime = videoStartTimes[currentVideoIndex];
   const showcasePosition = currentVideoStartTime + currentVideoSeekPosition;
-  const showcaseDuration = items.reduce((acc, item) => acc + item.duration, 0);
+  const showcaseDuration = items.reduce((acc, item) => acc + item.duration + 1, 0);
 
   const onSeek = (pos: number) => {
     handleShowcaseSeek(pos, currentVideoIndex, videoStartTimes);

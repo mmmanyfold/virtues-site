@@ -30,7 +30,6 @@ function Track({ isCurrent, onClick, number, start, end, richTextObjects}: any) 
   
   useEffect(() => {
     if (isCurrent && trackRef.current) {
-      console.log(trackRef)
       trackRef.current.scrollIntoView({
         behavior: 'smooth', // Smooth scrolling
         block: 'center', // Vertical alignment
