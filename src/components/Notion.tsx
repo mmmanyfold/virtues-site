@@ -26,7 +26,7 @@ function RichTextObject({ object, color }: any) {
       {hasNewlines ? (
         <>
           {linkUrl ? (
-            <a href={linkUrl}>
+            <a href={linkUrl} target="_blank">
               <pre className={className} style={color ? { color } : {}}>
                 {content}
               </pre>
@@ -40,7 +40,7 @@ function RichTextObject({ object, color }: any) {
       ) : (
         <>
           {linkUrl ? (
-            <a href={linkUrl}>
+            <a href={linkUrl} target="_blank">
               <span className={className} style={color ? { color } : {}}>
                 {content}
               </span>{" "}
