@@ -73,7 +73,7 @@ export default function About({ blocks }: any) {
         className={`pt-14 ${
           isMediaSmall
             ? "flex flex-col gap-y-12"
-            : "grid grid-cols-[4fr_3fr_9fr] gap-x-12"
+            : "grid grid-cols-[7fr_9fr] gap-x-12"
         }`}
       >
         {sections.map((column: any, i: number) => {
