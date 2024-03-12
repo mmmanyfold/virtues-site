@@ -8,8 +8,8 @@ const ContentBlock = ({ block, imgShadow }: any) => {
     case "paragraph":
       return (
         <p>
-          {block.paragraph.rich_text.map((richText: any) => (
-            <RichTextObject key={richText.text.content} object={richText} />
+          {block.paragraph.rich_text.map((richText: any, i: number) => (
+            <RichTextObject key={`object-${i}`} object={richText} />
           ))}
         </p>
       );

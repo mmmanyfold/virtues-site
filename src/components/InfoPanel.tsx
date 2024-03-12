@@ -1,3 +1,4 @@
+import { useEffect, useRef }  from "react";
 import { useAtom } from "jotai";
 import { RichTextCollection } from "../components/Notion.tsx";
 import {
@@ -21,6 +22,46 @@ function formatTimestamp(timestamp: number) {
     minutes.toString().padStart(2, "0") +
     ":" +
     seconds.toString().padStart(2, "0")
+  );
+}
+
+function Track({ isCurrent, onClick, number, start, end, richTextObjects}: any) {
+  const trackRef = useRef<null | HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (isCurrent && trackRef.current) {
+      console.log(trackRef)
+      trackRef.current.scrollIntoView({
+        behavior: 'smooth', // Smooth scrolling
+        block: 'center', // Vertical alignment
+        inline: 'start' // Horizontal alignment
+      });
+    }
+  }, [isCurrent])
+
+  return (
+    <div
+      ref={trackRef}
+      role="button"
+      className="py-6"
+      style={{ 
+        color: isCurrent ? "black" : "#908f8f",
+        fontWeight: isCurrent ? 500 : 400
+      }}
+      onClick={onClick}
+    >
+      <div className="flex gap-x-4 mb-6">
+        <div className="italic">#{number}</div>
+        <div>
+          <RichTextCollection objects={richTextObjects} />
+        </div>
+      </div>
+      {start !== undefined && end !== undefined && (
+        <p>
+          {formatTimestamp(start)}—{formatTimestamp(end)}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -51,25 +92,15 @@ function ChapterList({ metadata }: { metadata: any }) {
           : metaNumber === 1;
 
         return (
-          <div
+          <Track
             key={id}
-            role="button"
-            className="py-6"
-            style={{ color: isCurrentChapter ? "black" : "#908f8f" }}
+            isCurrent={isCurrentChapter}
             onClick={() => handleSetCurrentChapter(metaNumber - 1)}
-          >
-            <div className="flex gap-x-4 mb-6">
-              <div className="italic">#{metaNumber}</div>
-              <div>
-                <RichTextCollection objects={metadata[id]} />
-              </div>
-            </div>
-            {start !== undefined && end !== undefined && (
-              <p>
-                {formatTimestamp(start)}—{formatTimestamp(end)}
-              </p>
-            )}
-          </div>
+            number={metaNumber}
+            start={start}
+            end={end}
+            richTextObjects={metadata[id]}
+          />
         );
       })}
     </>
@@ -104,28 +135,20 @@ function ShowcaseList({
         let end;
 
         if (metaIndex > 0) {
-          start = durationOfPrevShowcaseItems(showcaseItems, metaIndex) + 1;
+          start = durationOfPrevShowcaseItems(showcaseItems, metaIndex) + metaIndex;
         }
         end = start + showcaseItems[metaIndex].duration;
 
         return (
-          <div
+          <Track
             key={id}
-            role="button"
-            className="py-6"
-            style={{ color: isCurrentItem ? "black" : "#908f8f" }}
+            isCurrent={isCurrentItem}
             onClick={() => handleSetCurrentShowcaseItem(metaIndex)}
-          >
-            <div className="flex gap-x-4 mb-6">
-              <div className="italic">#{metaIndex + 1}</div>
-              <div>
-                <RichTextCollection objects={metadata[id]} />
-              </div>
-            </div>
-            <p>
-              {formatTimestamp(start)}—{formatTimestamp(end)}
-            </p>
-          </div>
+            number={metaIndex + 1}
+            start={start}
+            end={end}
+            richTextObjects={metadata[id]}
+          />
         );
       })}
     </>
