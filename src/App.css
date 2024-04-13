@@ -51,7 +51,7 @@ h1.title {
 
 .about {
   font-size: 5.5vw;
-  padding: 7.5vw 0.5em;
+  padding: 7.5vw 0;
 }
 
 #vimeo-player iframe {

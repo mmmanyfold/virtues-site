@@ -30,7 +30,7 @@ const ContentBlock = ({ block, imgShadow }: any) => {
 function Section({ blocks, imgShadow, className }: any) {
   return (
     <div
-      className={`flex flex-col gap-y-6 text-lg leading-tight ${
+      className={`flex flex-col gap-y-6 pt-14 text-lg leading-tight ${
         className || ""
       }`}
     >
@@ -60,7 +60,7 @@ export default function About({ blocks }: any) {
         return acc;
       }
     },
-    [[]],
+    [[]]
   );
 
   return (
@@ -69,27 +69,23 @@ export default function About({ blocks }: any) {
         isMenuOpen ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"
       }`}
     >
-      <div
-        className={`pt-14 ${
-          isMediaSmall
-            ? "flex flex-col gap-y-12"
-            : "grid grid-cols-[7fr_9fr] gap-x-12"
-        }`}
-      >
-        {sections.map((column: any, i: number) => {
-          let className;
-          if (i === 2 && !isMediaSmall) {
-            className = "pl-6 justify-end";
-          }
-          return (
-            <Section
-              key={`column-${i}`}
-              blocks={column}
-              imgShadow={i === 1}
-              className={className}
-            />
-          );
-        })}
+      <div className={`${isMediaSmall ? "flex flex-col" : "grid"}`}>
+        <Section
+          blocks={sections[0]}
+          className={`${
+            isMediaSmall
+              ? "px-[1em]"
+              : "px-[1.5em] w-1/2 h-[85dvh] fixed overflow-y-scroll"
+          }`}
+        />
+
+        <Section
+          blocks={sections[1]}
+          imgShadow={true}
+          className={`${
+            isMediaSmall ? "px-[1em]" : "px-[1.5em] w-1/2 justify-self-end"
+          }`}
+        />
       </div>
     </div>
   );
