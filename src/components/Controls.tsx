@@ -25,6 +25,7 @@ import {
   handleFullscreen,
   handleMute,
   handlePlay,
+  handlePause,
   handlePlaylistJump,
   handleToggleInfoPanel,
   handleSetCurrentShowcaseItem,
@@ -108,7 +109,7 @@ function ControlPlayPause({ iconClass }: { iconClass: string }) {
   return (
     <ControlButton
       ariaLabel={isPlaying ? "Pause" : "Play"}
-      onClick={handlePlay}
+      onClick={isPlaying ? handlePause : handlePlay}
     >
       {isPlaying ? (
         <Pause className={iconClass} weight="fill" />

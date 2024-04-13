@@ -46,13 +46,12 @@ export const handleMute = () => {
 
 export const handlePlay = () => {
   const player = store.get(playerAtom);
-  const isPlaying = store.get(isPlayingAtom);
+  player.play().catch(handleError);
+};
 
-  if (isPlaying) {
-    player.pause().catch(handleError);
-  } else {
-    player.play().catch(handleError);
-  }
+export const handlePause = () => {
+  const player = store.get(playerAtom);
+  player.pause().catch(handleError);
 };
 
 export const handleFullscreen = () => {
