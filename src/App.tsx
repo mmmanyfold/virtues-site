@@ -24,7 +24,7 @@ import {
   windowWidthAtom,
   isMediaSmallAtom,
 } from "./store.ts";
-import { handlePlay, handleToggleMenu } from "./handlers.ts";
+import { handleToggleMenu } from "./handlers.ts";
 
 function VideoPlayer() {
   const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
@@ -36,7 +36,7 @@ function VideoPlayer() {
 
   return (
     <Suspense fallback={<div>loading...</div>}>
-      <div className="relative cursor-pointer" onClick={handlePlay}>
+      <div className="relative cursor-pointer">
         <div
           id="vimeo-player"
           className={`relative overflow-hidden w-[100%]`}
