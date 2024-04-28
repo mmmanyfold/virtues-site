@@ -123,11 +123,13 @@ function ShowcaseList({
 }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const metaIds = Object.keys(metadata).sort();
+  
+  const getIndexFromMetaId = (id: string) => metaIds[0] === "00" ? parseInt(id) : parseInt(id) - 1;
 
   return (
     <>
       {metaIds.map((id) => {
-        const metaIndex = parseInt(id) - 1;
+        const metaIndex = getIndexFromMetaId(id);
         const isCurrentItem = metaIndex === showcaseItemIndex;
 
         let start = 0;
