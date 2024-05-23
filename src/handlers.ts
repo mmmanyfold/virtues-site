@@ -17,6 +17,7 @@ import {
   isAboutOpenAtom,
   showcaseItemIndexAtom,
   isSeekLoadingAtom,
+  playerLoadingAtom,
 } from "./store.ts";
 
 export const handleToggleInfoPanel = () => {
@@ -120,26 +121,13 @@ export const handleSetCurrentChapter = (index: number) => {
   player.setCurrentTime(newChapter.startTime).catch(handleError);
 };
 
-export const handleSetCurrentPlaylist = async (newIndex: number) => {
-  const player = store.get(playerAtom);
-  const playlists = await store.get(playlistsAtom);
-  const { vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
-  const videoUrl = !!videoShowCasePayload.data
-    ? videoShowCasePayload.data[0].player_embed_url
-    : vimeoPlayerURL;
-
+export const handleSetCurrentPlaylist = (newIndex: number) => {
+  store.set(playerLoadingAtom, true);
   store.set(showcaseItemIndexAtom, 0);
   store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
-
-  player
-    .loadVideo(videoUrl)
-    .then(() => {
-      bindEventsToPlayer();
-      store.set(seekingPositionAtom, 0);
-    })
-    .catch(handleError);
+  store.set(playerAtom, Object.create(null));
 };
 
 export const handleSetCurrentShowcaseItem = async (

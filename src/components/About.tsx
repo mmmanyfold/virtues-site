@@ -60,7 +60,7 @@ export default function About({ blocks }: any) {
         return acc;
       }
     },
-    [[]]
+    [[]],
   );
 
   return (

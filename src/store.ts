@@ -2,6 +2,7 @@ import { atom, createStore } from "jotai";
 import { default as Player } from "@vimeo/player";
 import { handleError } from "./handlers.ts";
 import { TimeUpdate } from "./types.ts";
+import { isEmpty } from "./common.ts";
 
 // stores
 // -----
@@ -18,6 +19,7 @@ export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
 export const seekingPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
 export const isSeekLoadingAtom = atom(false);
+export const playerLoadingAtom = atom<boolean>(false);
 
 // chapter-based control
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
@@ -79,9 +81,15 @@ store.sub(windowWidthAtom, () => {
 });
 
 store.sub(playerAtom, () => {
-  bindEventsToPlayer();
   const player = store.get(playerAtom);
-  player.setMuted(true)
+
+  if (isEmpty(player)) {
+    return;
+  }
+
+  bindEventsToPlayer();
+  player
+    .setMuted(true)
     .then(() => {
       player.play().catch(handleError);
       store.set(isMutedAtom, true);
@@ -91,6 +99,11 @@ store.sub(playerAtom, () => {
 
 export const bindEventsToPlayer = () => {
   const player = store.get(playerAtom);
+
+  if (isEmpty(player)) {
+    return;
+  }
+
   const isMuted = store.get(isMutedAtom);
   const isPlaying = store.get(isPlayingAtom);
 

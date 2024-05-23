@@ -7,7 +7,11 @@ import {
   isAboutOpenAtom,
   externalLinksPageAtom,
 } from "../store.ts";
-import { handleOpenAbout, handleSetCurrentPlaylist, handleToggleMenu } from "../handlers.ts";
+import {
+  handleOpenAbout,
+  handleSetCurrentPlaylist,
+  handleToggleMenu,
+} from "../handlers.ts";
 import { PlaylistVideo } from "../types.ts";
 
 function MenuItem({ title, isCurrentView, onClick, isSecondary }: any) {

@@ -36,7 +36,7 @@ function SeekChapter() {
 
 function showcaseVideoIndexFromPosition(
   position: number,
-  startTimes: number[]
+  startTimes: number[],
 ) {
   let index = 0;
   for (let i = 0; i < startTimes.length; i++) {
@@ -50,7 +50,7 @@ function showcaseVideoIndexFromPosition(
 function handleShowcaseSeek(
   pos: number,
   currentIndex: number,
-  startTimes: number[]
+  startTimes: number[],
 ) {
   const videoIndex = showcaseVideoIndexFromPosition(pos, startTimes);
   const videoPosition = pos - startTimes[videoIndex];
@@ -84,7 +84,7 @@ function SeekShowcase({ items }: { items: any[] }) {
   const showcasePosition = currentVideoStartTime + currentVideoSeekPosition;
   const showcaseDuration = items.reduce(
     (acc, item) => acc + item.duration + 1,
-    0
+    0,
   );
 
   const onSeek = (pos: number) => {

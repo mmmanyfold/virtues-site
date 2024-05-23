@@ -1,4 +1,4 @@
-import { useEffect, useRef }  from "react";
+import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import { RichTextCollection } from "../components/Notion.tsx";
 import {
@@ -25,27 +25,34 @@ function formatTimestamp(timestamp: number) {
   );
 }
 
-function Track({ isCurrent, onClick, number, start, end, richTextObjects}: any) {
+function Track({
+  isCurrent,
+  onClick,
+  number,
+  start,
+  end,
+  richTextObjects,
+}: any) {
   const trackRef = useRef<null | HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (isCurrent && trackRef.current) {
       trackRef.current.scrollIntoView({
-        behavior: 'smooth', // Smooth scrolling
-        block: 'center', // Vertical alignment
-        inline: 'start' // Horizontal alignment
+        behavior: "smooth", // Smooth scrolling
+        block: "center", // Vertical alignment
+        inline: "start", // Horizontal alignment
       });
     }
-  }, [isCurrent])
+  }, [isCurrent]);
 
   return (
     <div
       ref={trackRef}
       role="button"
       className="py-6"
-      style={{ 
+      style={{
         color: isCurrent ? "black" : "#908f8f",
-        fontWeight: isCurrent ? 500 : 400
+        fontWeight: isCurrent ? 500 : 400,
       }}
       onClick={onClick}
     >
@@ -123,8 +130,9 @@ function ShowcaseList({
 }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const metaIds = Object.keys(metadata).sort();
-  
-  const getIndexFromMetaId = (id: string) => metaIds[0] === "00" ? parseInt(id) : parseInt(id) - 1;
+
+  const getIndexFromMetaId = (id: string) =>
+    metaIds[0] === "00" ? parseInt(id) : parseInt(id) - 1;
 
   return (
     <>
@@ -136,7 +144,8 @@ function ShowcaseList({
         let end;
 
         if (metaIndex > 0) {
-          start = durationOfPrevShowcaseItems(showcaseItems, metaIndex) + metaIndex;
+          start =
+            durationOfPrevShowcaseItems(showcaseItems, metaIndex) + metaIndex;
         }
         end = start + showcaseItems[metaIndex].duration;
 

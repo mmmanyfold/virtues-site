@@ -173,7 +173,13 @@ const getRandomInt = (max: number) => {
   return Math.floor(Math.random() * max);
 };
 
-function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: string }) {
+function ShowcaseControls({
+  playlist,
+  iconClass,
+}: {
+  playlist: any;
+  iconClass: string;
+}) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const showcaseTotal = playlist.videoShowCasePayload.total;
 

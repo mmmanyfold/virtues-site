@@ -14,7 +14,6 @@ import {
   playerAtom,
   playlistsAtom,
   currentPlaylistIndexAtom,
-  readOnlyCurrentSelectionAtom,
   aboutPageAtom,
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
@@ -23,29 +22,39 @@ import {
   wrapperWidthAtom,
   windowWidthAtom,
   isMediaSmallAtom,
+  playerLoadingAtom,
 } from "./store.ts";
 import { handleToggleMenu } from "./handlers.ts";
+import { isEmpty } from "./common.ts";
 
 function VideoPlayer() {
-  const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
   const [[width, height]] = useAtom(videoSizeAtom);
+  const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
+  const [playerLoading] = useAtom(playerLoadingAtom);
 
-  const firstVideoUrl = !!firstVideoSelection.videoShowCasePayload.data
-    ? firstVideoSelection.videoShowCasePayload.data[0].player_embed_url
-    : firstVideoSelection.vimeoPlayerURL;
+  const [playlists] = useAtom(playlistsAtom);
+  const { vimeoPlayerURL, videoShowCasePayload } =
+    playlists[currentPlaylistIndex];
+  const videoUrl = !!videoShowCasePayload.data
+    ? videoShowCasePayload.data[0].player_embed_url
+    : vimeoPlayerURL;
 
   return (
     <Suspense fallback={<div>loading...</div>}>
       <div className="relative cursor-pointer">
-        <div
-          id="vimeo-player"
-          className={`relative overflow-hidden w-[100%]`}
-          style={{
-            paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
-          }}
-          data-vimeo-url={firstVideoUrl}
-          data-vimeo-background="1"
-        ></div>
+        {playerLoading || !playlists ? (
+          <div>LOADING</div>
+        ) : (
+          <div
+            id="vimeo-player"
+            className={`relative overflow-hidden w-[100%]`}
+            style={{
+              paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
+            }}
+            data-vimeo-url={videoUrl}
+            data-vimeo-background="1"
+          ></div>
+        )}
       </div>
     </Suspense>
   );
@@ -198,10 +207,22 @@ function VideoWrapper() {
 }
 
 function App() {
+  const [player] = useAtom(playerAtom);
+  const [playerLoading, setPlayerLoading] = useAtom(playerLoadingAtom);
+  const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
+  const [playlists] = useAtom(playlistsAtom);
+
   useEffect(() => {
-    const player = new Player("vimeo-player");
-    store.set(playerAtom, player);
-  }, []);
+    setPlayerLoading(false);
+  }, [currentPlaylistIndex]);
+
+  useEffect(() => {
+    if (!playerLoading && isEmpty(player) && !!playlists) {
+      const newPlayer = new Player("vimeo-player");
+      store.set(playerAtom, newPlayer);
+      // store.set(seekingPositionAtom, 0);
+    }
+  }, [playlists, player, playerLoading]);
 
   return (
     <Provider store={store}>
