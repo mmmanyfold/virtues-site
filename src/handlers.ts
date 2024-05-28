@@ -121,25 +121,10 @@ export const handleSetCurrentChapter = (index: number) => {
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
-  const player = store.get(playerAtom);
-  const playlists = await store.get(playlistsAtom);
-  const { vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
-  const videoUrl = !!videoShowCasePayload.data
-    ? videoShowCasePayload.data[0].player_embed_url
-    : vimeoPlayerURL;
-
   store.set(showcaseItemIndexAtom, 0);
   store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
-
-  player
-    .loadVideo(videoUrl)
-    .then(() => {
-      bindEventsToPlayer();
-      store.set(seekingPositionAtom, 0);
-    })
-    .catch(handleError);
 };
 
 export const handleSetCurrentShowcaseItem = async (

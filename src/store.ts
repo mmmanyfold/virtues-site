@@ -73,6 +73,25 @@ export const externalLinksPageAtom = atom(async (_get, { signal }) => {
 // subscriptions
 // -------------
 
+store.sub(currentPlaylistIndexAtom, async () => {
+  const player = store.get(playerAtom);
+  const newIndex = store.get(currentPlaylistIndexAtom);
+  const playlists = await store.get(playlistsAtom);
+
+  const { vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
+  const videoUrl = !!videoShowCasePayload.data
+    ? videoShowCasePayload.data[0].player_embed_url
+    : vimeoPlayerURL;
+
+  player
+    .loadVideo(videoUrl)
+    .then(() => {
+      bindEventsToPlayer();
+      store.set(seekingPositionAtom, 0);
+    })
+    .catch(handleError);
+})
+
 store.sub(windowWidthAtom, () => {
   const windowWidth = store.get(windowWidthAtom);
   store.set(isMediaSmallAtom, windowWidth < 890);
