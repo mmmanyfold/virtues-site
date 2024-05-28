@@ -4,7 +4,7 @@
 import {
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
-  bindEventsToPlayer,
+  setPlayerVideoData,
   chapterIndexAtom,
   chaptersAtom,
   isMutedAtom,
@@ -136,7 +136,7 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
   player
     .loadVideo(videoUrl)
     .then(() => {
-      bindEventsToPlayer();
+      setPlayerVideoData();
       store.set(seekingPositionAtom, 0);
     })
     .catch(handleError);
@@ -159,9 +159,9 @@ export const handleSetCurrentShowcaseItem = async (
   player
     .loadVideo(newVideo.player_embed_url)
     .then(() => {
+      setPlayerVideoData();
       store.set(seekingPositionAtom, pos);
       store.set(showcaseItemIndexAtom, index);
-      bindEventsToPlayer();
       player
         .setCurrentTime(pos)
         .then(() => {
@@ -195,7 +195,7 @@ export const handlePlaylistJump = async () => {
   player
     .loadVideo(nextVideoUrl)
     .then(() => {
-      bindEventsToPlayer();
+      setPlayerVideoData();
       store.set(seekingPositionAtom, 0);
     })
     .catch(handleError);

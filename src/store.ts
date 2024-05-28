@@ -12,7 +12,7 @@ export const store = createStore();
 
 export const playerAtom = atom(Object.create(null));
 export const isPlayingAtom = atom(false);
-export const isMutedAtom = atom(false);
+export const isMutedAtom = atom(true);
 export const isFullscreenAtom = atom(false);
 export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
 export const seekingPositionAtom = atom<number>(0);
@@ -79,20 +79,13 @@ store.sub(windowWidthAtom, () => {
 });
 
 store.sub(playerAtom, () => {
+  setPlayerVideoData();
   bindEventsToPlayer();
-  const player = store.get(playerAtom);
-  player.setMuted(true)
-    .then(() => {
-      player.play().catch(handleError);
-      store.set(isMutedAtom, true);
-    })
-    .catch(handleError);
 });
 
-export const bindEventsToPlayer = () => {
+export const setPlayerVideoData = () => {
   const player = store.get(playerAtom);
   const isMuted = store.get(isMutedAtom);
-  const isPlaying = store.get(isPlayingAtom);
 
   player.setMuted(isMuted).catch(handleError);
 
@@ -122,6 +115,11 @@ export const bindEventsToPlayer = () => {
       store.set(videoSizeAtom, dimensions);
     })
     .catch(handleError);
+}
+
+export const bindEventsToPlayer = () => {
+  const player = store.get(playerAtom);
+  const isPlaying = store.get(isPlayingAtom);
 
   // register event listeners
   player.on("play", () => {
