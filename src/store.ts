@@ -76,6 +76,8 @@ export const externalLinksPageAtom = atom(async (_get, { signal }) => {
 
 store.sub(currentPlaylistIndexAtom, async () => {
   store.set(isVideoLoadingAtom, true);
+  store.set(seekingPositionAtom, 0);
+  store.set(showcaseItemIndexAtom, 0);
 
   const player = store.get(playerAtom);
   const newIndex = store.get(currentPlaylistIndexAtom);
@@ -90,6 +92,7 @@ store.sub(currentPlaylistIndexAtom, async () => {
     .loadVideo(videoUrl)
     .then(() => {
       store.set(seekingPositionAtom, 0);
+      store.set(showcaseItemIndexAtom, 0);
       setPlayerVideoData();
       setTimeout(() => {
         player

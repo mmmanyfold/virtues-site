@@ -131,7 +131,6 @@ export const handleSetCurrentChapter = (index: number) => {
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
-  store.set(showcaseItemIndexAtom, 0);
   store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
