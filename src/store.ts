@@ -12,12 +12,13 @@ export const store = createStore();
 
 export const playerAtom = atom(Object.create(null));
 export const isPlayingAtom = atom(false);
-export const isMutedAtom = atom(false);
+export const isMutedAtom = atom(true);
 export const isFullscreenAtom = atom(false);
 export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
 export const seekingPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
 export const isSeekLoadingAtom = atom(false);
+export const isVideoLoadingAtom = atom(false);
 
 // chapter-based control
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
@@ -73,26 +74,51 @@ export const externalLinksPageAtom = atom(async (_get, { signal }) => {
 // subscriptions
 // -------------
 
+store.sub(currentPlaylistIndexAtom, async () => {
+  store.set(isVideoLoadingAtom, true);
+  store.set(seekingPositionAtom, 0);
+  store.set(showcaseItemIndexAtom, 0);
+
+  const player = store.get(playerAtom);
+  const newIndex = store.get(currentPlaylistIndexAtom);
+  const playlists = await store.get(playlistsAtom);
+
+  const { vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
+  const videoUrl = !!videoShowCasePayload.data
+    ? videoShowCasePayload.data[0].player_embed_url
+    : vimeoPlayerURL;
+
+  player
+    .loadVideo(videoUrl)
+    .then(() => {
+      store.set(seekingPositionAtom, 0);
+      store.set(showcaseItemIndexAtom, 0);
+      setPlayerVideoData();
+      setTimeout(() => {
+        player
+          .play()
+          .then(() => {
+            store.set(isVideoLoadingAtom, false);
+          })
+          .catch(handleError);
+      }, 500);
+    })
+    .catch(handleError);
+});
+
 store.sub(windowWidthAtom, () => {
   const windowWidth = store.get(windowWidthAtom);
   store.set(isMediaSmallAtom, windowWidth < 890);
 });
 
 store.sub(playerAtom, () => {
+  setPlayerVideoData();
   bindEventsToPlayer();
-  const player = store.get(playerAtom);
-  player.setMuted(true)
-    .then(() => {
-      player.play().catch(handleError);
-      store.set(isMutedAtom, true);
-    })
-    .catch(handleError);
 });
 
-export const bindEventsToPlayer = () => {
+export const setPlayerVideoData = () => {
   const player = store.get(playerAtom);
   const isMuted = store.get(isMutedAtom);
-  const isPlaying = store.get(isPlayingAtom);
 
   player.setMuted(isMuted).catch(handleError);
 
@@ -122,6 +148,11 @@ export const bindEventsToPlayer = () => {
       store.set(videoSizeAtom, dimensions);
     })
     .catch(handleError);
+}
+
+export const bindEventsToPlayer = () => {
+  const player = store.get(playerAtom);
+  const isPlaying = store.get(isPlayingAtom);
 
   // register event listeners
   player.on("play", () => {

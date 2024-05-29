@@ -4,7 +4,7 @@
 import {
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
-  bindEventsToPlayer,
+  setPlayerVideoData,
   chapterIndexAtom,
   chaptersAtom,
   isMutedAtom,
@@ -17,6 +17,7 @@ import {
   isAboutOpenAtom,
   showcaseItemIndexAtom,
   isSeekLoadingAtom,
+  isVideoLoadingAtom,
 } from "./store.ts";
 
 export const handleToggleInfoPanel = () => {
@@ -95,17 +96,26 @@ export const handleRestartPlayback = () => {
   player.setCurrentTime(0).catch(handleError);
 };
 
+export const getRandomIndex = (currentIndex: number, listLength: number) => {
+  if (listLength === 1) {
+    return 0;
+  } else if (listLength === 2) {
+    return currentIndex === 0 ? 1 : 0;
+  } else {
+    let i;
+    do {
+      i = Math.floor(Math.random() * (listLength - 1));
+    } while (i === currentIndex);
+    return i;
+  }
+}
+
 export const handleRandomChapter = () => {
   const player = store.get(playerAtom);
   const chapters = store.get(chaptersAtom);
   const currentChapterIndex = store.get(chapterIndexAtom);
-
-  const randomChapterIndex = Math.floor(Math.random() * chapters.length);
+  const randomChapterIndex = getRandomIndex(currentChapterIndex, chapters.length);
   const randomChapter = chapters[randomChapterIndex];
-
-  if (currentChapterIndex === randomChapterIndex) {
-    handleRandomChapter();
-  }
 
   store.set(chapterIndexAtom, randomChapterIndex);
   player.setCurrentTime(randomChapter.startTime).catch(handleError);
@@ -121,32 +131,20 @@ export const handleSetCurrentChapter = (index: number) => {
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
-  const player = store.get(playerAtom);
-  const playlists = await store.get(playlistsAtom);
-  const { vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
-  const videoUrl = !!videoShowCasePayload.data
-    ? videoShowCasePayload.data[0].player_embed_url
-    : vimeoPlayerURL;
-
-  store.set(showcaseItemIndexAtom, 0);
   store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
-
-  player
-    .loadVideo(videoUrl)
-    .then(() => {
-      bindEventsToPlayer();
-      store.set(seekingPositionAtom, 0);
-    })
-    .catch(handleError);
 };
 
 export const handleSetCurrentShowcaseItem = async (
   index: number,
   pos: number = 0,
 ) => {
-  if (pos > 0) {
+  const playFromBeginning = pos === 0;
+
+  if (playFromBeginning) {
+    store.set(isVideoLoadingAtom, true);
+  } else {
     store.set(isSeekLoadingAtom, true);
   }
 
@@ -159,46 +157,41 @@ export const handleSetCurrentShowcaseItem = async (
   player
     .loadVideo(newVideo.player_embed_url)
     .then(() => {
+      setPlayerVideoData();
+
       store.set(seekingPositionAtom, pos);
       store.set(showcaseItemIndexAtom, index);
-      bindEventsToPlayer();
-      player
-        .setCurrentTime(pos)
-        .then(() => {
-          store.set(isSeekLoadingAtom, false);
-        })
-        .catch(handleError);
+
+      if (playFromBeginning) {
+        setTimeout(() => {
+          player
+            .play()
+            .then(() => {
+              store.set(isVideoLoadingAtom, false);
+            })
+            .catch(handleError);
+        }, 500);
+      } else {
+        player
+          .setCurrentTime(pos)
+          .then(() => {
+            player.play().catch(handleError);
+            store.set(isSeekLoadingAtom, false);
+          })
+          .catch(handleError);
+      }
     })
     .catch(handleError);
 };
 
 export const handlePlaylistJump = async () => {
-  const player = store.get(playerAtom);
   const playlist = await store.get(playlistsAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
-  const randomChapterIndex = Math.floor(Math.random() * playlist.length);
+  const newIndex = getRandomIndex(currentPlaylistIndex, playlist.length);
 
-  if (currentPlaylistIndex === randomChapterIndex) {
-    await handlePlaylistJump();
-    return;
-  }
-
-  const { videoShowCasePayload, vimeoPlayerURL } = playlist[randomChapterIndex];
-  const nextVideoUrl = !!videoShowCasePayload.data
-    ? videoShowCasePayload.data[0].player_embed_url
-    : vimeoPlayerURL;
-
-  store.set(currentPlaylistIndexAtom, randomChapterIndex);
+  store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
-
-  player
-    .loadVideo(nextVideoUrl)
-    .then(() => {
-      bindEventsToPlayer();
-      store.set(seekingPositionAtom, 0);
-    })
-    .catch(handleError);
 };
 
 export const handleSeek = (position: number) => {

@@ -16,6 +16,8 @@ import {
 import {
   isMediaSmallAtom,
   isPlayingAtom,
+  isSeekLoadingAtom,
+  isVideoLoadingAtom,
   isMutedAtom,
   isFullscreenAtom,
   isInfoPanelOpenAtom,
@@ -33,6 +35,7 @@ import {
   handleNextChapter,
   handlePreviousChapter,
   handleRandomChapter,
+  getRandomIndex,
 } from "../handlers.ts";
 
 function ControlButton({
@@ -106,12 +109,14 @@ function ControlPrevious({
 
 function ControlPlayPause({ iconClass }: { iconClass: string }) {
   const [isPlaying] = useAtom(isPlayingAtom);
+  const [isSeekLoading] = useAtom(isSeekLoadingAtom);
+  const [isVideoLoading] = useAtom(isVideoLoadingAtom);
   return (
     <ControlButton
       ariaLabel={isPlaying ? "Pause" : "Play"}
       onClick={isPlaying ? handlePause : handlePlay}
     >
-      {isPlaying ? (
+      {isPlaying || isSeekLoading || isVideoLoading ? (
         <Pause className={iconClass} weight="fill" />
       ) : (
         <Play className={iconClass} weight="fill" />
@@ -169,10 +174,6 @@ function ControlFullScreen({ iconClass }: { iconClass: string }) {
   );
 }
 
-const getRandomInt = (max: number) => {
-  return Math.floor(Math.random() * max);
-};
-
 function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: string }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const showcaseTotal = playlist.videoShowCasePayload.total;
@@ -180,7 +181,7 @@ function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: s
   const handleNext = () => {
     const i =
       showcaseItemIndex === showcaseTotal - 1
-        ? showcaseItemIndex
+        ? 0
         : showcaseItemIndex + 1;
     handleSetCurrentShowcaseItem(i);
   };
@@ -191,10 +192,7 @@ function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: s
   };
 
   const handleRandom = () => {
-    let i = getRandomInt(showcaseTotal);
-    while (i === showcaseItemIndex) {
-      i = getRandomInt(showcaseTotal);
-    }
+    const i = getRandomIndex(showcaseItemIndex, showcaseTotal);
     handleSetCurrentShowcaseItem(i);
   };
 
