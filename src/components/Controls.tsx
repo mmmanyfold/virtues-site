@@ -16,6 +16,8 @@ import {
 import {
   isMediaSmallAtom,
   isPlayingAtom,
+  isSeekLoadingAtom,
+  isVideoLoadingAtom,
   isMutedAtom,
   isFullscreenAtom,
   isInfoPanelOpenAtom,
@@ -106,12 +108,14 @@ function ControlPrevious({
 
 function ControlPlayPause({ iconClass }: { iconClass: string }) {
   const [isPlaying] = useAtom(isPlayingAtom);
+  const [isSeekLoading] = useAtom(isSeekLoadingAtom);
+  const [isVideoLoading] = useAtom(isVideoLoadingAtom);
   return (
     <ControlButton
       ariaLabel={isPlaying ? "Pause" : "Play"}
       onClick={isPlaying ? handlePause : handlePlay}
     >
-      {isPlaying ? (
+      {isPlaying || isSeekLoading || isVideoLoading ? (
         <Pause className={iconClass} weight="fill" />
       ) : (
         <Play className={iconClass} weight="fill" />

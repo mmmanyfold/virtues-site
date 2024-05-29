@@ -17,6 +17,7 @@ import {
   isAboutOpenAtom,
   showcaseItemIndexAtom,
   isSeekLoadingAtom,
+  isVideoLoadingAtom,
 } from "./store.ts";
 
 export const handleToggleInfoPanel = () => {
@@ -131,7 +132,11 @@ export const handleSetCurrentShowcaseItem = async (
   index: number,
   pos: number = 0,
 ) => {
-  if (pos > 0) {
+  const playFromBeginning = pos === 0;
+
+  if (playFromBeginning) {
+    store.set(isVideoLoadingAtom, true);
+  } else {
     store.set(isSeekLoadingAtom, true);
   }
 
@@ -145,14 +150,28 @@ export const handleSetCurrentShowcaseItem = async (
     .loadVideo(newVideo.player_embed_url)
     .then(() => {
       setPlayerVideoData();
+
       store.set(seekingPositionAtom, pos);
       store.set(showcaseItemIndexAtom, index);
-      player
-        .setCurrentTime(pos)
-        .then(() => {
-          store.set(isSeekLoadingAtom, false);
-        })
-        .catch(handleError);
+
+      if (playFromBeginning) {
+        setTimeout(() => {
+          player
+            .play()
+            .then(() => {
+              store.set(isVideoLoadingAtom, false);
+            })
+            .catch(handleError);
+        }, 500);
+      } else {
+        player
+          .setCurrentTime(pos)
+          .then(() => {
+            player.play().catch(handleError);
+            store.set(isSeekLoadingAtom, false);
+          })
+          .catch(handleError);
+      }
     })
     .catch(handleError);
 };
