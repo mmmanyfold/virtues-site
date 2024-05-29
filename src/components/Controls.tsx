@@ -35,6 +35,7 @@ import {
   handleNextChapter,
   handlePreviousChapter,
   handleRandomChapter,
+  getRandomIndex,
 } from "../handlers.ts";
 
 function ControlButton({
@@ -173,10 +174,6 @@ function ControlFullScreen({ iconClass }: { iconClass: string }) {
   );
 }
 
-const getRandomInt = (max: number) => {
-  return Math.floor(Math.random() * max);
-};
-
 function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: string }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const showcaseTotal = playlist.videoShowCasePayload.total;
@@ -195,10 +192,7 @@ function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: s
   };
 
   const handleRandom = () => {
-    let i = getRandomInt(showcaseTotal);
-    while (i === showcaseItemIndex) {
-      i = getRandomInt(showcaseTotal);
-    }
+    const i = getRandomIndex(showcaseItemIndex, showcaseTotal);
     handleSetCurrentShowcaseItem(i);
   };
 

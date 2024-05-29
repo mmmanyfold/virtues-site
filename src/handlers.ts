@@ -96,17 +96,26 @@ export const handleRestartPlayback = () => {
   player.setCurrentTime(0).catch(handleError);
 };
 
+export const getRandomIndex = (currentIndex: number, listLength: number) => {
+  if (listLength === 1) {
+    return 0;
+  } else if (listLength === 2) {
+    return currentIndex === 0 ? 1 : 0;
+  } else {
+    let i;
+    do {
+      i = Math.floor(Math.random() * (listLength - 1));
+    } while (i === currentIndex);
+    return i;
+  }
+}
+
 export const handleRandomChapter = () => {
   const player = store.get(playerAtom);
   const chapters = store.get(chaptersAtom);
   const currentChapterIndex = store.get(chapterIndexAtom);
-
-  const randomChapterIndex = Math.floor(Math.random() * chapters.length);
+  const randomChapterIndex = getRandomIndex(currentChapterIndex, chapters.length);
   const randomChapter = chapters[randomChapterIndex];
-
-  if (currentChapterIndex === randomChapterIndex) {
-    handleRandomChapter();
-  }
 
   store.set(chapterIndexAtom, randomChapterIndex);
   player.setCurrentTime(randomChapter.startTime).catch(handleError);
@@ -179,14 +188,9 @@ export const handleSetCurrentShowcaseItem = async (
 export const handlePlaylistJump = async () => {
   const playlist = await store.get(playlistsAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
-  const randomChapterIndex = Math.floor(Math.random() * playlist.length);
+  const newIndex = getRandomIndex(currentPlaylistIndex, playlist.length);
 
-  if (currentPlaylistIndex === randomChapterIndex) {
-    await handlePlaylistJump();
-    return;
-  }
-
-  store.set(currentPlaylistIndexAtom, randomChapterIndex);
+  store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
 };
