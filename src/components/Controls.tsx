@@ -184,7 +184,7 @@ function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: s
   const handleNext = () => {
     const i =
       showcaseItemIndex === showcaseTotal - 1
-        ? showcaseItemIndex
+        ? 0
         : showcaseItemIndex + 1;
     handleSetCurrentShowcaseItem(i);
   };
