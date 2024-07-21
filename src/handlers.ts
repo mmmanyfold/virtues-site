@@ -172,13 +172,15 @@ export const handleSetCurrentShowcaseItem = async (
             .catch(handleError);
         }, 500);
       } else {
-        player
-          .setCurrentTime(pos)
-          .then(() => {
-            player.play().catch(handleError);
-            store.set(isSeekLoadingAtom, false);
-          })
-          .catch(handleError);
+        setTimeout(() => {
+          player
+            .setCurrentTime(pos)
+            .then(() => {
+              player.play().catch(handleError);
+              store.set(isSeekLoadingAtom, false);
+            })
+            .catch(handleError);
+        }, 500);
       }
     })
     .catch(handleError);

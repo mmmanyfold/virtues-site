@@ -152,7 +152,6 @@ export const setPlayerVideoData = () => {
 
 export const bindEventsToPlayer = () => {
   const player = store.get(playerAtom);
-  const isPlaying = store.get(isPlayingAtom);
 
   // register event listeners
   player.on("play", () => {
@@ -174,8 +173,8 @@ export const bindEventsToPlayer = () => {
 
   player.on("fullscreenchange", ({ fullscreen }: any) => {
     store.set(isFullscreenAtom, fullscreen);
-    if (isPlaying) {
+    setTimeout(() => {
       player.play().catch(handleError);
-    }
+    }, 500);
   });
 };
