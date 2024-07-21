@@ -233,7 +233,7 @@ function ChapterControls({ iconClass }: { iconClass: string }) {
 
 function Controls({ playlist }: { playlist: any }) {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
-  const iconClass = isMediaSmall ? "text-20px]" : "text-[30px]";
+  const iconClass = isMediaSmall ? "text-[20px]" : "text-[30px] lg:text-[35px] xl:text-[30px]";
 
   if (playlist.videoShowCasePayload?.data) {
     return <ShowcaseControls playlist={playlist} iconClass={iconClass} />;

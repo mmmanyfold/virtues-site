@@ -84,8 +84,8 @@ function Title() {
     <h1
       className={`title absolute ${isInfoPanelOpen ? "hidden" : "z-40"} ${
         isMediaSmall
-          ? "text-[3rem] top-[0.25em] left-[0.35em]"
-          : "text-[5.5vw] top-[0.35em] left-[0.5em]"
+          ? "text-[3rem] top-2 left-3.5"
+          : "text-[7.5vh] top-[0.15em] left-[0.3em]"
       }`}
       style={{ color }}
     >
@@ -104,7 +104,7 @@ function MenuToggle() {
   const [aboutPage] = useAtom(aboutPageAtom);
 
   const { titleColor } = playlists[currentPlaylistIndex];
-  const iconClass = isMediaSmall ? "text-[2rem]" : "text-[35px]";
+  const iconClass = isMediaSmall ? "text-[2rem]" : "text-[4.5vh]";
 
   let plusColor = "black";
 
@@ -117,7 +117,7 @@ function MenuToggle() {
       <div
         role="button"
         className={`absolute ${isInfoPanelOpen ? "hidden" : "z-40"} ${
-          isMediaSmall ? "top-3 right-3" : "top-8 right-8"
+          isMediaSmall ? "top-4 right-3.5" : "top-6 right-6"
         }`}
         onClick={handleToggleMenu}
       >

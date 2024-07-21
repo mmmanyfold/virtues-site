@@ -108,7 +108,7 @@ store.sub(currentPlaylistIndexAtom, async () => {
 
 store.sub(windowWidthAtom, () => {
   const windowWidth = store.get(windowWidthAtom);
-  store.set(isMediaSmallAtom, windowWidth < 890);
+  store.set(isMediaSmallAtom, windowWidth < 768);
 });
 
 store.sub(playerAtom, () => {
