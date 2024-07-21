@@ -36,7 +36,7 @@ function VideoPlayer() {
 
   return (
     <Suspense fallback={<div>loading...</div>}>
-      <div className="relative cursor-pointer">
+      <div className="relative pointer-events-none">
         <div
           id="vimeo-player"
           className={`relative overflow-hidden w-[100%]`}
