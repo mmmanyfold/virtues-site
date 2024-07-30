@@ -106,13 +106,16 @@ export const getRandomIndex = (currentIndex: number, listLength: number) => {
     } while (i === currentIndex);
     return i;
   }
-}
+};
 
 export const handleRandomChapter = () => {
   const player = store.get(playerAtom);
   const chapters = store.get(chaptersAtom);
   const currentChapterIndex = store.get(chapterIndexAtom);
-  const randomChapterIndex = getRandomIndex(currentChapterIndex, chapters.length);
+  const randomChapterIndex = getRandomIndex(
+    currentChapterIndex,
+    chapters.length,
+  );
   const randomChapter = chapters[randomChapterIndex];
 
   store.set(chapterIndexAtom, randomChapterIndex);
@@ -161,13 +164,9 @@ export const handleSetCurrentShowcaseItem = async (
       store.set(showcaseItemIndexAtom, index);
 
       if (playFromBeginning) {
+        store.set(isVideoLoadingAtom, false);
         setTimeout(() => {
-          player
-            .play()
-            .then(() => {
-              store.set(isVideoLoadingAtom, false);
-            })
-            .catch(handleError);
+          player.play().catch(handleError);
         }, 500);
       } else {
         setTimeout(() => {
@@ -203,6 +202,9 @@ export const handleSeek = (position: number) => {
 export const handleError = (error: Error) => {
   console.error(error);
   switch (error.name) {
+    case "PlayInterrupted":
+      handlePlay();
+      break;
     case "RangeError":
       break;
     case "PasswordError":
