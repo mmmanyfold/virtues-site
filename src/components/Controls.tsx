@@ -190,8 +190,6 @@ function ShowcaseControls({ playlist, iconClass, disableControls }: { playlist: 
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const showcaseTotal = playlist.videoShowCasePayload.total;
 
-  console.log("disableControls", disableControls)
-
   const handleNext = () => {
     const i =
       showcaseItemIndex === showcaseTotal - 1
