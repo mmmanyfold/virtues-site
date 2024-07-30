@@ -12,6 +12,7 @@ import {
   ArrowsDownUp,
   ArrowsOut,
   ArrowsIn,
+  CircleNotch,
 } from "@phosphor-icons/react";
 import {
   isMediaSmallAtom,
@@ -134,17 +135,32 @@ function ControlPlayPause({
   disabled?: boolean;
 }) {
   const [isPlaying] = useAtom(isPlayingAtom);
+
+  let ariaLabel: string;
+  if (disabled) {
+    ariaLabel = "Loading";
+  } else if (isPlaying) {
+    ariaLabel = "Pause";
+  } else {
+    ariaLabel = "Play";
+  }
+
+  let icon: React.ReactNode;
+  if (disabled) {
+    icon = <CircleNotch className={`animate-spin ${iconClass}`} />;
+  } else if (isPlaying) {
+    icon = <Pause className={iconClass} weight="fill" />;
+  } else {
+    icon = <Play className={iconClass} weight="fill" />;
+  }
+
   return (
     <ControlButton
-      ariaLabel={isPlaying ? "Pause" : "Play"}
+      ariaLabel={ariaLabel}
       onClick={isPlaying ? handlePause : handlePlay}
       disabled={disabled}
     >
-      {isPlaying ? (
-        <Pause className={iconClass} weight="fill" />
-      ) : (
-        <Play className={iconClass} weight="fill" />
-      )}
+      {icon}
     </ControlButton>
   );
 }
@@ -299,17 +315,20 @@ function Controls({ playlist }: { playlist: any }) {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [isSeekLoading] = useAtom(isSeekLoadingAtom);
   const [isVideoLoading] = useAtom(isVideoLoadingAtom);
+  const disableControls = isVideoLoading || isSeekLoading;
 
-  const iconClass = isMediaSmall
-    ? "text-[20px]"
-    : "text-[30px] lg:text-[35px] xl:text-[30px]";
+  const iconClass = [
+    "transition-all duration-400 ease-in-out",
+    disableControls ? "opacity-60" : "opacity-100",
+    isMediaSmall ? "text-[20px]" : "text-[30px] lg:text-[35px] xl:text-[30px]",
+  ].join(" ");
 
   if (playlist.videoShowCasePayload?.data) {
     return (
       <ShowcaseControls
         playlist={playlist}
         iconClass={iconClass}
-        disableControls={isVideoLoading || isSeekLoading}
+        disableControls={disableControls}
       />
     );
   }
