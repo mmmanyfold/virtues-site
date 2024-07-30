@@ -295,14 +295,20 @@ function ShowcaseControls({
   );
 }
 
-function ChapterControls({ iconClass }: { iconClass: string }) {
+function ChapterControls({
+  iconClass,
+  disableControls,
+}: {
+  iconClass: string;
+  disableControls: boolean;
+}) {
   return (
     <div className="flex items-center justify-around bg-cream py-3">
       <ControlInfoPanel iconClass={iconClass} />
       <ControlMute iconClass={iconClass} />
       <ControlRandom iconClass={iconClass} onClick={handleRandomChapter} />
       <ControlPrevious iconClass={iconClass} onClick={handlePreviousChapter} />
-      <ControlPlayPause iconClass={iconClass} />
+      <ControlPlayPause iconClass={iconClass} disabled={disableControls} />
       <ControlNext iconClass={iconClass} onClick={handleNextChapter} />
       <ControlRestart iconClass={iconClass} onClick={handleRestartPlayback} />
       <ControlJump iconClass={iconClass} />
@@ -319,7 +325,7 @@ function Controls({ playlist }: { playlist: any }) {
 
   const iconClass = [
     "transition-all duration-400 ease-in-out",
-    disableControls ? "opacity-60" : "opacity-100",
+    disableControls ? "opacity-75" : "opacity-100",
     isMediaSmall ? "text-[20px]" : "text-[30px] lg:text-[35px] xl:text-[30px]",
   ].join(" ");
 
@@ -332,7 +338,9 @@ function Controls({ playlist }: { playlist: any }) {
       />
     );
   }
-  return <ChapterControls iconClass={iconClass} />;
+  return (
+    <ChapterControls iconClass={iconClass} disableControls={disableControls} />
+  );
 }
 
 export default Controls;

@@ -13,6 +13,7 @@ import {
 import {
   handleSetCurrentChapter,
   handleSetCurrentShowcaseItem,
+  handleToggleInfoPanel
 } from "../handlers.ts";
 
 function formatTimestamp(timestamp: number) {
@@ -64,7 +65,7 @@ function Track({ isCurrent, onClick, number, start, end, richTextObjects}: any) 
   );
 }
 
-function ChapterList({ metadata }: { metadata: any }) {
+function ChapterList({ metadata, closeOnSelect }: { metadata: any, closeOnSelect: boolean }) {
   const [currentChapter] = useAtom(currentChapterAtom);
   const [chapters] = useAtom(chaptersAtom);
   const [duration] = useAtom(durationAtom);
@@ -94,7 +95,12 @@ function ChapterList({ metadata }: { metadata: any }) {
           <Track
             key={id}
             isCurrent={isCurrentChapter}
-            onClick={() => handleSetCurrentChapter(metaNumber - 1)}
+            onClick={() => {
+              handleSetCurrentChapter(metaNumber - 1);
+              if (closeOnSelect) {
+                handleToggleInfoPanel();
+              }
+            }}
             number={metaNumber}
             start={start}
             end={end}
@@ -117,9 +123,11 @@ function durationOfPrevShowcaseItems(showcaseItems: any[], index: number) {
 function ShowcaseList({
   metadata,
   showcaseItems,
+  closeOnSelect,
 }: {
   metadata: any;
   showcaseItems: any[];
+  closeOnSelect: boolean;
 }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const metaIds = Object.keys(metadata).sort();
@@ -133,18 +141,23 @@ function ShowcaseList({
         const isCurrentItem = metaIndex === showcaseItemIndex;
 
         let start = 0;
-        let end;
 
         if (metaIndex > 0) {
           start = durationOfPrevShowcaseItems(showcaseItems, metaIndex) + metaIndex;
         }
-        end = start + showcaseItems[metaIndex].duration;
+
+        const end = start + showcaseItems[metaIndex].duration;
 
         return (
           <Track
             key={id}
             isCurrent={isCurrentItem}
-            onClick={() => handleSetCurrentShowcaseItem(metaIndex)}
+            onClick={() => {
+              handleSetCurrentShowcaseItem(metaIndex)
+              if (closeOnSelect) {
+                handleToggleInfoPanel();
+              }
+            }}
             number={metaIndex + 1}
             start={start}
             end={end}
@@ -172,13 +185,14 @@ function InfoPanel() {
     >
       <h2 className="italic text-2xl tracking-wide mb-2">{videoTitle}</h2>
       <div className="divide-y divide-[#a9a9a9] text-lg tracklist">
-        {!!videoShowCasePayload?.data ? (
+        {videoShowCasePayload?.data ? (
           <ShowcaseList
             metadata={vimeoChapters}
             showcaseItems={videoShowCasePayload.data}
+            closeOnSelect={isMediaSmall}
           />
         ) : (
-          <ChapterList metadata={vimeoChapters} />
+          <ChapterList metadata={vimeoChapters} closeOnSelect={isMediaSmall} />
         )}
       </div>
     </div>
