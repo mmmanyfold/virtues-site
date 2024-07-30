@@ -8,7 +8,6 @@ import {
   chapterIndexAtom,
   chaptersAtom,
   isMutedAtom,
-  isPlayingAtom,
   playerAtom,
   playlistsAtom,
   seekingPositionAtom,
@@ -35,7 +34,6 @@ export const handleToggleMenu = () => {
 export const handleOpenAbout = () => {
   store.set(isAboutOpenAtom, true);
   store.set(isMenuOpenAtom, false);
-  store.set(isPlayingAtom, false);
 };
 
 export const handleMute = () => {
