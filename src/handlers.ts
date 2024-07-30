@@ -164,7 +164,6 @@ export const handleSetCurrentShowcaseItem = async (
       store.set(showcaseItemIndexAtom, index);
 
       if (playFromBeginning) {
-        store.set(isVideoLoadingAtom, false);
         setTimeout(() => {
           player.play().catch(handleError);
         }, 500);
@@ -174,7 +173,6 @@ export const handleSetCurrentShowcaseItem = async (
             .setCurrentTime(pos)
             .then(() => {
               player.play().catch(handleError);
-              store.set(isSeekLoadingAtom, false);
             })
             .catch(handleError);
         }, 500);

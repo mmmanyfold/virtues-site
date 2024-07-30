@@ -18,7 +18,7 @@ export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
 export const seekingPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
 export const isSeekLoadingAtom = atom(false);
-export const isVideoLoadingAtom = atom(false);
+export const isVideoLoadingAtom = atom(true);
 
 // chapter-based control
 export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
@@ -95,12 +95,7 @@ store.sub(currentPlaylistIndexAtom, async () => {
       store.set(showcaseItemIndexAtom, 0);
       setPlayerVideoData();
       setTimeout(() => {
-        player
-          .play()
-          .then(() => {
-            store.set(isVideoLoadingAtom, false);
-          })
-          .catch(handleError);
+        player.play().catch(handleError);
       }, 500);
     })
     .catch(handleError);
@@ -156,6 +151,8 @@ export const bindEventsToPlayer = () => {
   // register event listeners
   player.on("play", () => {
     store.set(isPlayingAtom, true);
+    store.set(isVideoLoadingAtom, false);
+    store.set(isSeekLoadingAtom, false);
   });
 
   player.on("pause", () => {
