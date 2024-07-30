@@ -202,9 +202,6 @@ export const handleSeek = (position: number) => {
 export const handleError = (error: Error) => {
   console.error(error);
   switch (error.name) {
-    case "PlayInterrupted":
-      handlePlay();
-      break;
     case "RangeError":
       break;
     case "PasswordError":
