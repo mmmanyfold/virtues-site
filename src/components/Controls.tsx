@@ -41,14 +41,16 @@ import {
 function ControlButton({
   ariaLabel,
   onClick,
+  disabled,
   children,
 }: {
   ariaLabel: string;
   onClick: () => void;
+  disabled: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <button aria-label={ariaLabel} className="relative" onClick={onClick}>
+    <button aria-label={ariaLabel} disabled={disabled} className="relative" onClick={onClick}>
       {children}
     </button>
   );
@@ -59,6 +61,7 @@ function ControlInfoPanel({ iconClass }: { iconClass: string }) {
   return (
     <ControlButton
       ariaLabel={isInfoPanelOpen ? "Close tracklist" : "Open tracklist"}
+      disabled={false}
       onClick={handleToggleInfoPanel}
     >
       <Info className={iconClass} weight="light" />
@@ -69,7 +72,7 @@ function ControlInfoPanel({ iconClass }: { iconClass: string }) {
 function ControlMute({ iconClass }: { iconClass: string }) {
   const [isMuted] = useAtom(isMutedAtom);
   return (
-    <ControlButton ariaLabel={isMuted ? "Unmute" : "Mute"} onClick={handleMute}>
+    <ControlButton ariaLabel={isMuted ? "Unmute" : "Mute"} disabled={false} onClick={handleMute}>
       {isMuted ? (
         <SpeakerSimpleSlash className={iconClass} weight="fill" />
       ) : (
@@ -81,13 +84,15 @@ function ControlMute({ iconClass }: { iconClass: string }) {
 
 function ControlRandom({
   iconClass,
+  disabled,
   onClick,
 }: {
   iconClass: string;
+  disabled: boolean;
   onClick: () => void;
 }) {
   return (
-    <ControlButton ariaLabel="Random track" onClick={onClick}>
+    <ControlButton ariaLabel="Random track" disabled={disabled} onClick={onClick}>
       <Shuffle className={iconClass} weight="bold" />
     </ControlButton>
   );
@@ -95,25 +100,28 @@ function ControlRandom({
 
 function ControlPrevious({
   iconClass,
+  disabled,
   onClick,
 }: {
   iconClass: string;
+  disabled: boolean;
   onClick: () => void;
 }) {
   return (
-    <ControlButton ariaLabel="Previous track" onClick={onClick}>
+    <ControlButton ariaLabel="Previous track" disabled={disabled} onClick={onClick}>
       <Rewind className={iconClass} weight="fill" />
     </ControlButton>
   );
 }
 
-function ControlPlayPause({ iconClass }: { iconClass: string }) {
+function ControlPlayPause({ iconClass, disabled }: { iconClass: string, disabled: boolean }) {
   const [isPlaying] = useAtom(isPlayingAtom);
   const [isSeekLoading] = useAtom(isSeekLoadingAtom);
   const [isVideoLoading] = useAtom(isVideoLoadingAtom);
   return (
     <ControlButton
       ariaLabel={isPlaying ? "Pause" : "Play"}
+      disabled={disabled}
       onClick={isPlaying ? handlePause : handlePlay}
     >
       {isPlaying || isSeekLoading || isVideoLoading ? (
@@ -127,13 +135,15 @@ function ControlPlayPause({ iconClass }: { iconClass: string }) {
 
 function ControlNext({
   iconClass,
+  disabled,
   onClick,
 }: {
   iconClass: string;
+  disabled: boolean;
   onClick: () => void;
 }) {
   return (
-    <ControlButton ariaLabel="Next track" onClick={onClick}>
+    <ControlButton ariaLabel="Next track" disabled={disabled} onClick={onClick}>
       <FastForward className={iconClass} weight="fill" />
     </ControlButton>
   );
@@ -141,21 +151,23 @@ function ControlNext({
 
 function ControlRestart({
   iconClass,
+  disabled,
   onClick,
 }: {
   iconClass: string;
+  disabled: boolean;
   onClick: () => void;
 }) {
   return (
-    <ControlButton ariaLabel="Restart track" onClick={onClick}>
+    <ControlButton ariaLabel="Restart track" disabled={disabled} onClick={onClick}>
       <ArrowCounterClockwise className={iconClass} weight="fill" />
     </ControlButton>
   );
 }
 
-function ControlJump({ iconClass }: { iconClass: string }) {
+function ControlJump({ iconClass, disabled }: { iconClass: string, disabled: boolean }) {
   return (
-    <ControlButton ariaLabel="Jump to playlist" onClick={handlePlaylistJump}>
+    <ControlButton ariaLabel="Jump to playlist" disabled={disabled} onClick={handlePlaylistJump}>
       <ArrowsDownUp className={iconClass} weight="bold" />
     </ControlButton>
   );
@@ -164,7 +176,7 @@ function ControlJump({ iconClass }: { iconClass: string }) {
 function ControlFullScreen({ iconClass }: { iconClass: string }) {
   const [isFullscreen] = useAtom(isFullscreenAtom);
   return (
-    <ControlButton ariaLabel="Fullscreen" onClick={handleFullscreen}>
+    <ControlButton ariaLabel="Fullscreen" disabled={false} onClick={handleFullscreen}>
       {isFullscreen ? (
         <ArrowsIn className={iconClass} />
       ) : (
@@ -174,9 +186,11 @@ function ControlFullScreen({ iconClass }: { iconClass: string }) {
   );
 }
 
-function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: string }) {
+function ShowcaseControls({ playlist, iconClass, disableControls }: { playlist: any, iconClass: string, disableControls: boolean }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const showcaseTotal = playlist.videoShowCasePayload.total;
+
+  console.log("disableControls", disableControls)
 
   const handleNext = () => {
     const i =
@@ -204,12 +218,12 @@ function ShowcaseControls({ playlist, iconClass }: { playlist: any, iconClass: s
     <div className="flex items-center justify-around bg-cream py-3">
       <ControlInfoPanel iconClass={iconClass} />
       <ControlMute iconClass={iconClass} />
-      <ControlRandom iconClass={iconClass} onClick={handleRandom} />
-      <ControlPrevious iconClass={iconClass} onClick={handlePrevious} />
-      <ControlPlayPause iconClass={iconClass} />
-      <ControlNext iconClass={iconClass} onClick={handleNext} />
-      <ControlRestart iconClass={iconClass} onClick={handleRestart} />
-      <ControlJump iconClass={iconClass} />
+      <ControlRandom iconClass={iconClass} onClick={handleRandom} disabled={disableControls} />
+      <ControlPrevious iconClass={iconClass} onClick={handlePrevious} disabled={disableControls} />
+      <ControlPlayPause iconClass={iconClass} disabled={disableControls} />
+      <ControlNext iconClass={iconClass} onClick={handleNext} disabled={disableControls} />
+      <ControlRestart iconClass={iconClass} onClick={handleRestart} disabled={disableControls} />
+      <ControlJump iconClass={iconClass} disabled={disableControls} />
       <ControlFullScreen iconClass={iconClass} />
     </div>
   );
@@ -233,10 +247,13 @@ function ChapterControls({ iconClass }: { iconClass: string }) {
 
 function Controls({ playlist }: { playlist: any }) {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
+  const [isSeekLoading] = useAtom(isSeekLoadingAtom);
+  const [isVideoLoading] = useAtom(isVideoLoadingAtom);
+
   const iconClass = isMediaSmall ? "text-[20px]" : "text-[30px] lg:text-[35px] xl:text-[30px]";
 
   if (playlist.videoShowCasePayload?.data) {
-    return <ShowcaseControls playlist={playlist} iconClass={iconClass} />;
+    return <ShowcaseControls playlist={playlist} iconClass={iconClass} disableControls={isVideoLoading || isSeekLoading} />;
   }
   return <ChapterControls iconClass={iconClass} />;
 }
