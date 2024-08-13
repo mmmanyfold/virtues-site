@@ -1,6 +1,7 @@
 // handlers
 // --------
 
+import Player from "@vimeo/player";
 import {
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
@@ -137,6 +138,22 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
   store.set(isAboutOpenAtom, false);
 };
 
+export const playWithMuteControl = (player: Player, isMuted: boolean) => {
+  player
+    .setMuted(true)
+    .then(() => {
+      player
+        .play()
+        .then(() => {
+          player
+          .setMuted(isMuted)
+          .catch(handleError);
+        })
+        .catch(handleError);
+    })
+    .catch(handleError);
+}
+
 export const handleSetCurrentShowcaseItem = async (
   index: number,
   pos: number = 0,
@@ -150,6 +167,8 @@ export const handleSetCurrentShowcaseItem = async (
   }
 
   const player = store.get(playerAtom);
+  const isMuted = store.get(isMutedAtom);
+
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
   const newVideo =
@@ -165,14 +184,14 @@ export const handleSetCurrentShowcaseItem = async (
 
       if (playFromBeginning) {
         setTimeout(() => {
-          player.play().catch(handleError);
+          playWithMuteControl(player, isMuted)
         }, 500);
       } else {
         setTimeout(() => {
           player
             .setCurrentTime(pos)
             .then(() => {
-              player.play().catch(handleError);
+              playWithMuteControl(player, isMuted)
             })
             .catch(handleError);
         }, 500);

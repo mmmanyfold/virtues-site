@@ -1,6 +1,6 @@
 import { atom, createStore } from "jotai";
 import { default as Player } from "@vimeo/player";
-import { handleError } from "./handlers.ts";
+import { handleError, playWithMuteControl } from "./handlers.ts";
 import { TimeUpdate } from "./types.ts";
 
 // stores
@@ -80,6 +80,7 @@ store.sub(currentPlaylistIndexAtom, async () => {
   store.set(showcaseItemIndexAtom, 0);
 
   const player = store.get(playerAtom);
+  const isMuted = store.get(isMutedAtom);
   const newIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
 
@@ -95,7 +96,7 @@ store.sub(currentPlaylistIndexAtom, async () => {
       store.set(showcaseItemIndexAtom, 0);
       setPlayerVideoData();
       setTimeout(() => {
-        player.play().catch(handleError);
+        playWithMuteControl(player, isMuted)
       }, 500);
     })
     .catch(handleError);
@@ -113,9 +114,6 @@ store.sub(playerAtom, () => {
 
 export const setPlayerVideoData = () => {
   const player = store.get(playerAtom);
-  const isMuted = store.get(isMutedAtom);
-
-  player.setMuted(isMuted).catch(handleError);
 
   player
     .getDuration()
@@ -174,4 +172,12 @@ export const bindEventsToPlayer = () => {
       player.play().catch(handleError);
     }, 500);
   });
+
+  player.on("loaded", () => {
+    store.set(isVideoLoadingAtom, false)
+  })
+
+  player.on("error", () => {
+    store.set(isVideoLoadingAtom, false)
+  })
 };
