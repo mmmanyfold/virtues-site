@@ -189,10 +189,10 @@ function InfoPanel() {
           <ShowcaseList
             metadata={vimeoChapters}
             showcaseItems={videoShowCasePayload.data}
-            closeOnSelect={isMediaSmall}
+            closeOnSelect={true}
           />
         ) : (
-          <ChapterList metadata={vimeoChapters} closeOnSelect={isMediaSmall} />
+          <ChapterList metadata={vimeoChapters} closeOnSelect={true} />
         )}
       </div>
     </div>
