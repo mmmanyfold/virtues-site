@@ -89,14 +89,13 @@ store.sub(currentPlaylistIndexAtom, async () => {
     ? videoShowCasePayload.data[0].player_embed_url
     : vimeoPlayerURL;
 
+  player.setMuted(true).catch(handleError);
   player
     .loadVideo(videoUrl)
     .then(() => {
       store.set(seekingPositionAtom, 0);
       store.set(showcaseItemIndexAtom, 0);
       setPlayerVideoData();
-      
-      player.setMuted(true);
       setTimeout(() => {
         playWithMuteControl(player, isMuted)
       }, 500);

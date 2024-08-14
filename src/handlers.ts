@@ -167,6 +167,7 @@ export const handleSetCurrentShowcaseItem = async (
   const newVideo =
     playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
 
+  player.setMuted(true).catch(handleError);
   player
     .loadVideo(newVideo.player_embed_url)
     .then(() => {
@@ -175,7 +176,6 @@ export const handleSetCurrentShowcaseItem = async (
       store.set(seekingPositionAtom, pos);
       store.set(showcaseItemIndexAtom, index);
 
-      player.setMuted(true)
       if (playFromBeginning) {
         setTimeout(() => {
           playWithMuteControl(player, isMuted)
