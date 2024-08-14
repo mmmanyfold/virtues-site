@@ -174,4 +174,12 @@ export const bindEventsToPlayer = () => {
       player.play().catch(handleError);
     }, 500);
   });
+
+  player.on("loaded", () => {
+    store.set(isVideoLoadingAtom, false)
+  })
+
+  player.on("error", () => {
+    store.set(isVideoLoadingAtom, false)
+  })
 };
