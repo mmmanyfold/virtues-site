@@ -95,6 +95,8 @@ store.sub(currentPlaylistIndexAtom, async () => {
       store.set(seekingPositionAtom, 0);
       store.set(showcaseItemIndexAtom, 0);
       setPlayerVideoData();
+      
+      player.setMuted(true);
       setTimeout(() => {
         playWithMuteControl(player, isMuted)
       }, 500);

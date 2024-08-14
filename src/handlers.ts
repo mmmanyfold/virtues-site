@@ -140,17 +140,10 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
 
 export const playWithMuteControl = (player: Player, isMuted: boolean) => {
   player
-    .setMuted(true)
-    .then(() => {
-      player
-        .play()
-        .then(() => {
-          player
-          .setMuted(isMuted)
-          .catch(handleError);
-        })
-        .catch(handleError);
-    })
+    .play()
+    .catch(handleError);
+  player
+    .setMuted(isMuted)
     .catch(handleError);
 }
 
@@ -182,6 +175,7 @@ export const handleSetCurrentShowcaseItem = async (
       store.set(seekingPositionAtom, pos);
       store.set(showcaseItemIndexAtom, index);
 
+      player.setMuted(true)
       if (playFromBeginning) {
         setTimeout(() => {
           playWithMuteControl(player, isMuted)
