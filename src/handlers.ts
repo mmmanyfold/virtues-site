@@ -16,6 +16,7 @@ import {
   currentPlaylistIndexAtom,
   isAboutOpenAtom,
   showcaseItemIndexAtom,
+  isPlayingAtom,
   isSeekLoadingAtom,
   isVideoLoadingAtom,
 } from "./store.ts";
@@ -39,9 +40,13 @@ export const handleOpenAbout = () => {
 
 export const handleMute = () => {
   const player = store.get(playerAtom);
+  const isPlaying = store.get(isPlayingAtom)
   const isMuted = store.get(isMutedAtom);
   store.set(isMutedAtom, !isMuted);
   player.setMuted(!isMuted).catch(handleError);
+  if (isMuted && isPlaying) {
+    player.play().catch(handleError);
+  }
 };
 
 export const handlePlay = () => {
