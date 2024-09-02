@@ -21,6 +21,7 @@ import {
   isMenuOpenAtom,
   isMutedAtom,
   isPlayingAtom,
+  isSeekLoadingAtom,
   isVideoLoadingAtom,
   playerRefAtom,
   playlistsAtom,
@@ -53,10 +54,16 @@ function VideoPlayer() {
   const firstPlaylist = playlists[0]
   const defaultVideoUrl = getDefaultVideoUrl(firstPlaylist)
 
-  const [_isPlaying, setIsPlaying] = useAtom(isPlayingAtom)
   const [_isMuted, setIsMuted] = useAtom(isMutedAtom)
+  const [_isPlaying, setIsPlaying] = useAtom(isPlayingAtom)
+  const [_isSeekLoading, setIsSeekLoading] = useAtom(isSeekLoadingAtom)
   const [_isVideoLoading, setIsVideoLoading] = useAtom(isVideoLoadingAtom)
   const [_seekingPosition, setSeekingPosition] = useAtom(seekingPositionAtom)
+
+  const onCanPlay = () => {
+    setIsVideoLoading(false)
+    setIsSeekLoading(false)
+  }
 
   const onTimeUpdate = () => {
     const currentTime = player?.currentTime || 0
@@ -80,9 +87,9 @@ function VideoPlayer() {
         }}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        onVolumeChange={() => setIsMuted(player?.muted || false)}
-        onCanPlay={() => setIsVideoLoading(false)}
+        onCanPlay={onCanPlay}
         onTimeUpdate={onTimeUpdate}
+        onVolumeChange={() => setIsMuted(player?.muted || false)}
       >
         <source src={defaultVideoUrl} />
       </video>
