@@ -71,7 +71,7 @@ export const handleFullscreen = () => {
 };
 
 export const handlePreviousChapter = () => {
-  const player = store.get(playerAtom);
+  // const player = store.get(playerAtom);
   const chapters = store.get(chaptersAtom);
   const chapterIndex = store.get(chapterIndexAtom);
 
@@ -83,7 +83,7 @@ export const handlePreviousChapter = () => {
   const seekTo = chapters[previousChapterIndex];
 
   store.set(chapterIndexAtom, previousChapterIndex);
-  player.setCurrentTime(seekTo.startTime).catch(handleError);
+  // player.setCurrentTime(seekTo.startTime).catch(handleError);
 };
 
 export const handleNextChapter = () => {
@@ -92,13 +92,13 @@ export const handleNextChapter = () => {
     return;
   }
 
-  const player = store.get(playerAtom);
+  // const player = store.get(playerAtom);
   const chapterIndex = store.get(chapterIndexAtom);
   const newChapterIndex = (chapterIndex + 1) % chapters.length;
   const seekTo = chapters[newChapterIndex];
 
   store.set(chapterIndexAtom, newChapterIndex);
-  player.setCurrentTime(seekTo.startTime).catch(handleError);
+  // player.setCurrentTime(seekTo.startTime).catch(handleError);
 };
 
 export const handleRestartPlayback = () => {
@@ -121,7 +121,7 @@ export const getRandomIndex = (currentIndex: number, listLength: number) => {
 };
 
 export const handleRandomChapter = () => {
-  const player = store.get(playerAtom);
+  // const player = store.get(playerAtom);
   const chapters = store.get(chaptersAtom);
   const currentChapterIndex = store.get(chapterIndexAtom);
   const randomChapterIndex = getRandomIndex(
@@ -131,16 +131,16 @@ export const handleRandomChapter = () => {
   const randomChapter = chapters[randomChapterIndex];
 
   store.set(chapterIndexAtom, randomChapterIndex);
-  player.setCurrentTime(randomChapter.startTime).catch(handleError);
+  // player.setCurrentTime(randomChapter.startTime).catch(handleError);
 };
 
 export const handleSetCurrentChapter = (index: number) => {
-  const player = store.get(playerAtom);
+  // const player = store.get(playerAtom);
   const chapters = store.get(chaptersAtom);
   const newChapter = chapters[index];
 
   store.set(chapterIndexAtom, index);
-  player.setCurrentTime(newChapter.startTime).catch(handleError);
+  // player.setCurrentTime(newChapter.startTime).catch(handleError);
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
@@ -161,36 +161,24 @@ export const handleSetCurrentShowcaseItem = async (
     store.set(isSeekLoadingAtom, true);
   }
 
-  const player = store.get(playerAtom);
+  const player = store.get(playerRefAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
-  const newVideo =
-    playlists[currentPlaylistIndex].videoShowCasePayload.data[index];
+  const showcaseVideos = playlists[currentPlaylistIndex].videoShowCasePayload.data
+  const newVideo = showcaseVideos && showcaseVideos[index];
 
-  player
-    .loadVideo(newVideo.player_embed_url)
-    .then(() => {
-      setPlayerVideoData();
+  const sourceElement = player.querySelector('source');
+  if (sourceElement && newVideo) {
+    sourceElement.src = newVideo.videoSourceUrl;
+    player.load();
 
-      store.set(seekingPositionAtom, pos);
-      store.set(showcaseItemIndexAtom, index);
+    if (!playFromBeginning) {
+      player.currentTime = pos
+    }
 
-      if (playFromBeginning) {
-        setTimeout(() => {
-          player.play().catch(handleError);
-        }, 500);
-      } else {
-        setTimeout(() => {
-          player
-            .setCurrentTime(pos)
-            .then(() => {
-              player.play().catch(handleError);
-            })
-            .catch(handleError);
-        }, 500);
-      }
-    })
-    .catch(handleError);
+    store.set(seekingPositionAtom, pos);
+    store.set(showcaseItemIndexAtom, index);
+  }
 };
 
 export const handlePlaylistJump = async () => {
@@ -207,22 +195,4 @@ export const handleSeek = (position: number) => {
   const player = store.get(playerRefAtom);
   store.set(seekingPositionAtom, position);
   player.currentTime = position;
-};
-
-export const handleError = (error: Error) => {
-  console.error(error);
-  switch (error.name) {
-    case "RangeError":
-      break;
-    case "PasswordError":
-      // the video is password-protected and the viewer needs to enter the
-      // password first
-      break;
-    case "PrivacyError":
-      // the video is private
-      break;
-    default:
-      // some other error occurred
-      break;
-  }
 };

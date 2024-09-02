@@ -1,7 +1,5 @@
 import { atom, createStore } from "jotai";
-import { default as Player } from "@vimeo/player";
-import { handleError } from "./handlers.ts";
-import { TimeUpdate } from "./types.ts";
+import {videos} from "./data.ts"
 
 // stores
 // -----
@@ -14,28 +12,29 @@ export const playerRefAtom = atom(Object.create(null))
 export const isPlayingAtom = atom(false);
 export const isMutedAtom = atom(true);
 export const isFullscreenAtom = atom(false);
-export const seekableTimesAtom = atom<Player.VimeoTimeRange[]>([]);
+export const seekableTimesAtom = atom<[]>([]);
 export const seekingPositionAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
 export const isSeekLoadingAtom = atom(false);
 export const isVideoLoadingAtom = atom(true);
 
 // chapter-based control
-export const chaptersAtom = atom<Player.VimeoChapter[]>([]);
+export const chaptersAtom = atom<[]>([]);
 export const chapterIndexAtom = atom<number>(0);
-export const currentChapterAtom = atom<Player.VimeoChapter | null>(null);
+export const currentChapterAtom = atom(null);
 
 // showcase-based control
 export const showcaseItemIndexAtom = atom<number>(0);
 
-export const playlistsAtom = atom(async (_get, { signal }) => {
-  const response = await fetch(
-    `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
-    { signal },
-  );
-  const { rows } = await response.json();
-  return rows;
-});
+export const playlistsAtom = atom(videos)
+// atom(async (_get, { signal }) => {
+//   const response = await fetch(
+//     `https://rami-notion-api.fly.dev/public/virtues-videos.json`,
+//     { signal },
+//   );
+//   const { rows } = await response.json();
+//   return rows;
+// });
 
 export const aboutPageAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
@@ -83,15 +82,15 @@ store.sub(currentPlaylistIndexAtom, async () => {
   const newIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
 
-  const { videoSourceUrl, vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
-  // const videoUrl = !!videoShowCasePayload.data
-  //   ? videoShowCasePayload.data[0].player_embed_url
-  //   : vimeoPlayerURL;
+  const { videoSourceUrl, videoShowCasePayload } = playlists[newIndex];
+  const videoUrl = !!videoShowCasePayload.data
+    ? videoShowCasePayload.data[0].videoSourceUrl
+    : videoSourceUrl;
 
   if (player) {
     const sourceElement = player.querySelector('source');
     if (sourceElement) {
-      sourceElement.src = videoSourceUrl;
+      sourceElement.src = videoUrl;
       player.load();
     }
   }
@@ -102,80 +101,34 @@ store.sub(windowWidthAtom, () => {
   store.set(isMediaSmallAtom, windowWidth < 768);
 });
 
-store.sub(playerAtom, () => {
-  setPlayerVideoData();
-  bindEventsToPlayer();
-});
+// export const setPlayerVideoData = () => {
+//   player
+//     .getDuration()
+//     .then((duration: number) => {
+//       store.set(durationAtom, duration);
+//     })
 
-export const setPlayerVideoData = () => {
-  const player = store.get(playerAtom);
-  const isMuted = store.get(isMutedAtom);
+//   player
+//     .getChapters()
+//     .then((chapters: Player.VimeoChapter[]) => {
+//       store.set(chaptersAtom, chapters);
+//     })
 
-  player.setMuted(isMuted).catch(handleError);
+//   player
+//     .getSeekable()
+//     .then((seekable: Player.VimeoTimeRange[]) => {
+//       store.set(seekableTimesAtom, seekable);
+//     })
 
-  player
-    .getDuration()
-    .then((duration: number) => {
-      store.set(durationAtom, duration);
-    })
-    .catch(handleError);
+//   Promise.all([player.getVideoWidth(), player.getVideoHeight()])
+//     .then((dimensions) => {
+//       store.set(videoSizeAtom, dimensions);
+//     })
+// }
 
-  player
-    .getChapters()
-    .then((chapters: Player.VimeoChapter[]) => {
-      store.set(chaptersAtom, chapters);
-    })
-    .catch(handleError);
-
-  player
-    .getSeekable()
-    .then((seekable: Player.VimeoTimeRange[]) => {
-      store.set(seekableTimesAtom, seekable);
-    })
-    .catch(handleError);
-
-  Promise.all([player.getVideoWidth(), player.getVideoHeight()])
-    .then((dimensions) => {
-      store.set(videoSizeAtom, dimensions);
-    })
-    .catch(handleError);
-}
-
-export const bindEventsToPlayer = () => {
-  const player = store.get(playerAtom);
-
-  // register event listeners
-  player.on("play", () => {
-    store.set(isPlayingAtom, true);
-    store.set(isVideoLoadingAtom, false);
-    store.set(isSeekLoadingAtom, false);
-  });
-
-  player.on("pause", () => {
-    store.set(isPlayingAtom, false);
-  });
-
-  player.on("chapterchange", (chapter: Player.VimeoChapter) => {
-    store.set(currentChapterAtom, chapter);
-    store.set(chapterIndexAtom, chapter.index - 1);
-  });
-
-  player.on("timeupdate", (timeupdate: TimeUpdate) => {
-    store.set(seekingPositionAtom, Math.trunc(timeupdate.seconds));
-  });
-
-  player.on("fullscreenchange", ({ fullscreen }: any) => {
-    store.set(isFullscreenAtom, fullscreen);
-    setTimeout(() => {
-      player.play().catch(handleError);
-    }, 500);
-  });
-
-  player.on("loaded", () => {
-    store.set(isVideoLoadingAtom, false)
-  })
-
-  player.on("error", () => {
-    store.set(isVideoLoadingAtom, false)
-  })
-};
+// export const bindEventsToPlayer = () => {
+//   player.on("chapterchange", (chapter: Player.VimeoChapter) => {
+//     store.set(currentChapterAtom, chapter);
+//     store.set(chapterIndexAtom, chapter.index - 1);
+//   });
+// };

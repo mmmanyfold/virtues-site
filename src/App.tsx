@@ -1,31 +1,41 @@
 import { useEffect, useRef, Suspense } from "react";
 import { Provider, useAtom } from "jotai";
-import { useWindowSize } from "@uidotdev/usehooks";
 import { X, Plus } from "@phosphor-icons/react";
-import Seekbar from "./components/Seekbar.tsx";
+import { useWindowSize } from "@uidotdev/usehooks";
+
+import About from "./components/About.tsx";
 import Controls from "./components/Controls.tsx";
 import InfoPanel from "./components/InfoPanel.tsx";
 import Menu from "./components/Menu.tsx";
-import About from "./components/About.tsx";
+import Seekbar from "./components/Seekbar.tsx";
+
 import "./App.css";
+import { handleToggleMenu } from "./handlers.ts";
 import {
   store,
-  playerRefAtom,
-  playlistsAtom,
-  currentPlaylistIndexAtom,
   aboutPageAtom,
-  isInfoPanelOpenAtom,
-  isMenuOpenAtom,
+  currentPlaylistIndexAtom,
   isAboutOpenAtom,
-  videoSizeAtom,
-  wrapperWidthAtom,
-  windowWidthAtom,
+  isInfoPanelOpenAtom,
   isMediaSmallAtom,
+  isMenuOpenAtom,
   isMutedAtom,
   isPlayingAtom,
   isVideoLoadingAtom,
+  playerRefAtom,
+  playlistsAtom,
+  seekingPositionAtom,
+  videoSizeAtom,
+  windowWidthAtom,
+  wrapperWidthAtom,
 } from "./store.ts";
-import { handleToggleMenu } from "./handlers.ts";
+
+const getDefaultVideoUrl = (playlist: any) => {
+  if (playlist?.videoShowCasePayload?.data?.length) {
+    return playlist.videoShowCasePayload.data[0].videoSourceUrl
+  }
+  return playlist?.videoSourceUrl
+}
 
 function VideoPlayer() {
   const [[width, height]] = useAtom(videoSizeAtom);
@@ -40,14 +50,20 @@ function VideoPlayer() {
   }, [player])
 
   const [playlists] = useAtom(playlistsAtom)
-  const firstVideo = playlists[0]
-  const firstVideoUrl = firstVideo?.videoSourceUrl
+  const firstPlaylist = playlists[0]
+  const defaultVideoUrl = getDefaultVideoUrl(firstPlaylist)
 
   const [_isPlaying, setIsPlaying] = useAtom(isPlayingAtom)
   const [_isMuted, setIsMuted] = useAtom(isMutedAtom)
   const [_isVideoLoading, setIsVideoLoading] = useAtom(isVideoLoadingAtom)
+  const [_seekingPosition, setSeekingPosition] = useAtom(seekingPositionAtom)
 
-  if (!firstVideoUrl) {
+  const onTimeUpdate = () => {
+    const currentTime = player?.currentTime || 0
+    setSeekingPosition(Math.trunc(currentTime))
+  }
+
+  if (!defaultVideoUrl) {
     return null;
   }
 
@@ -66,8 +82,9 @@ function VideoPlayer() {
         onPause={() => setIsPlaying(false)}
         onVolumeChange={() => setIsMuted(player?.muted || false)}
         onCanPlay={() => setIsVideoLoading(false)}
+        onTimeUpdate={onTimeUpdate}
       >
-        <source src={firstVideoUrl} />
+        <source src={defaultVideoUrl} />
       </video>
     </div>
   );
