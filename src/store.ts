@@ -10,7 +10,7 @@ export const store = createStore();
 // atoms
 // -----
 
-export const playerAtom = atom(Object.create(null));
+export const playerRefAtom = atom(Object.create(null))
 export const isPlayingAtom = atom(false);
 export const isMutedAtom = atom(true);
 export const isFullscreenAtom = atom(false);
@@ -79,26 +79,22 @@ store.sub(currentPlaylistIndexAtom, async () => {
   store.set(seekingPositionAtom, 0);
   store.set(showcaseItemIndexAtom, 0);
 
-  const player = store.get(playerAtom);
+  const player = store.get(playerRefAtom);
   const newIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
 
-  const { vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
-  const videoUrl = !!videoShowCasePayload.data
-    ? videoShowCasePayload.data[0].player_embed_url
-    : vimeoPlayerURL;
+  const { videoSourceUrl, vimeoPlayerURL, videoShowCasePayload } = playlists[newIndex];
+  // const videoUrl = !!videoShowCasePayload.data
+  //   ? videoShowCasePayload.data[0].player_embed_url
+  //   : vimeoPlayerURL;
 
-  player
-    .loadVideo(videoUrl)
-    .then(() => {
-      store.set(seekingPositionAtom, 0);
-      store.set(showcaseItemIndexAtom, 0);
-      setPlayerVideoData();
-      setTimeout(() => {
-        player.play().catch(handleError);
-      }, 500);
-    })
-    .catch(handleError);
+  if (player) {
+    const sourceElement = player.querySelector('source');
+    if (sourceElement) {
+      sourceElement.src = videoSourceUrl;
+      player.load();
+    }
+  }
 });
 
 store.sub(windowWidthAtom, () => {

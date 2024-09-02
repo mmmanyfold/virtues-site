@@ -4,11 +4,9 @@
 import {
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
-  setPlayerVideoData,
   chapterIndexAtom,
   chaptersAtom,
-  isMutedAtom,
-  playerAtom,
+  playerRefAtom,
   playlistsAtom,
   seekingPositionAtom,
   store,
@@ -37,25 +35,39 @@ export const handleOpenAbout = () => {
 };
 
 export const handleMute = () => {
-  const player = store.get(playerAtom);
-  const isMuted = store.get(isMutedAtom);
-  store.set(isMutedAtom, !isMuted);
-  player.setMuted(!isMuted).catch(handleError);
+  const player = store.get(playerRefAtom);
+  if (player) {
+    if (player.muted) {
+      player.muted = false;
+    } else {
+      player.muted = true;
+    }
+  }
 };
 
 export const handlePlay = () => {
-  const player = store.get(playerAtom);
-  player.play().catch(handleError);
+  const player = store.get(playerRefAtom);
+  player.play()
 };
 
 export const handlePause = () => {
-  const player = store.get(playerAtom);
-  player.pause().catch(handleError);
+  const player = store.get(playerRefAtom);
+  player.pause()
 };
 
 export const handleFullscreen = () => {
-  const player = store.get(playerAtom);
-  player.requestFullscreen().catch(handleError);
+  const player = store.get(playerRefAtom);
+  if (player) {
+    if (player.requestFullscreen) {
+      player.requestFullscreen();
+    } else if (player.mozRequestFullScreen) { // Firefox
+      player.mozRequestFullScreen();
+    } else if (player.webkitRequestFullscreen) { // Chrome, Safari, Opera
+      player.webkitRequestFullscreen();
+    } else if (player.msRequestFullscreen) { // IE/Edge
+      player.msRequestFullscreen();
+    }
+  }
 };
 
 export const handlePreviousChapter = () => {
@@ -90,8 +102,8 @@ export const handleNextChapter = () => {
 };
 
 export const handleRestartPlayback = () => {
-  const player = store.get(playerAtom);
-  player.setCurrentTime(0).catch(handleError);
+  const player = store.get(playerRefAtom);
+  player.currentTime = 0;
 };
 
 export const getRandomIndex = (currentIndex: number, listLength: number) => {
@@ -192,9 +204,9 @@ export const handlePlaylistJump = async () => {
 };
 
 export const handleSeek = (position: number) => {
-  const player = store.get(playerAtom);
+  const player = store.get(playerRefAtom);
   store.set(seekingPositionAtom, position);
-  player.setCurrentTime(position).catch(handleError);
+  player.currentTime = position;
 };
 
 export const handleError = (error: Error) => {

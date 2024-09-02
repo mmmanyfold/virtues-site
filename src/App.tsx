@@ -1,7 +1,6 @@
-import { useEffect, Suspense } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { Provider, useAtom } from "jotai";
 import { useWindowSize } from "@uidotdev/usehooks";
-import { default as Player } from "@vimeo/player";
 import { X, Plus } from "@phosphor-icons/react";
 import Seekbar from "./components/Seekbar.tsx";
 import Controls from "./components/Controls.tsx";
@@ -11,10 +10,9 @@ import About from "./components/About.tsx";
 import "./App.css";
 import {
   store,
-  playerAtom,
+  playerRefAtom,
   playlistsAtom,
   currentPlaylistIndexAtom,
-  readOnlyCurrentSelectionAtom,
   aboutPageAtom,
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
@@ -23,31 +21,55 @@ import {
   wrapperWidthAtom,
   windowWidthAtom,
   isMediaSmallAtom,
+  isMutedAtom,
+  isPlayingAtom,
+  isVideoLoadingAtom,
 } from "./store.ts";
 import { handleToggleMenu } from "./handlers.ts";
 
 function VideoPlayer() {
-  const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
   const [[width, height]] = useAtom(videoSizeAtom);
 
-  const firstVideoUrl = !!firstVideoSelection.videoShowCasePayload.data
-    ? firstVideoSelection.videoShowCasePayload.data[0].player_embed_url
-    : firstVideoSelection.vimeoPlayerURL;
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const player = videoRef.current
+
+  useEffect(() => {
+    if (player) {
+      store.set(playerRefAtom, player)
+    }
+  }, [player])
+
+  const [playlists] = useAtom(playlistsAtom)
+  const firstVideo = playlists[0]
+  const firstVideoUrl = firstVideo?.videoSourceUrl
+
+  const [_isPlaying, setIsPlaying] = useAtom(isPlayingAtom)
+  const [_isMuted, setIsMuted] = useAtom(isMutedAtom)
+  const [_isVideoLoading, setIsVideoLoading] = useAtom(isVideoLoadingAtom)
+
+  if (!firstVideoUrl) {
+    return null;
+  }
 
   return (
-    <Suspense fallback={<div>loading...</div>}>
-      <div className="relative pointer-events-none">
-        <div
-          id="vimeo-player"
-          className={`relative overflow-hidden w-[100%]`}
-          style={{
-            paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
-          }}
-          data-vimeo-url={firstVideoUrl}
-          data-vimeo-background="1"
-        ></div>
-      </div>
-    </Suspense>
+    <div>
+      <video
+        muted
+        autoPlay
+        playsInline
+        ref={videoRef}
+        className="h-[100dvh]"
+        style={{
+          // paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
+        }}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onVolumeChange={() => setIsMuted(player?.muted || false)}
+        onCanPlay={() => setIsVideoLoading(false)}
+      >
+        <source src={firstVideoUrl} />
+      </video>
+    </div>
   );
 }
 
@@ -183,12 +205,12 @@ function VideoWrapper() {
   return (
     <>
       <div
-        className="relative"
-        style={{
-          width: `${wrapperWidth}px`,
-          left: positionLeft,
-          height: "100%",
-        }}
+        // className="relative"
+        // style={{
+        //   width: `${wrapperWidth}px`,
+        //   left: positionLeft,
+        //   height: "100%",
+        // }}
       >
         <VideoPlayer />
       </div>
@@ -198,11 +220,6 @@ function VideoWrapper() {
 }
 
 function App() {
-  useEffect(() => {
-    const player = new Player("vimeo-player");
-    store.set(playerAtom, player);
-  }, []);
-
   return (
     <Provider store={store}>
       <Title />
