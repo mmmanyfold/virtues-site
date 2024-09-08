@@ -14,6 +14,7 @@ import {
   playerRefAtom,
   playlistsAtom,
   seekingPositionAtom,
+  setPlayerVideoData,
   showcaseItemIndexAtom,
   store,
 } from "./store.ts";
@@ -165,15 +166,17 @@ export const handleSetCurrentShowcaseItem = async (
   const player = store.get(playerRefAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
-  const newVideo = getPlaylistVideo(playlists[currentPlaylistIndex], index)
+  const currentPlaylist = playlists[currentPlaylistIndex]
+  const newVideo = getPlaylistVideo(currentPlaylist, index)
 
-  if (newVideo.files.length) {
+  if (newVideo && newVideo.files.length) {
     const sourceElement = player.querySelector('source');
     sourceElement.src = newVideo.files[0].link
 
     if (!playFromBeginning) {
       player.currentTime = pos
     }
+    setPlayerVideoData(newVideo, currentPlaylist.vimeoChaptersPayload.data)
     player.load();
 
     store.set(seekingPositionAtom, pos);

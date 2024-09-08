@@ -1,4 +1,4 @@
-import { useEffect, useRef, Suspense } from "react";
+import { useEffect, useRef, Suspense, CSSProperties } from "react";
 import { Provider, useAtom } from "jotai";
 import { X, Plus } from "@phosphor-icons/react";
 import { useWindowSize } from "@uidotdev/usehooks";
@@ -33,9 +33,7 @@ import {
   wrapperWidthAtom,
 } from "./store.ts";
 
-function VideoPlayer() {
-  const [[width, height]] = useAtom(videoSizeAtom);
-
+function VideoPlayer({ style }: { style: CSSProperties}) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const player = videoRef.current
 
@@ -56,8 +54,10 @@ function VideoPlayer() {
   }, [player])
 
   useEffect(() => {
-    setPlayerVideoData(defaultVideo, firstPlaylist.vimeoChaptersPayload.data)
-  }, [playlists])
+    if (defaultVideo) {
+      setPlayerVideoData(defaultVideo, firstPlaylist.vimeoChaptersPayload.data)
+    }
+  }, [defaultVideo])
 
   const onCanPlay = () => {
     setIsVideoLoading(false)
@@ -74,16 +74,12 @@ function VideoPlayer() {
   }
 
   return (
-    <div>
       <video
         muted
         autoPlay
         playsInline
         ref={videoRef}
-        className="h-[100dvh]"
-        style={{
-          // paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
-        }}
+        style={style}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onCanPlay={onCanPlay}
@@ -92,7 +88,6 @@ function VideoPlayer() {
       >
         <source src={defaultVideo.files[0].link} />
       </video>
-    </div>
   );
 }
 
@@ -231,17 +226,21 @@ function VideoWrapper() {
   const positionLeft =
     wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
 
+  const videoStyle = {
+    width: `${wrapperWidth}px`,
+    left: positionLeft,
+  }
+
   return (
     <>
       <div
-        // className="relative"
-        // style={{
-        //   width: `${wrapperWidth}px`,
-        //   left: positionLeft,
-        //   height: "100%",
-        // }}
+        className="relative"
+        style={{
+          ...videoStyle,
+          height: "100%",
+        }}
       >
-        <VideoPlayer />
+        <VideoPlayer style={videoStyle} />
       </div>
       {isInfoPanelOpen && <InfoPanel />}
     </>
