@@ -196,6 +196,7 @@ export const handlePlaylistJump = async () => {
 
 export const handleSeek = (position: number) => {
   const player = store.get(playerRefAtom);
+  store.set(isVideoLoadingAtom, true);
   store.set(seekingPositionAtom, position);
   player.currentTime = position;
 };
