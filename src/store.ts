@@ -70,7 +70,7 @@ export const externalLinksPageAtom = atom(async (_get, { signal }) => {
   return await response.json();
 });
 
-const setPlayerVideoData = (video: Video | ShowcaseVideo, chapters: VimeoChapter[]) => {
+export const setPlayerVideoData = (video: Video | ShowcaseVideo, chapters: VimeoChapter[]) => {
   store.set(durationAtom, video.duration);
   store.set(chaptersAtom, chapters);
   store.set(videoSizeAtom, [video.width, video.height])

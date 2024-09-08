@@ -27,6 +27,7 @@ import {
   playerRefAtom,
   playlistsAtom,
   seekingPositionAtom,
+  setPlayerVideoData,
   videoSizeAtom,
   windowWidthAtom,
   wrapperWidthAtom,
@@ -38,12 +39,6 @@ function VideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null)
   const player = videoRef.current
 
-  useEffect(() => {
-    if (player) {
-      store.set(playerRefAtom, player)
-    }
-  }, [player])
-
   const [playlists] = useAtom(playlistsAtom)
   const firstPlaylist = playlists[0]
   const defaultVideo = getPlaylistVideo(firstPlaylist)
@@ -53,6 +48,16 @@ function VideoPlayer() {
   const [_isSeekLoading, setIsSeekLoading] = useAtom(isSeekLoadingAtom)
   const [_isVideoLoading, setIsVideoLoading] = useAtom(isVideoLoadingAtom)
   const [_seekingPosition, setSeekingPosition] = useAtom(seekingPositionAtom)
+
+  useEffect(() => {
+    if (player) {
+      store.set(playerRefAtom, player)
+    }
+  }, [player])
+
+  useEffect(() => {
+    setPlayerVideoData(defaultVideo, firstPlaylist.vimeoChaptersPayload.data)
+  }, [playlists])
 
   const onCanPlay = () => {
     setIsVideoLoading(false)
