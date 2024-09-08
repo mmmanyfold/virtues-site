@@ -3,7 +3,10 @@ import { RichTextObject } from "../components/Notion.tsx";
 import { useAtom } from "jotai";
 import { isMenuOpenAtom, isMediaSmallAtom } from "../store.ts";
 
-const ContentBlock = ({ block, imgShadow }: any) => {
+const ContentBlock = ({ block, imgShadow }: { 
+  block: any, 
+  imgShadow?: string | boolean 
+}) => {
   switch (block.type) {
     case "paragraph":
       return (
@@ -27,7 +30,11 @@ const ContentBlock = ({ block, imgShadow }: any) => {
   }
 };
 
-function Section({ blocks, imgShadow, className }: any) {
+function Section({ blocks, imgShadow, className }: {
+  blocks: any,
+  imgShadow?: string | boolean,
+  className?: string
+}) {
   return (
     <div
       className={`flex flex-col gap-y-6 pt-14 text-lg leading-tight ${
@@ -43,7 +50,7 @@ function Section({ blocks, imgShadow, className }: any) {
   );
 }
 
-export default function About({ blocks }: any) {
+export default function About({ blocks }: { blocks: any }) {
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
 

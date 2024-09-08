@@ -15,6 +15,7 @@ import {
   store,
   aboutPageAtom,
   currentPlaylistIndexAtom,
+  getPlaylistVideo,
   isAboutOpenAtom,
   isInfoPanelOpenAtom,
   isMediaSmallAtom,
@@ -31,13 +32,6 @@ import {
   wrapperWidthAtom,
 } from "./store.ts";
 
-const getDefaultVideoUrl = (playlist: any) => {
-  if (playlist?.videoShowCasePayload?.data?.length) {
-    return playlist.videoShowCasePayload.data[0].videoSourceUrl
-  }
-  return playlist?.videoSourceUrl
-}
-
 function VideoPlayer() {
   const [[width, height]] = useAtom(videoSizeAtom);
 
@@ -52,7 +46,7 @@ function VideoPlayer() {
 
   const [playlists] = useAtom(playlistsAtom)
   const firstPlaylist = playlists[0]
-  const defaultVideoUrl = getDefaultVideoUrl(firstPlaylist)
+  const defaultVideo = getPlaylistVideo(firstPlaylist)
 
   const [_isMuted, setIsMuted] = useAtom(isMutedAtom)
   const [_isPlaying, setIsPlaying] = useAtom(isPlayingAtom)
@@ -70,7 +64,7 @@ function VideoPlayer() {
     setSeekingPosition(Math.trunc(currentTime))
   }
 
-  if (!defaultVideoUrl) {
+  if (!defaultVideo?.files?.length) {
     return null;
   }
 
@@ -91,7 +85,7 @@ function VideoPlayer() {
         onTimeUpdate={onTimeUpdate}
         onVolumeChange={() => setIsMuted(player?.muted || false)}
       >
-        <source src={defaultVideoUrl} />
+        <source src={defaultVideo.files[0].link} />
       </video>
     </div>
   );
@@ -190,7 +184,13 @@ function getWrapperWidth({
   videoHeight,
   windowWidth,
   windowHeight,
-}: any) {
+}: {
+  controlsHeight: number,
+  videoWidth: number,
+  videoHeight: number,
+  windowWidth: number,
+  windowHeight: number,
+}) {
   const windowHeightWithoutControls = windowHeight - controlsHeight;
   const videoAspectRatio = videoWidth / videoHeight;
 

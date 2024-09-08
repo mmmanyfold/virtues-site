@@ -10,7 +10,12 @@ import {
 import { handleOpenAbout, handleSetCurrentPlaylist, handleToggleMenu } from "../handlers.ts";
 import { PlaylistVideo } from "../types.ts";
 
-function MenuItem({ title, isCurrentView, onClick, isSecondary }: any) {
+function MenuItem({ title, isCurrentView, onClick, isSecondary }: {
+  title: string,
+  isCurrentView: boolean,
+  onClick: () => void,
+  isSecondary?: boolean
+}) {
   return (
     <div
       role="button"
@@ -26,7 +31,10 @@ function MenuItem({ title, isCurrentView, onClick, isSecondary }: any) {
   );
 }
 
-function ExternalLink({ link, text }: any) {
+function ExternalLink({ link, text }: {
+  link: string,
+  text: string
+}) {
   return (
     <a
       className="flex gap-x-1.5 items-center pb-0.5 border-b border-b-[3px] border-b-[#fcf3e9] hover:border-b-[#000] font-normal"
@@ -67,7 +75,7 @@ export default function Menu() {
             },
           )}
           {externalLinks?.rows.length > 0 &&
-            externalLinks?.rows.map((link: any, index: number) => {
+            externalLinks?.rows.map((link: { link: string, text: string }, index: number) => {
               return (
                 <ExternalLink
                   key={"elink-" + index}

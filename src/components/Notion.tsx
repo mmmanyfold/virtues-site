@@ -1,6 +1,6 @@
 import "react";
 
-function RichTextObject({ object, color }: any) {
+function RichTextObject({ object, color }: { object: any, color?: string }) {
   let textObject;
   let content;
   let linkUrl;
@@ -56,7 +56,7 @@ function RichTextObject({ object, color }: any) {
   );
 }
 
-const RichTextCollectionItem = ({ object, color }: any) => {
+const RichTextCollectionItem = ({ object, color }: { object: any, color?: string }) => {
   switch (object.type) {
     case "text":
       return <RichTextObject key={object.id} object={object} color={color} />;
@@ -71,10 +71,10 @@ const RichTextCollectionItem = ({ object, color }: any) => {
   }
 };
 
-function RichTextCollection({ objects, color }: any) {
+function RichTextCollection({ objects, color }: { objects: any, color?: string }) {
   return (
     <>
-      {objects?.map((object: any, i: any) => (
+      {objects?.map((object: any, i: number) => (
         <RichTextCollectionItem
           key={`${object.type}-${i}`}
           object={object}
@@ -85,7 +85,7 @@ function RichTextCollection({ objects, color }: any) {
   );
 }
 
-const ParagraphObject = ({ object, color }: any) => {
+const ParagraphObject = ({ object, color }: { object: any, color?: string }) => {
   let textObjects;
   let className = "";
 
@@ -116,7 +116,7 @@ const ParagraphObject = ({ object, color }: any) => {
   );
 };
 
-const BulletedListItem = ({ block }: any) => {
+const BulletedListItem = ({ block }: { block: any }) => {
   return (
     <li className="notion-bulleted-list-item">
       <div>

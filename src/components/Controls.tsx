@@ -38,6 +38,7 @@ import {
   handleRandomChapter,
   getRandomIndex,
 } from "../handlers.ts";
+import { Playlist } from "../types.ts";
 
 function ControlButton({
   ariaLabel,
@@ -237,7 +238,7 @@ function ShowcaseControls({
   iconClass,
   disableControls,
 }: {
-  playlist: any;
+  playlist: Playlist;
   iconClass: string;
   disableControls: boolean;
 }) {
@@ -317,7 +318,7 @@ function ChapterControls({
   );
 }
 
-function Controls({ playlist }: { playlist: any }) {
+function Controls({ playlist }: { playlist: Playlist }) {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [isSeekLoading] = useAtom(isSeekLoadingAtom);
   const [isVideoLoading] = useAtom(isVideoLoadingAtom);
