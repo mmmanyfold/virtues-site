@@ -15,6 +15,7 @@ import {
   handleSetCurrentShowcaseItem,
   handleToggleInfoPanel
 } from "../handlers.ts";
+import { NotionChapters, ShowcaseVideo } from "../types.ts";
 
 function formatTimestamp(timestamp: number) {
   const minutes = Math.floor(timestamp / 60);
@@ -26,7 +27,14 @@ function formatTimestamp(timestamp: number) {
   );
 }
 
-function Track({ isCurrent, onClick, number, start, end, richTextObjects}: any) {
+function Track({ isCurrent, onClick, number, start, end, richTextObjects}: {
+  isCurrent: boolean,
+  onClick: () => void,
+  number: number,
+  start?: number,
+  end?: number,
+  richTextObjects: any
+}) {
   const trackRef = useRef<null | HTMLDivElement>(null);
   
   useEffect(() => {
@@ -65,7 +73,10 @@ function Track({ isCurrent, onClick, number, start, end, richTextObjects}: any) 
   );
 }
 
-function ChapterList({ metadata, closeOnSelect }: { metadata: any, closeOnSelect: boolean }) {
+function ChapterList({ metadata, closeOnSelect }: { 
+  metadata: NotionChapters, 
+  closeOnSelect: boolean 
+}) {
   const [currentChapter] = useAtom(currentChapterAtom);
   const [chapters] = useAtom(chaptersAtom);
   const [duration] = useAtom(durationAtom);
@@ -83,12 +94,12 @@ function ChapterList({ metadata, closeOnSelect }: { metadata: any, closeOnSelect
           const nextChapter =
             chapters.length >= metaNumber && chapters[metaNumber];
 
-          start = chapter.startTime;
-          end = nextChapter ? nextChapter.startTime - 1 : duration;
+          start = chapter.timecode;
+          end = nextChapter ? nextChapter.timecode - 1 : duration;
         }
 
-        const isCurrentChapter = currentChapter
-          ? currentChapter?.index === metaNumber
+        const isCurrentChapter = currentChapter?.index
+          ? currentChapter.index + 1 === metaNumber
           : metaNumber === 1;
 
         return (
@@ -112,7 +123,7 @@ function ChapterList({ metadata, closeOnSelect }: { metadata: any, closeOnSelect
   );
 }
 
-function durationOfPrevShowcaseItems(showcaseItems: any[], index: number) {
+function durationOfPrevShowcaseItems(showcaseItems: ShowcaseVideo[], index: number) {
   let duration = 0;
   for (let i = 0; i < index; i++) {
     duration += showcaseItems[i].duration;
@@ -125,8 +136,8 @@ function ShowcaseList({
   showcaseItems,
   closeOnSelect,
 }: {
-  metadata: any;
-  showcaseItems: any[];
+  metadata: NotionChapters,
+  showcaseItems: ShowcaseVideo[];
   closeOnSelect: boolean;
 }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
@@ -174,7 +185,7 @@ function InfoPanel() {
   const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
 
-  const { videoTitle, vimeoChapters, videoShowCasePayload } =
+  const { videoTitle, notionChapters, videoShowCasePayload } =
     playlists[currentPlaylistIndex];
 
   return (
@@ -187,12 +198,12 @@ function InfoPanel() {
       <div className="divide-y divide-[#a9a9a9] text-lg tracklist">
         {videoShowCasePayload?.data ? (
           <ShowcaseList
-            metadata={vimeoChapters}
+            metadata={notionChapters}
             showcaseItems={videoShowCasePayload.data}
             closeOnSelect={true}
           />
         ) : (
-          <ChapterList metadata={vimeoChapters} closeOnSelect={true} />
+          <ChapterList metadata={notionChapters} closeOnSelect={true} />
         )}
       </div>
     </div>

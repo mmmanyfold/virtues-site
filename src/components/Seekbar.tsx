@@ -8,6 +8,7 @@ import {
   isSeekLoadingAtom,
 } from "../store.ts";
 import { handleSetCurrentShowcaseItem, handleSeek } from "../handlers.ts";
+import { Playlist, ShowcaseVideo } from "../types.ts";
 
 const seekbarProps = {
   radius: 0,
@@ -62,7 +63,7 @@ function handleShowcaseSeek(
   handleSetCurrentShowcaseItem(videoIndex, videoPosition);
 }
 
-function SeekShowcase({ items }: { items: any[] }) {
+function SeekShowcase({ items }: { items: ShowcaseVideo[] }) {
   const [currentVideoIndex] = useAtom(showcaseItemIndexAtom);
   const [currentVideoSeekPosition] = useAtom(seekingPositionAtom);
 
@@ -103,7 +104,7 @@ function SeekShowcase({ items }: { items: any[] }) {
   );
 }
 
-function Seekbar({ playlist }: { playlist: any }) {
+function Seekbar({ playlist }: { playlist: Playlist }) {
   const [isSeekLoading] = useAtom(isSeekLoadingAtom);
 
   if (isSeekLoading || !playlist) {

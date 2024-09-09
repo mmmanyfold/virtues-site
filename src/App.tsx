@@ -1,53 +1,96 @@
-import { useEffect, Suspense } from "react";
+import { useEffect, useRef, Suspense, CSSProperties } from "react";
 import { Provider, useAtom } from "jotai";
-import { useWindowSize } from "@uidotdev/usehooks";
-import { default as Player } from "@vimeo/player";
 import { X, Plus } from "@phosphor-icons/react";
-import Seekbar from "./components/Seekbar.tsx";
+import { useWindowSize } from "@uidotdev/usehooks";
+
+import About from "./components/About.tsx";
 import Controls from "./components/Controls.tsx";
 import InfoPanel from "./components/InfoPanel.tsx";
 import Menu from "./components/Menu.tsx";
-import About from "./components/About.tsx";
+import Seekbar from "./components/Seekbar.tsx";
+
 import "./App.css";
+import { handleToggleMenu } from "./handlers.ts";
 import {
   store,
-  playerAtom,
-  playlistsAtom,
-  currentPlaylistIndexAtom,
-  readOnlyCurrentSelectionAtom,
   aboutPageAtom,
-  isInfoPanelOpenAtom,
-  isMenuOpenAtom,
+  currentPlaylistIndexAtom,
+  displaySizeAtom,
+  getPlaylistVideo,
+  getVideoLink,
   isAboutOpenAtom,
-  videoSizeAtom,
-  wrapperWidthAtom,
-  windowWidthAtom,
+  isInfoPanelOpenAtom,
   isMediaSmallAtom,
+  isMenuOpenAtom,
+  isMutedAtom,
+  isPlayingAtom,
+  isSeekLoadingAtom,
+  isVideoLoadingAtom,
+  playerRefAtom,
+  playlistsAtom,
+  seekingPositionAtom,
+  setPlayerVideoData,
+  videoSizeAtom,
+  windowWidthAtom,
 } from "./store.ts";
-import { handleToggleMenu } from "./handlers.ts";
 
-function VideoPlayer() {
-  const [firstVideoSelection] = useAtom(readOnlyCurrentSelectionAtom);
-  const [[width, height]] = useAtom(videoSizeAtom);
+function VideoPlayer({ style }: { style: CSSProperties}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const player = videoRef.current
 
-  const firstVideoUrl = !!firstVideoSelection.videoShowCasePayload.data
-    ? firstVideoSelection.videoShowCasePayload.data[0].player_embed_url
-    : firstVideoSelection.vimeoPlayerURL;
+  const [_isMuted, setIsMuted] = useAtom(isMutedAtom)
+  const [_isPlaying, setIsPlaying] = useAtom(isPlayingAtom)
+  const [_isSeekLoading, setIsSeekLoading] = useAtom(isSeekLoadingAtom)
+  const [_isVideoLoading, setIsVideoLoading] = useAtom(isVideoLoadingAtom)
+  const [_playerRef, setPlayerRef] = useAtom(playerRefAtom)
+  const [_seekingPosition, setSeekingPosition] = useAtom(seekingPositionAtom)
+  
+  const [playlists] = useAtom(playlistsAtom)
+  const firstPlaylist = playlists[0]
+  const defaultVideo = getPlaylistVideo(firstPlaylist)
+  const defaultVideoLink = getVideoLink(defaultVideo)
+
+  useEffect(() => {
+    if (player) {
+      setPlayerRef(player)
+    }
+  }, [player])
+
+  useEffect(() => {
+    if (defaultVideo) {
+      setPlayerVideoData(defaultVideo, firstPlaylist.vimeoChaptersPayload.data)
+    }
+  }, [defaultVideo])
+
+  const onCanPlay = () => {
+    setIsVideoLoading(false)
+    setIsSeekLoading(false)
+  }
+
+  const onTimeUpdate = () => {
+    const currentTime = player?.currentTime || 0
+    setSeekingPosition(Math.trunc(currentTime))
+  }
+
+  if (!defaultVideoLink) {
+    return null;
+  }
 
   return (
-    <Suspense fallback={<div>loading...</div>}>
-      <div className="relative pointer-events-none">
-        <div
-          id="vimeo-player"
-          className={`relative overflow-hidden w-[100%]`}
-          style={{
-            paddingTop: !!width ? `${(height / width) * 100}%` : "41.67%",
-          }}
-          data-vimeo-url={firstVideoUrl}
-          data-vimeo-background="1"
-        ></div>
-      </div>
-    </Suspense>
+      <video
+        muted
+        autoPlay
+        playsInline
+        ref={videoRef}
+        style={style}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onCanPlay={onCanPlay}
+        onTimeUpdate={onTimeUpdate}
+        onVolumeChange={() => setIsMuted(player?.muted || false)}
+      >
+        <source src={defaultVideoLink} />
+      </video>
   );
 }
 
@@ -138,59 +181,78 @@ function MenuToggle() {
   );
 }
 
-function getWrapperWidth({
+function getDisplaySize({
   controlsHeight,
   videoWidth,
   videoHeight,
   windowWidth,
   windowHeight,
-}: any) {
+}: {
+  controlsHeight: number,
+  videoWidth: number,
+  videoHeight: number,
+  windowWidth: number,
+  windowHeight: number,
+}) {
   const windowHeightWithoutControls = windowHeight - controlsHeight;
-  const videoAspectRatio = videoWidth / videoHeight;
 
-  let width = windowHeightWithoutControls * videoAspectRatio;
-
+  let width = windowHeightWithoutControls * (videoWidth / videoHeight);
   if (width < windowWidth) {
     width = windowWidth;
   }
 
-  return width;
+  return { 
+    displayWidth: width, 
+    displayHeight: width * (videoHeight / videoWidth),
+    windowHeightWithoutControls
+  };
 }
 
 function VideoWrapper() {
-  const windowSize = useWindowSize();
-  const [windowWidth] = useAtom(windowWidthAtom);
-  const [videoSize] = useAtom(videoSizeAtom);
-  const [wrapperWidth] = useAtom(wrapperWidthAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
+  const [videoSize] = useAtom(videoSizeAtom);
+  const [windowWidth, setWindowWidth] = useAtom(windowWidthAtom);
+  const [displaySize, setDisplaySize] = useAtom(displaySizeAtom);
+  const windowSize = useWindowSize();
 
   useEffect(() => {
-    const width = getWrapperWidth({
+    const size = getDisplaySize({
       controlsHeight: isMediaSmall ? 57 : 67,
       videoWidth: videoSize[0],
       videoHeight: videoSize[1],
       windowWidth: windowSize.width || 1,
       windowHeight: windowSize.height || 1,
     });
-    store.set(wrapperWidthAtom, width);
-    store.set(windowWidthAtom, windowSize.width || 1);
+    setDisplaySize(size);
+    setWindowWidth(windowSize.width || 1);
   }, [windowSize, videoSize, isMediaSmall]);
 
-  const positionLeft =
-    wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
+  const { 
+    displayWidth, 
+    displayHeight, 
+    windowHeightWithoutControls 
+  } = displaySize;
+  
+  const positionLeft = displayWidth === windowWidth ? 0 : `-${(displayWidth - windowWidth) / 2}px`;
+  const positionTop = displayHeight === windowHeightWithoutControls ? 0 : `-${(displayHeight - windowHeightWithoutControls) / 2}px`;
+
+  const videoStyle = {
+    width: `${displayWidth}px`,
+    left: positionLeft,
+    top: positionTop
+  }
 
   return (
     <>
       <div
         className="relative"
         style={{
-          width: `${wrapperWidth}px`,
-          left: positionLeft,
+          ...videoStyle,
           height: "100%",
         }}
       >
-        <VideoPlayer />
+        <VideoPlayer style={videoStyle} />
       </div>
       {isInfoPanelOpen && <InfoPanel />}
     </>
@@ -198,11 +260,6 @@ function VideoWrapper() {
 }
 
 function App() {
-  useEffect(() => {
-    const player = new Player("vimeo-player");
-    store.set(playerAtom, player);
-  }, []);
-
   return (
     <Provider store={store}>
       <Title />

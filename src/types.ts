@@ -1,3 +1,77 @@
+export type VideoFile = {
+  rendition: string
+  type: string
+  width: number
+  height: number
+  link: string
+}
+
+export type ChapterVideo = {
+  duration: number
+  width: number
+  height: number
+  files: VideoFile[]
+}
+
+export type ShowcaseVideo = ChapterVideo & {
+  uri: string
+  name: string
+  description: string | null
+  type: "video"
+  link: string
+  player_embed_url: string
+  language: string
+  is_playable: boolean
+  has_audio: boolean
+}
+
+export type Video = ChapterVideo | ShowcaseVideo
+
+export interface VimeoChapter {
+  uri: string
+  title: string
+  timecode: number
+  thumbnails: []
+  index?: number
+}
+
+export interface NotionChapter {
+  type: string
+  text: { content: string }
+  annotations: {
+    bold: boolean
+    italic: boolean
+    strikethrough: boolean
+    underline: boolean
+    code: boolean
+    color: string
+  }
+  plain_text: string
+}[]
+
+export interface NotionChapters {
+  [key: string]: NotionChapter
+}
+
+export type Playlist = {
+  uuid: string
+  order: number
+  titleColor: string
+  notionChapters: NotionChapters
+  videoTitle: string
+  vimeoShowcaseID: string
+  videoShowCasePayload: {
+    total: number
+    data: ShowcaseVideo[]
+  }
+  vimeoVideoID?: number
+  vimeoPlaybackPayload: ChapterVideo
+  vimeoChaptersPayload: {
+    total: number
+    data: VimeoChapter[]
+  }
+}
+
 export type PlaylistVideo = {
   uuid: string;
   vimeoPlayerURL: string;
