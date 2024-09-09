@@ -16,6 +16,7 @@ import {
   aboutPageAtom,
   currentPlaylistIndexAtom,
   getPlaylistVideo,
+  getVideoLink,
   isAboutOpenAtom,
   isInfoPanelOpenAtom,
   isMediaSmallAtom,
@@ -37,19 +38,21 @@ function VideoPlayer({ style }: { style: CSSProperties}) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const player = videoRef.current
 
-  const [playlists] = useAtom(playlistsAtom)
-  const firstPlaylist = playlists[0]
-  const defaultVideo = getPlaylistVideo(firstPlaylist)
-
   const [_isMuted, setIsMuted] = useAtom(isMutedAtom)
   const [_isPlaying, setIsPlaying] = useAtom(isPlayingAtom)
   const [_isSeekLoading, setIsSeekLoading] = useAtom(isSeekLoadingAtom)
   const [_isVideoLoading, setIsVideoLoading] = useAtom(isVideoLoadingAtom)
+  const [_playerRef, setPlayerRef] = useAtom(playerRefAtom)
   const [_seekingPosition, setSeekingPosition] = useAtom(seekingPositionAtom)
+  
+  const [playlists] = useAtom(playlistsAtom)
+  const firstPlaylist = playlists[0]
+  const defaultVideo = getPlaylistVideo(firstPlaylist)
+  const defaultVideoLink = getVideoLink(defaultVideo)
 
   useEffect(() => {
     if (player) {
-      store.set(playerRefAtom, player)
+      setPlayerRef(player)
     }
   }, [player])
 
@@ -69,7 +72,7 @@ function VideoPlayer({ style }: { style: CSSProperties}) {
     setSeekingPosition(Math.trunc(currentTime))
   }
 
-  if (!defaultVideo?.files?.length) {
+  if (!defaultVideoLink) {
     return null;
   }
 
@@ -86,7 +89,7 @@ function VideoPlayer({ style }: { style: CSSProperties}) {
         onTimeUpdate={onTimeUpdate}
         onVolumeChange={() => setIsMuted(player?.muted || false)}
       >
-        <source src={defaultVideo.files[0].link} />
+        <source src={defaultVideoLink} />
       </video>
   );
 }
@@ -204,12 +207,12 @@ function getWrapperWidth({
 }
 
 function VideoWrapper() {
-  const windowSize = useWindowSize();
-  const [windowWidth] = useAtom(windowWidthAtom);
-  const [videoSize] = useAtom(videoSizeAtom);
-  const [wrapperWidth] = useAtom(wrapperWidthAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
+  const [videoSize] = useAtom(videoSizeAtom);
+  const [windowWidth, setWindowWidth] = useAtom(windowWidthAtom);
+  const [wrapperWidth, setWrapperWidth] = useAtom(wrapperWidthAtom);
+  const windowSize = useWindowSize();
 
   useEffect(() => {
     const width = getWrapperWidth({
@@ -219,8 +222,8 @@ function VideoWrapper() {
       windowWidth: windowSize.width || 1,
       windowHeight: windowSize.height || 1,
     });
-    store.set(wrapperWidthAtom, width);
-    store.set(windowWidthAtom, windowSize.width || 1);
+    setWrapperWidth(width);
+    setWindowWidth(windowSize.width || 1);
   }, [windowSize, videoSize, isMediaSmall]);
 
   const positionLeft =

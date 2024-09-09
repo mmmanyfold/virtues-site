@@ -1,12 +1,17 @@
 import { atom, createStore } from "jotai";
-import { Playlist, VimeoChapter, Video, ShowcaseVideo } from "./types";
+import { Playlist, VimeoChapter, Video } from "./types";
 
-export const getPlaylistVideo = (playlist: Playlist, showcaseIndex?: number): Video | ShowcaseVideo => {
+export const getPlaylistVideo = (playlist: Playlist, showcaseIndex?: number): Video => {
   if (playlist.videoShowCasePayload?.data?.length) {
     let index = showcaseIndex || 0
     return playlist.videoShowCasePayload.data[index]
   }
   return playlist.vimeoPlaybackPayload
+}
+
+export const getVideoLink = (video: Video) => {
+  const files = video.files.sort((a, b) => b.width - a.width)
+  return files[0].link
 }
 
 // stores
@@ -70,10 +75,10 @@ export const externalLinksPageAtom = atom(async (_get, { signal }) => {
   return await response.json();
 });
 
-export const setPlayerVideoData = (video: Video | ShowcaseVideo, chapters: VimeoChapter[]) => {
-  store.set(durationAtom, video.duration);
+export const setPlayerVideoData = (video: Video, chapters: VimeoChapter[]) => {
   store.set(chaptersAtom, chapters);
-  store.set(videoSizeAtom, [video.width, video.height])
+  store.set(durationAtom, video.duration);
+  store.set(videoSizeAtom, [video.width, video.height]);
 }
 
 // subscriptions
@@ -87,13 +92,13 @@ store.sub(currentPlaylistIndexAtom, async () => {
   const player = store.get(playerRefAtom);
   const playlists = await store.get(playlistsAtom);
   const newIndex = store.get(currentPlaylistIndexAtom);
-  const newPlaylist = playlists[newIndex]
-  const video = getPlaylistVideo(newPlaylist)
+  const newPlaylist = playlists[newIndex];
+  const video = getPlaylistVideo(newPlaylist);
 
   if (player && video.files.length) {
     const sourceElement = player.querySelector('source');
     if (sourceElement) {
-      sourceElement.src = video.files[0].link;
+      sourceElement.src = getVideoLink(video);
       setPlayerVideoData(video, newPlaylist.vimeoChaptersPayload.data);
       player.load();
     }
@@ -103,7 +108,7 @@ store.sub(currentPlaylistIndexAtom, async () => {
 store.sub(chapterIndexAtom, () => {
   const index = store.get(chapterIndexAtom);
   const chapters = store.get(chaptersAtom);
-  const chapter = chapters[index]
+  const chapter = chapters[index];
 
   store.set(currentChapterAtom, { ...chapter, index });
   store.set(chapterIndexAtom, index);

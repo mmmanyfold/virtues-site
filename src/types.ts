@@ -6,14 +6,14 @@ export type VideoFile = {
   link: string
 }
 
-export type Video = {
+export type ChapterVideo = {
   duration: number
   width: number
   height: number
   files: VideoFile[]
 }
 
-export type ShowcaseVideo = Video & {
+export type ShowcaseVideo = ChapterVideo & {
   uri: string
   name: string
   description: string | null
@@ -24,6 +24,8 @@ export type ShowcaseVideo = Video & {
   is_playable: boolean
   has_audio: boolean
 }
+
+export type Video = ChapterVideo | ShowcaseVideo
 
 export interface VimeoChapter {
   uri: string
@@ -63,7 +65,7 @@ export type Playlist = {
     data: ShowcaseVideo[]
   }
   vimeoVideoID?: number
-  vimeoPlaybackPayload: Video
+  vimeoPlaybackPayload: ChapterVideo
   vimeoChaptersPayload: {
     total: number
     data: VimeoChapter[]

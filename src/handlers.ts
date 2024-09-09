@@ -6,6 +6,7 @@ import {
   chapterIndexAtom,
   currentPlaylistIndexAtom,
   getPlaylistVideo,
+  getVideoLink,
   isAboutOpenAtom,
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
@@ -171,7 +172,7 @@ export const handleSetCurrentShowcaseItem = async (
 
   if (newVideo && newVideo.files.length) {
     const sourceElement = player.querySelector('source');
-    sourceElement.src = newVideo.files[0].link
+    sourceElement.src = getVideoLink(newVideo)
     player.load();
     
     setPlayerVideoData(newVideo, currentPlaylist.vimeoChaptersPayload.data)
