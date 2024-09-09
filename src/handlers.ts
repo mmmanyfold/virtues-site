@@ -111,15 +111,15 @@ export const handleRestartPlayback = () => {
 export const getRandomIndex = (currentIndex: number, listLength: number) => {
   if (listLength === 1) {
     return 0;
-  } else if (listLength === 2) {
-    return currentIndex === 0 ? 1 : 0;
-  } else {
-    let i;
-    do {
-      i = Math.floor(Math.random() * (listLength - 1));
-    } while (i === currentIndex);
-    return i;
   }
+  if (listLength === 2) {
+    return currentIndex === 0 ? 1 : 0;
+  }
+  let i;
+  do {
+    i = Math.floor(Math.random() * listLength);
+  } while (i === currentIndex);
+  return i;
 };
 
 export const handleRandomChapter = () => {
@@ -185,9 +185,9 @@ export const handleSetCurrentShowcaseItem = async (
 };
 
 export const handlePlaylistJump = async () => {
-  const playlist = await store.get(playlistsAtom);
+  const playlists = await store.get(playlistsAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
-  const newIndex = getRandomIndex(currentPlaylistIndex, playlist.length);
+  const newIndex = getRandomIndex(currentPlaylistIndex, playlists.length);
 
   store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
