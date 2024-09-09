@@ -80,7 +80,7 @@ function VideoPlayer({ style }: { style: CSSProperties}) {
       <video
         muted
         autoPlay
-        playsInline
+        // playsInline
         ref={videoRef}
         style={style}
         onPlay={() => setIsPlaying(true)}
