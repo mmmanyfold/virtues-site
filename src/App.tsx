@@ -15,6 +15,7 @@ import {
   store,
   aboutPageAtom,
   currentPlaylistIndexAtom,
+  displaySizeAtom,
   getPlaylistVideo,
   getVideoLink,
   isAboutOpenAtom,
@@ -31,7 +32,6 @@ import {
   setPlayerVideoData,
   videoSizeAtom,
   windowWidthAtom,
-  wrapperWidthAtom,
 } from "./store.ts";
 
 function VideoPlayer({ style }: { style: CSSProperties}) {
@@ -181,7 +181,7 @@ function MenuToggle() {
   );
 }
 
-function getWrapperWidth({
+function getDisplaySize({
   controlsHeight,
   videoWidth,
   videoHeight,
@@ -195,15 +195,17 @@ function getWrapperWidth({
   windowHeight: number,
 }) {
   const windowHeightWithoutControls = windowHeight - controlsHeight;
-  const videoAspectRatio = videoWidth / videoHeight;
 
-  let width = windowHeightWithoutControls * videoAspectRatio;
-
+  let width = windowHeightWithoutControls * (videoWidth / videoHeight);
   if (width < windowWidth) {
     width = windowWidth;
   }
 
-  return width;
+  return { 
+    displayWidth: width, 
+    displayHeight: width * (videoHeight / videoWidth),
+    windowHeightWithoutControls
+  };
 }
 
 function VideoWrapper() {
@@ -211,27 +213,34 @@ function VideoWrapper() {
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
   const [videoSize] = useAtom(videoSizeAtom);
   const [windowWidth, setWindowWidth] = useAtom(windowWidthAtom);
-  const [wrapperWidth, setWrapperWidth] = useAtom(wrapperWidthAtom);
+  const [displaySize, setDisplaySize] = useAtom(displaySizeAtom);
   const windowSize = useWindowSize();
 
   useEffect(() => {
-    const width = getWrapperWidth({
+    const size = getDisplaySize({
       controlsHeight: isMediaSmall ? 57 : 67,
       videoWidth: videoSize[0],
       videoHeight: videoSize[1],
       windowWidth: windowSize.width || 1,
       windowHeight: windowSize.height || 1,
     });
-    setWrapperWidth(width);
+    setDisplaySize(size);
     setWindowWidth(windowSize.width || 1);
   }, [windowSize, videoSize, isMediaSmall]);
 
-  const positionLeft =
-    wrapperWidth === windowWidth ? 0 : `-${(wrapperWidth - windowWidth) / 2}px`;
+  const { 
+    displayWidth, 
+    displayHeight, 
+    windowHeightWithoutControls 
+  } = displaySize;
+  
+  const positionLeft = displayWidth === windowWidth ? 0 : `-${(displayWidth - windowWidth) / 2}px`;
+  const positionTop = displayHeight === windowHeightWithoutControls ? 0 : `-${(displayHeight - windowHeightWithoutControls) / 2}px`;
 
   const videoStyle = {
-    width: `${wrapperWidth}px`,
+    width: `${displayWidth}px`,
     left: positionLeft,
+    top: positionTop
   }
 
   return (

@@ -33,7 +33,15 @@ export const playerRefAtom = atom(Object.create(null))
 export const seekingPositionAtom = atom<number>(0);
 export const videoSizeAtom = atom<[number, number]>([0, 0]);
 export const windowWidthAtom = atom<number>(0);
-export const wrapperWidthAtom = atom<number>(0);
+export const displaySizeAtom = atom<{ 
+  displayWidth: number, 
+  displayHeight: number, 
+  windowHeightWithoutControls: number 
+}>({ 
+  displayWidth: 0, 
+  displayHeight: 0, 
+  windowHeightWithoutControls: 0 
+});
 
 // controls
 export const chaptersAtom = atom<VimeoChapter[]>([]);
