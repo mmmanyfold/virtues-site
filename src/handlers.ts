@@ -172,15 +172,15 @@ export const handleSetCurrentShowcaseItem = async (
   if (newVideo && newVideo.files.length) {
     const sourceElement = player.querySelector('source');
     sourceElement.src = newVideo.files[0].link
-
+    player.load();
+    
+    setPlayerVideoData(newVideo, currentPlaylist.vimeoChaptersPayload.data)
+    store.set(showcaseItemIndexAtom, index);
+    store.set(seekingPositionAtom, pos);
+    
     if (!playFromBeginning) {
       player.currentTime = pos
     }
-    setPlayerVideoData(newVideo, currentPlaylist.vimeoChaptersPayload.data)
-    player.load();
-
-    store.set(seekingPositionAtom, pos);
-    store.set(showcaseItemIndexAtom, index);
   }
 };
 
