@@ -2,7 +2,7 @@ import { useEffect, useRef, Suspense, CSSProperties } from "react";
 import { Provider, useAtom } from "jotai";
 import { X, Plus } from "@phosphor-icons/react";
 import { useWindowSize } from "@uidotdev/usehooks";
-import { isIOS } from "react-device-detect";
+import { isIOS, isMobileOnly } from "react-device-detect";
 
 import About from "./components/About.tsx";
 import Controls from "./components/Controls.tsx";
@@ -133,7 +133,7 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
 
   return (
     <>
-      {isIOS && (
+      {isIOS && isMobileOnly && (
         <video
           muted
           id="ios-fullscreen-video"

@@ -22,7 +22,7 @@ import {
   showcaseItemIndexAtom,
   store,
 } from "./store.ts";
-import { isIOS } from "react-device-detect";
+import { isIOS, isMobileOnly } from "react-device-detect";
 
 export const handleToggleInfoPanel = () => {
   const isOpen = store.get(isInfoPanelOpenAtom);
@@ -75,7 +75,7 @@ export const handleFullscreen = () => {
   const player = store.get(playerRefAtom);
   const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
 
-  if (isIOS && player && iosFullscreenPlayer) {
+  if (isIOS && isMobileOnly && player && iosFullscreenPlayer) {
     player.pause();
 
     const isShowcase = store.get(isShowcaseAtom);
