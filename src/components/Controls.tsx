@@ -11,7 +11,6 @@ import {
   ArrowCounterClockwise,
   ArrowsDownUp,
   ArrowsOut,
-  ArrowsIn,
   CircleNotch,
 } from "@phosphor-icons/react";
 import {
@@ -20,7 +19,6 @@ import {
   isSeekLoadingAtom,
   isVideoLoadingAtom,
   isMutedAtom,
-  isFullscreenAtom,
   isInfoPanelOpenAtom,
   showcaseItemIndexAtom,
 } from "../store.ts";
