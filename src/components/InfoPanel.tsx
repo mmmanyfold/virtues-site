@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef }  from "react";
 import { useAtom } from "jotai";
 import { RichTextCollection } from "../components/Notion.tsx";
 import {
@@ -13,7 +13,7 @@ import {
 import {
   handleSetCurrentChapter,
   handleSetCurrentShowcaseItem,
-  handleToggleInfoPanel,
+  handleToggleInfoPanel
 } from "../handlers.ts";
 import { NotionChapters, ShowcaseVideo } from "../types.ts";
 
@@ -27,41 +27,34 @@ function formatTimestamp(timestamp: number) {
   );
 }
 
-function Track({
-  isCurrent,
-  onClick,
-  number,
-  start,
-  end,
-  richTextObjects,
-}: {
-  isCurrent: boolean;
-  onClick: () => void;
-  number: number;
-  start?: number;
-  end?: number;
-  richTextObjects: any;
+function Track({ isCurrent, onClick, number, start, end, richTextObjects}: {
+  isCurrent: boolean,
+  onClick: () => void,
+  number: number,
+  start?: number,
+  end?: number,
+  richTextObjects: any
 }) {
   const trackRef = useRef<null | HTMLDivElement>(null);
-
+  
   useEffect(() => {
     if (isCurrent && trackRef.current) {
       trackRef.current.scrollIntoView({
-        behavior: "smooth", // Smooth scrolling
-        block: "center", // Vertical alignment
-        inline: "start", // Horizontal alignment
+        behavior: 'smooth', // Smooth scrolling
+        block: 'center', // Vertical alignment
+        inline: 'start' // Horizontal alignment
       });
     }
-  }, [isCurrent]);
+  }, [isCurrent])
 
   return (
     <div
       ref={trackRef}
       role="button"
       className="py-6"
-      style={{
+      style={{ 
         color: isCurrent ? "black" : "#908f8f",
-        fontWeight: isCurrent ? 500 : 400,
+        fontWeight: isCurrent ? 500 : 400
       }}
       onClick={onClick}
     >
@@ -80,12 +73,9 @@ function Track({
   );
 }
 
-function ChapterList({
-  metadata,
-  closeOnSelect,
-}: {
-  metadata: NotionChapters;
-  closeOnSelect: boolean;
+function ChapterList({ metadata, closeOnSelect }: { 
+  metadata: NotionChapters, 
+  closeOnSelect: boolean 
 }) {
   const [currentChapter] = useAtom(currentChapterAtom);
   const [chapters] = useAtom(chaptersAtom);
@@ -133,10 +123,7 @@ function ChapterList({
   );
 }
 
-function durationOfPrevShowcaseItems(
-  showcaseItems: ShowcaseVideo[],
-  index: number
-) {
+function durationOfPrevShowcaseItems(showcaseItems: ShowcaseVideo[], index: number) {
   let duration = 0;
   for (let i = 0; i < index; i++) {
     duration += showcaseItems[i].duration;
@@ -149,15 +136,14 @@ function ShowcaseList({
   showcaseItems,
   closeOnSelect,
 }: {
-  metadata: NotionChapters;
+  metadata: NotionChapters,
   showcaseItems: ShowcaseVideo[];
   closeOnSelect: boolean;
 }) {
   const [showcaseItemIndex] = useAtom(showcaseItemIndexAtom);
   const metaIds = Object.keys(metadata).sort();
-
-  const getIndexFromMetaId = (id: string) =>
-    metaIds[0] === "00" ? parseInt(id) : parseInt(id) - 1;
+  
+  const getIndexFromMetaId = (id: string) => metaIds[0] === "00" ? parseInt(id) : parseInt(id) - 1;
 
   return (
     <>
@@ -168,8 +154,7 @@ function ShowcaseList({
         let start = 0;
 
         if (metaIndex > 0) {
-          start =
-            durationOfPrevShowcaseItems(showcaseItems, metaIndex) + metaIndex;
+          start = durationOfPrevShowcaseItems(showcaseItems, metaIndex) + metaIndex;
         }
 
         const end = start + showcaseItems[metaIndex].duration;
@@ -179,7 +164,7 @@ function ShowcaseList({
             key={id}
             isCurrent={isCurrentItem}
             onClick={() => {
-              handleSetCurrentShowcaseItem({ index: metaIndex });
+              handleSetCurrentShowcaseItem(metaIndex)
               if (closeOnSelect) {
                 handleToggleInfoPanel();
               }

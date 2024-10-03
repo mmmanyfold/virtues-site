@@ -3,12 +3,9 @@ import { RichTextObject } from "../components/Notion.tsx";
 import { useAtom } from "jotai";
 import { isMenuOpenAtom, isMediaSmallAtom } from "../store.ts";
 
-const ContentBlock = ({
-  block,
-  imgShadow,
-}: {
-  block: any;
-  imgShadow?: string | boolean;
+const ContentBlock = ({ block, imgShadow }: { 
+  block: any, 
+  imgShadow?: string | boolean 
 }) => {
   switch (block.type) {
     case "paragraph":
@@ -33,14 +30,10 @@ const ContentBlock = ({
   }
 };
 
-function Section({
-  blocks,
-  imgShadow,
-  className,
-}: {
-  blocks: any;
-  imgShadow?: string | boolean;
-  className?: string;
+function Section({ blocks, imgShadow, className }: {
+  blocks: any,
+  imgShadow?: string | boolean,
+  className?: string
 }) {
   return (
     <div
