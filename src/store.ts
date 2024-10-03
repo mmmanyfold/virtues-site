@@ -104,7 +104,7 @@ store.sub(currentPlaylistIndexAtom, async () => {
 
   const player = store.get(playerRefAtom);
   const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
-  
+
   const playlists = await store.get(playlistsAtom);
   const newIndex = store.get(currentPlaylistIndexAtom);
   const newPlaylist = playlists[newIndex];
