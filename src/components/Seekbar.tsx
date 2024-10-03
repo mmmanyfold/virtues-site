@@ -28,7 +28,7 @@ function SeekChapter() {
       <Seek
         position={seekPosition}
         duration={duration}
-        onSeek={handleSeek}
+        onSeek={(pos) => handleSeek({ pos })}
         {...seekbarProps}
       />
     </div>
