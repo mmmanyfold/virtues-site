@@ -164,7 +164,7 @@ function ShowcaseList({
             key={id}
             isCurrent={isCurrentItem}
             onClick={() => {
-              handleSetCurrentShowcaseItem(metaIndex)
+              handleSetCurrentShowcaseItem({ index: metaIndex })
               if (closeOnSelect) {
                 handleToggleInfoPanel();
               }

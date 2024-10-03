@@ -57,10 +57,13 @@ function handleShowcaseSeek(
   const videoPosition = pos - startTimes[videoIndex];
 
   if (videoIndex === currentIndex) {
-    handleSeek(videoPosition);
+    handleSeek({ pos: videoPosition });
     return;
   }
-  handleSetCurrentShowcaseItem(videoIndex, videoPosition);
+  handleSetCurrentShowcaseItem({
+    index: videoIndex,
+    pos: videoPosition
+  });
 }
 
 function SeekShowcase({ items }: { items: ShowcaseVideo[] }) {
@@ -70,7 +73,10 @@ function SeekShowcase({ items }: { items: ShowcaseVideo[] }) {
   useEffect(() => {
     if (currentVideoSeekPosition === items[currentVideoIndex].duration - 1) {
       const isLast = currentVideoIndex === items.length - 1;
-      handleSetCurrentShowcaseItem(isLast ? 0 : currentVideoIndex + 1, 1);
+      handleSetCurrentShowcaseItem({ 
+        index: isLast ? 0 : currentVideoIndex + 1,
+        pos: 1
+      });
     }
   }, [currentVideoSeekPosition, currentVideoIndex]);
 

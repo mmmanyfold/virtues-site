@@ -7,9 +7,11 @@ import {
   currentPlaylistIndexAtom,
   getPlaylistVideo,
   getVideoLink,
+  iosFullscreenPlayerRefAtom,
   isAboutOpenAtom,
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
+  isMutedAtom,
   isSeekLoadingAtom,
   isVideoLoadingAtom,
   playerRefAtom,
@@ -19,6 +21,7 @@ import {
   showcaseItemIndexAtom,
   store,
 } from "./store.ts";
+import { isIOS } from "react-device-detect";
 
 export const handleToggleInfoPanel = () => {
   const isOpen = store.get(isInfoPanelOpenAtom);
@@ -39,11 +42,20 @@ export const handleOpenAbout = () => {
 
 export const handleMute = () => {
   const player = store.get(playerRefAtom);
+  const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
+
   if (player) {
     if (player.muted) {
       player.muted = false;
     } else {
       player.muted = true;
+    }
+  }
+  if (iosFullscreenPlayer) {
+    if (iosFullscreenPlayer.muted) {
+      iosFullscreenPlayer.muted = false;
+    } else {
+      iosFullscreenPlayer.muted = true;
     }
   }
 };
@@ -60,6 +72,23 @@ export const handlePause = () => {
 
 export const handleFullscreen = () => {
   const player = store.get(playerRefAtom);
+  const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
+  
+  if (isIOS && player && iosFullscreenPlayer) {
+    player.pause();
+    
+    const currentShowcaseItemIndex = store.get(showcaseItemIndexAtom);
+    const seekingPosition = store.get(seekingPositionAtom);
+    
+    handleSetCurrentShowcaseItem({ 
+      index: currentShowcaseItemIndex, 
+      pos: seekingPosition,
+      iosPlayer: true, 
+      play: true
+    });
+    return;
+  }
+
   if (player) {
     if (player.requestFullscreen) {
       player.requestFullscreen();
@@ -152,10 +181,17 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
   store.set(isAboutOpenAtom, false);
 };
 
-export const handleSetCurrentShowcaseItem = async (
+export const handleSetCurrentShowcaseItem = async ({
+  index,
+  pos = 0,
+  iosPlayer,
+  play
+}: {
   index: number,
-  pos: number = 0,
-) => {
+  pos?: number,
+  iosPlayer?: boolean,
+  play?: boolean
+}) => {
   const playFromBeginning = pos === 0;
 
   if (playFromBeginning) {
@@ -164,7 +200,7 @@ export const handleSetCurrentShowcaseItem = async (
     store.set(isSeekLoadingAtom, true);
   }
 
-  const player = store.get(playerRefAtom);
+  const player = iosPlayer ? store.get(iosFullscreenPlayerRefAtom) : store.get(playerRefAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
   const currentPlaylist = playlists[currentPlaylistIndex]
@@ -182,6 +218,9 @@ export const handleSetCurrentShowcaseItem = async (
     if (!playFromBeginning) {
       player.currentTime = pos
     }
+    if (play) {
+      player.play()
+    }
   }
 };
 
@@ -195,9 +234,25 @@ export const handlePlaylistJump = async () => {
   store.set(isAboutOpenAtom, false);
 };
 
-export const handleSeek = (position: number) => {
-  const player = store.get(playerRefAtom);
+export const handleSeek = ({ pos }: { pos: number }) => {
   store.set(isVideoLoadingAtom, true);
-  store.set(seekingPositionAtom, position);
-  player.currentTime = position;
+  store.set(seekingPositionAtom, pos);
+  
+  const player = store.get(playerRefAtom);
+  player.currentTime = pos;
 };
+
+export const handleIosFullscreenExit = () => {
+  if (!document.fullscreenElement) {
+    const iosPlayer = store.get(iosFullscreenPlayerRefAtom);
+    const player = store.get(playerRefAtom)
+
+    const isMuted = store.get(isMutedAtom);
+    const pos = store.get(seekingPositionAtom);
+    
+    iosPlayer.pause();
+    player.muted = isMuted;
+    player.currentTime = pos;
+    player.play();
+  }
+}
