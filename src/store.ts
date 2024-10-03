@@ -34,7 +34,7 @@ export const isSeekLoadingAtom = atom(false);
 export const isShowcaseAtom = atom<boolean | null>(null);
 export const isVideoLoadingAtom = atom(true);
 export const playerRefAtom = atom(Object.create(null));
-export const iosFullscreenPlayerRefAtom = atom(Object.create(null));
+export const iosFullscreenPlayerRefAtom = atom<any>(null);
 export const seekingPositionAtom = atom<number>(0);
 export const videoSizeAtom = atom<[number, number]>([0, 0]);
 export const windowWidthAtom = atom<number>(0);
@@ -114,16 +114,19 @@ store.sub(currentPlaylistIndexAtom, async () => {
 
   if (player && video.files.length) {
     const sourceElement = player.querySelector("source");
-    const iosSourceElement = iosFullscreenPlayer.querySelector("source");
 
     if (sourceElement) {
       sourceElement.src = getVideoLink(video);
       setPlayerVideoData(video, newPlaylist.vimeoChaptersPayload.data);
       player.load();
     }
-    if (iosSourceElement) {
-      iosSourceElement.src = getVideoLink(video);
-      iosFullscreenPlayer.load();
+
+    if (iosFullscreenPlayer) {
+      const iosSourceElement = iosFullscreenPlayer.querySelector("source");
+      if (iosSourceElement) {
+        iosSourceElement.src = getVideoLink(video);
+        iosFullscreenPlayer.load();
+      }
     }
   }
 });
