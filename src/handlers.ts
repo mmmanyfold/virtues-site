@@ -62,29 +62,29 @@ export const handleMute = () => {
 
 export const handlePlay = () => {
   const player = store.get(playerRefAtom);
-  player.play()
+  player.play();
 };
 
 export const handlePause = () => {
   const player = store.get(playerRefAtom);
-  player.pause()
+  player.pause();
 };
 
 export const handleFullscreen = () => {
   const player = store.get(playerRefAtom);
   const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
-  
+
   if (isIOS && player && iosFullscreenPlayer) {
     player.pause();
-    
+
     const currentShowcaseItemIndex = store.get(showcaseItemIndexAtom);
     const seekingPosition = store.get(seekingPositionAtom);
-    
-    handleSetCurrentShowcaseItem({ 
-      index: currentShowcaseItemIndex, 
+
+    handleSetCurrentShowcaseItem({
+      index: currentShowcaseItemIndex,
       pos: seekingPosition,
-      iosPlayer: true, 
-      play: true
+      iosPlayer: true,
+      play: true,
     });
     return;
   }
@@ -92,11 +92,14 @@ export const handleFullscreen = () => {
   if (player) {
     if (player.requestFullscreen) {
       player.requestFullscreen();
-    } else if (player.mozRequestFullScreen) { // Firefox
+    } else if (player.mozRequestFullScreen) {
+      // Firefox
       player.mozRequestFullScreen();
-    } else if (player.webkitRequestFullscreen) { // Chrome, Safari, Opera
+    } else if (player.webkitRequestFullscreen) {
+      // Chrome, Safari, Opera
       player.webkitRequestFullscreen();
-    } else if (player.msRequestFullscreen) { // IE/Edge
+    } else if (player.msRequestFullscreen) {
+      // IE/Edge
       player.msRequestFullscreen();
     }
   }
@@ -115,7 +118,7 @@ export const handlePreviousChapter = () => {
   const seekTo = chapters[previousChapterIndex];
 
   store.set(chapterIndexAtom, previousChapterIndex);
-  player.currentTime = seekTo.timecode
+  player.currentTime = seekTo.timecode;
 };
 
 export const handleNextChapter = () => {
@@ -130,7 +133,7 @@ export const handleNextChapter = () => {
   const seekTo = chapters[newChapterIndex];
 
   store.set(chapterIndexAtom, newChapterIndex);
-  player.currentTime = seekTo.timecode
+  player.currentTime = seekTo.timecode;
 };
 
 export const handleRestartPlayback = () => {
@@ -158,12 +161,12 @@ export const handleRandomChapter = () => {
   const currentChapterIndex = store.get(chapterIndexAtom);
   const randomChapterIndex = getRandomIndex(
     currentChapterIndex,
-    chapters.length,
+    chapters.length
   );
   const randomChapter = chapters[randomChapterIndex];
 
   store.set(chapterIndexAtom, randomChapterIndex);
-  player.currentTime = randomChapter.timecode
+  player.currentTime = randomChapter.timecode;
 };
 
 export const handleSetCurrentChapter = (index: number) => {
@@ -172,7 +175,7 @@ export const handleSetCurrentChapter = (index: number) => {
   const newChapter = chapters[index];
 
   store.set(chapterIndexAtom, index);
-  player.currentTime = newChapter.timecode
+  player.currentTime = newChapter.timecode;
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
@@ -185,12 +188,12 @@ export const handleSetCurrentShowcaseItem = async ({
   index,
   pos = 0,
   iosPlayer,
-  play
+  play,
 }: {
-  index: number,
-  pos?: number,
-  iosPlayer?: boolean,
-  play?: boolean
+  index: number;
+  pos?: number;
+  iosPlayer?: boolean;
+  play?: boolean;
 }) => {
   const playFromBeginning = pos === 0;
 
@@ -200,26 +203,28 @@ export const handleSetCurrentShowcaseItem = async ({
     store.set(isSeekLoadingAtom, true);
   }
 
-  const player = iosPlayer ? store.get(iosFullscreenPlayerRefAtom) : store.get(playerRefAtom);
+  const player = iosPlayer
+    ? store.get(iosFullscreenPlayerRefAtom)
+    : store.get(playerRefAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
-  const currentPlaylist = playlists[currentPlaylistIndex]
-  const newVideo = getPlaylistVideo(currentPlaylist, index)
+  const currentPlaylist = playlists[currentPlaylistIndex];
+  const newVideo = getPlaylistVideo(currentPlaylist, index);
 
   if (newVideo && newVideo.files.length) {
-    const sourceElement = player.querySelector('source');
-    sourceElement.src = getVideoLink(newVideo)
+    const sourceElement = player.querySelector("source");
+    sourceElement.src = getVideoLink(newVideo);
     player.load();
-    
-    setPlayerVideoData(newVideo, currentPlaylist.vimeoChaptersPayload.data)
+
+    setPlayerVideoData(newVideo, currentPlaylist.vimeoChaptersPayload.data);
     store.set(showcaseItemIndexAtom, index);
     store.set(seekingPositionAtom, pos);
-    
+
     if (!playFromBeginning) {
-      player.currentTime = pos
+      player.currentTime = pos;
     }
     if (play) {
-      player.play()
+      player.play();
     }
   }
 };
@@ -237,7 +242,7 @@ export const handlePlaylistJump = async () => {
 export const handleSeek = ({ pos }: { pos: number }) => {
   store.set(isVideoLoadingAtom, true);
   store.set(seekingPositionAtom, pos);
-  
+
   const player = store.get(playerRefAtom);
   player.currentTime = pos;
 };
@@ -245,14 +250,14 @@ export const handleSeek = ({ pos }: { pos: number }) => {
 export const handleIosFullscreenExit = () => {
   if (!document.fullscreenElement) {
     const iosPlayer = store.get(iosFullscreenPlayerRefAtom);
-    const player = store.get(playerRefAtom)
+    const player = store.get(playerRefAtom);
 
     const isMuted = store.get(isMutedAtom);
     const pos = store.get(seekingPositionAtom);
-    
+
     iosPlayer.pause();
     player.muted = isMuted;
     player.currentTime = pos;
     player.play();
   }
-}
+};

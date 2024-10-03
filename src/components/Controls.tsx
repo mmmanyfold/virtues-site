@@ -247,7 +247,8 @@ function ShowcaseControls({
   };
 
   const handlePrevious = () => {
-    const index = showcaseItemIndex > 0 ? showcaseItemIndex - 1 : showcaseItemIndex;
+    const index =
+      showcaseItemIndex > 0 ? showcaseItemIndex - 1 : showcaseItemIndex;
     handleSetCurrentShowcaseItem({ index });
   };
 
