@@ -13,7 +13,6 @@ import {
   isMenuOpenAtom,
   isMutedAtom,
   isSeekLoadingAtom,
-  isShowcaseAtom,
   isVideoLoadingAtom,
   playerRefAtom,
   playlistsAtom,
@@ -71,14 +70,21 @@ export const handlePause = () => {
   player.pause();
 };
 
-export const handleFullscreen = () => {
+const getIsShowcase = async () => {
+  const playlists = await store.get(playlistsAtom);
+  const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
+  const currentPlaylist = playlists[currentPlaylistIndex];
+  return !!currentPlaylist?.videoShowCasePayload?.data;
+}
+
+export const handleFullscreen = async () => {
   const player = store.get(playerRefAtom);
   const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
 
   if (isIOS && isMobileOnly && player && iosFullscreenPlayer) {
     player.pause();
 
-    const isShowcase = store.get(isShowcaseAtom);
+    const isShowcase = await getIsShowcase();
     const seekingPosition = store.get(seekingPositionAtom);
 
     if (isShowcase) {

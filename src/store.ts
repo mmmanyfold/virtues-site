@@ -24,42 +24,6 @@ export const store = createStore();
 // atoms
 // -----
 
-// player
-export const currentPlaylistIndexAtom = atom<number>(0);
-export const durationAtom = atom<number>(0);
-export const isFullscreenAtom = atom(false);
-export const isMutedAtom = atom(true);
-export const isPlayingAtom = atom(false);
-export const isSeekLoadingAtom = atom(false);
-export const isShowcaseAtom = atom<boolean | null>(null);
-export const isVideoLoadingAtom = atom(true);
-export const playerRefAtom = atom(Object.create(null));
-export const iosFullscreenPlayerRefAtom = atom<any>(null);
-export const seekingPositionAtom = atom<number>(0);
-export const videoSizeAtom = atom<[number, number]>([0, 0]);
-export const windowWidthAtom = atom<number>(0);
-export const displaySizeAtom = atom<{
-  displayWidth: number;
-  displayHeight: number;
-  windowHeightWithoutControls: number;
-}>({
-  displayWidth: 0,
-  displayHeight: 0,
-  windowHeightWithoutControls: 0,
-});
-
-// controls
-export const chaptersAtom = atom<VimeoChapter[]>([]);
-export const chapterIndexAtom = atom<number>(0);
-export const currentChapterAtom = atom<VimeoChapter | null>(null);
-export const showcaseItemIndexAtom = atom<number>(0);
-
-// menus
-export const isAboutOpenAtom = atom<boolean>(false);
-export const isInfoPanelOpenAtom = atom<boolean>(false);
-export const isMediaSmallAtom = atom<boolean>(true);
-export const isMenuOpenAtom = atom<boolean>(false);
-
 // data
 export const playlistsAtom = atom(async (_get, { signal }) => {
   const response = await fetch(
@@ -88,6 +52,41 @@ export const externalLinksPageAtom = atom(async (_get, { signal }) => {
   return await response.json();
 });
 
+// player
+export const currentPlaylistIndexAtom = atom<number>(0);
+export const durationAtom = atom<number>(0);
+export const isFullscreenAtom = atom(false);
+export const isMutedAtom = atom(true);
+export const isPlayingAtom = atom(false);
+export const isSeekLoadingAtom = atom(false);
+export const isVideoLoadingAtom = atom(true);
+export const playerRefAtom = atom(Object.create(null));
+export const iosFullscreenPlayerRefAtom = atom<any>(null);
+export const seekingPositionAtom = atom<number>(0);
+export const videoSizeAtom = atom<[number, number]>([0, 0]);
+export const windowWidthAtom = atom<number>(0);
+export const displaySizeAtom = atom<{
+  displayWidth: number;
+  displayHeight: number;
+  windowHeightWithoutControls: number;
+}>({
+  displayWidth: 0,
+  displayHeight: 0,
+  windowHeightWithoutControls: 0,
+});
+
+// controls
+export const chaptersAtom = atom<VimeoChapter[]>([]);
+export const chapterIndexAtom = atom<number>(0);
+export const currentChapterAtom = atom<VimeoChapter | null>(null);
+export const showcaseItemIndexAtom = atom<number>(0);
+
+// menus
+export const isAboutOpenAtom = atom<boolean>(false);
+export const isInfoPanelOpenAtom = atom<boolean>(false);
+export const isMediaSmallAtom = atom<boolean>(true);
+export const isMenuOpenAtom = atom<boolean>(false);
+
 export const setPlayerVideoData = (video: Video, chapters: VimeoChapter[]) => {
   store.set(chaptersAtom, chapters);
   store.set(durationAtom, video.duration);
@@ -109,8 +108,6 @@ store.sub(currentPlaylistIndexAtom, async () => {
   const newIndex = store.get(currentPlaylistIndexAtom);
   const newPlaylist = playlists[newIndex];
   const video = getPlaylistVideo(newPlaylist);
-
-  store.set(isShowcaseAtom, !!newPlaylist.videoShowCasePayload?.data);
 
   if (player && video.files.length) {
     const sourceElement = player.querySelector("source");
