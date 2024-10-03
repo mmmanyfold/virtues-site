@@ -1,6 +1,6 @@
 import "react";
 
-function RichTextObject({ object, color }: { object: any, color?: string }) {
+function RichTextObject({ object, color }: { object: any; color?: string }) {
   let textObject;
   let content;
   let linkUrl;
@@ -14,7 +14,7 @@ function RichTextObject({ object, color }: { object: any, color?: string }) {
     hasNewlines = content.includes("\n");
     const annotations = object.annotations;
     const classes = Object.keys(annotations).filter(
-      (k) => annotations[k] === true,
+      (k) => annotations[k] === true
     );
     className = classes.join(" ");
   }
@@ -56,7 +56,13 @@ function RichTextObject({ object, color }: { object: any, color?: string }) {
   );
 }
 
-const RichTextCollectionItem = ({ object, color }: { object: any, color?: string }) => {
+const RichTextCollectionItem = ({
+  object,
+  color,
+}: {
+  object: any;
+  color?: string;
+}) => {
   switch (object.type) {
     case "text":
       return <RichTextObject key={object.id} object={object} color={color} />;
@@ -71,7 +77,13 @@ const RichTextCollectionItem = ({ object, color }: { object: any, color?: string
   }
 };
 
-function RichTextCollection({ objects, color }: { objects: any, color?: string }) {
+function RichTextCollection({
+  objects,
+  color,
+}: {
+  objects: any;
+  color?: string;
+}) {
   return (
     <>
       {objects?.map((object: any, i: number) => (
@@ -85,14 +97,20 @@ function RichTextCollection({ objects, color }: { objects: any, color?: string }
   );
 }
 
-const ParagraphObject = ({ object, color }: { object: any, color?: string }) => {
+const ParagraphObject = ({
+  object,
+  color,
+}: {
+  object: any;
+  color?: string;
+}) => {
   let textObjects;
   let className = "";
 
   if (object.type === "paragraph") {
     const annotations = object.paragraph?.annotations || {};
     const classes = Object.keys(annotations).filter(
-      (k) => annotations[k] === true,
+      (k) => annotations[k] === true
     );
     className = classes.join(" ");
     textObjects = object.paragraph?.rich_text || [];

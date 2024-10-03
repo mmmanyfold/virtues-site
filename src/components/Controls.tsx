@@ -221,14 +221,9 @@ function ControlJump({
 }
 
 function ControlFullScreen({ iconClass }: { iconClass: string }) {
-  const [isFullscreen] = useAtom(isFullscreenAtom);
   return (
     <ControlButton ariaLabel="Fullscreen" onClick={handleFullscreen}>
-      {isFullscreen ? (
-        <ArrowsIn className={iconClass} />
-      ) : (
-        <ArrowsOut className={iconClass} />
-      )}
+      <ArrowsOut className={iconClass} />
     </ControlButton>
   );
 }
@@ -246,23 +241,24 @@ function ShowcaseControls({
   const showcaseTotal = playlist.videoShowCasePayload.total;
 
   const handleNext = () => {
-    const i =
+    const index =
       showcaseItemIndex === showcaseTotal - 1 ? 0 : showcaseItemIndex + 1;
-    handleSetCurrentShowcaseItem(i);
+    handleSetCurrentShowcaseItem({ index });
   };
 
   const handlePrevious = () => {
-    const i = showcaseItemIndex > 0 ? showcaseItemIndex - 1 : showcaseItemIndex;
-    handleSetCurrentShowcaseItem(i);
+    const index =
+      showcaseItemIndex > 0 ? showcaseItemIndex - 1 : showcaseItemIndex;
+    handleSetCurrentShowcaseItem({ index });
   };
 
   const handleRandom = () => {
-    const i = getRandomIndex(showcaseItemIndex, showcaseTotal);
-    handleSetCurrentShowcaseItem(i);
+    const index = getRandomIndex(showcaseItemIndex, showcaseTotal);
+    handleSetCurrentShowcaseItem({ index });
   };
 
   const handleRestart = () => {
-    handleSetCurrentShowcaseItem(0);
+    handleSetCurrentShowcaseItem({ index: 0 });
   };
 
   return (
