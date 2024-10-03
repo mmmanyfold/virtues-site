@@ -13,6 +13,7 @@ import {
   isMenuOpenAtom,
   isMutedAtom,
   isSeekLoadingAtom,
+  isShowcaseAtom,
   isVideoLoadingAtom,
   playerRefAtom,
   playlistsAtom,
@@ -77,15 +78,23 @@ export const handleFullscreen = () => {
   if (isIOS && player && iosFullscreenPlayer) {
     player.pause();
 
-    const currentShowcaseItemIndex = store.get(showcaseItemIndexAtom);
+    const isShowcase = store.get(isShowcaseAtom);
     const seekingPosition = store.get(seekingPositionAtom);
 
-    handleSetCurrentShowcaseItem({
-      index: currentShowcaseItemIndex,
-      pos: seekingPosition,
-      iosPlayer: true,
-      play: true,
-    });
+    if (isShowcase) {
+      handleSetCurrentShowcaseItem({
+        index: store.get(showcaseItemIndexAtom),
+        pos: seekingPosition,
+        iosPlayer: true,
+        play: true,
+      });
+    } else {
+      handleSeek({
+        pos: seekingPosition,
+        iosPlayer: true,
+        play: true,
+      });
+    }
     return;
   }
 
@@ -206,6 +215,7 @@ export const handleSetCurrentShowcaseItem = async ({
   const player = iosPlayer
     ? store.get(iosFullscreenPlayerRefAtom)
     : store.get(playerRefAtom);
+
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const playlists = await store.get(playlistsAtom);
   const currentPlaylist = playlists[currentPlaylistIndex];
@@ -239,12 +249,26 @@ export const handlePlaylistJump = async () => {
   store.set(isAboutOpenAtom, false);
 };
 
-export const handleSeek = ({ pos }: { pos: number }) => {
+export const handleSeek = ({
+  pos,
+  iosPlayer,
+  play,
+}: {
+  pos: number;
+  iosPlayer?: boolean;
+  play?: boolean;
+}) => {
   store.set(isVideoLoadingAtom, true);
   store.set(seekingPositionAtom, pos);
 
-  const player = store.get(playerRefAtom);
+  const player = iosPlayer
+    ? store.get(iosFullscreenPlayerRefAtom)
+    : store.get(playerRefAtom);
+
   player.currentTime = pos;
+  if (play) {
+    player.play();
+  }
 };
 
 export const handleIosFullscreenExit = () => {
@@ -259,5 +283,6 @@ export const handleIosFullscreenExit = () => {
     player.muted = isMuted;
     player.currentTime = pos;
     player.play();
+    store.set(isVideoLoadingAtom, false);
   }
 };
