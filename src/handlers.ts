@@ -12,6 +12,7 @@ import {
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
   isMutedAtom,
+  isPlayingAtom,
   isSeekLoadingAtom,
   isVideoLoadingAtom,
   playerRefAtom,
@@ -120,6 +121,11 @@ export const handleFullscreen = async () => {
   }
 };
 
+const setCurrentTime = (player: any, time: number) => {
+  player.currentTime = time;
+  store.set(seekingPositionAtom, time);
+}
+
 export const handlePreviousChapter = () => {
   const player = store.get(playerRefAtom);
   const chapters = store.get(chaptersAtom);
@@ -133,7 +139,7 @@ export const handlePreviousChapter = () => {
   const seekTo = chapters[previousChapterIndex];
 
   store.set(chapterIndexAtom, previousChapterIndex);
-  player.currentTime = seekTo.timecode;
+  setCurrentTime(player, seekTo.timecode);
 };
 
 export const handleNextChapter = () => {
@@ -148,12 +154,12 @@ export const handleNextChapter = () => {
   const seekTo = chapters[newChapterIndex];
 
   store.set(chapterIndexAtom, newChapterIndex);
-  player.currentTime = seekTo.timecode;
+  setCurrentTime(player, seekTo.timecode);
 };
 
 export const handleRestartPlayback = () => {
   const player = store.get(playerRefAtom);
-  player.currentTime = 0;
+  setCurrentTime(player, 0);
 };
 
 export const getRandomIndex = (currentIndex: number, listLength: number) => {
@@ -181,7 +187,7 @@ export const handleRandomChapter = () => {
   const randomChapter = chapters[randomChapterIndex];
 
   store.set(chapterIndexAtom, randomChapterIndex);
-  player.currentTime = randomChapter.timecode;
+  setCurrentTime(player, randomChapter.timecode);
 };
 
 export const handleSetCurrentChapter = (index: number) => {
@@ -190,7 +196,7 @@ export const handleSetCurrentChapter = (index: number) => {
   const newChapter = chapters[index];
 
   store.set(chapterIndexAtom, index);
-  player.currentTime = newChapter.timecode;
+  setCurrentTime(player, newChapter.timecode);
 };
 
 export const handleSetCurrentPlaylist = async (newIndex: number) => {
@@ -237,7 +243,7 @@ export const handleSetCurrentShowcaseItem = async ({
     store.set(seekingPositionAtom, pos);
 
     if (!playFromBeginning) {
-      player.currentTime = pos;
+      setCurrentTime(player, pos);
     }
     if (play) {
       player.play();
@@ -264,17 +270,24 @@ export const handleSeek = ({
   iosPlayer?: boolean;
   play?: boolean;
 }) => {
-  store.set(isVideoLoadingAtom, true);
-  store.set(seekingPositionAtom, pos);
+  const isPlaying = store.get(isPlayingAtom);
+  const pauseAndPlay = !iosPlayer && isPlaying
 
   const player = iosPlayer
     ? store.get(iosFullscreenPlayerRefAtom)
     : store.get(playerRefAtom);
-
-  player.currentTime = pos;
-  if (play) {
-    player.play();
+  
+  if (pauseAndPlay) {
+    player.pause();
+    store.set(isVideoLoadingAtom, true);
   }
+  setCurrentTime(player, pos);  
+  setTimeout(() => {
+    if (play || pauseAndPlay) {
+      player.play();
+      store.set(isVideoLoadingAtom, false);
+    }
+  }, 500)
 };
 
 export const handleIosFullscreenExit = () => {
@@ -286,8 +299,8 @@ export const handleIosFullscreenExit = () => {
     const pos = store.get(seekingPositionAtom);
 
     iosPlayer.pause();
+    setCurrentTime(player, pos);
     player.muted = isMuted;
-    player.currentTime = pos;
     player.play();
     store.set(isVideoLoadingAtom, false);
   }

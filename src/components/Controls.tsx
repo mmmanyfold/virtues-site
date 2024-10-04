@@ -1,4 +1,5 @@
 import { useAtom } from "jotai";
+import { isIOS } from "react-device-detect";
 import {
   Info,
   SpeakerSimpleHigh,
@@ -52,7 +53,7 @@ function ControlButton({
   return (
     <button
       aria-label={ariaLabel}
-      className="relative"
+      className="relative grow flex justify-center"
       onClick={onClick}
       disabled={disabled}
     >
@@ -319,7 +320,7 @@ function Controls({ playlist }: { playlist: Playlist }) {
   const disableControls = isVideoLoading || isSeekLoading;
 
   const iconClass = [
-    "transition-all duration-400 ease-in-out",
+    isIOS ? "" : "transition-all duration-400 ease-in-out",
     disableControls ? "opacity-75" : "opacity-100",
     isMediaSmall ? "text-[20px]" : "text-[30px] lg:text-[35px] xl:text-[30px]",
   ].join(" ");
