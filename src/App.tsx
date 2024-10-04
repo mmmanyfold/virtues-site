@@ -67,28 +67,11 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
 
     if (player && iosFullscreenPlayer) {
       setIosFullscreenPlayerRef(iosFullscreenPlayer);
-
-      iosFullscreenPlayer.addEventListener(
-        "fullscreenchange",
-        handleIosFullscreenExit
-      );
-      iosFullscreenPlayer.addEventListener(
-        "webkitfullscreenchange",
-        handleIosFullscreenExit
-      );
       iosFullscreenPlayer.addEventListener(
         "webkitendfullscreen",
         handleIosFullscreenExit
       );
       return () => {
-        iosFullscreenPlayer.removeEventListener(
-          "fullscreenchange",
-          handleIosFullscreenExit
-        );
-        iosFullscreenPlayer.removeEventListener(
-          "webkitfullscreenchange",
-          handleIosFullscreenExit
-        );
         iosFullscreenPlayer.removeEventListener(
           "webkitendfullscreen",
           handleIosFullscreenExit

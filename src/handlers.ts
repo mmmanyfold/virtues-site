@@ -142,7 +142,10 @@ const findChapterIndex = (chapters: VimeoChapter[], currentTime: number) => {
   return -1;
 };
 
-export const handleTimeUpdate = async (currentTime: number, iosPlayer: boolean) => {
+export const handleTimeUpdate = async (
+  currentTime: number,
+  iosPlayer: boolean
+) => {
   store.set(seekingPositionAtom, Math.trunc(currentTime));
 
   const playlists = await store.get(playlistsAtom);
@@ -315,7 +318,7 @@ export const handleSeek = ({
   play?: boolean;
 }) => {
   const isPlaying = store.get(isPlayingAtom);
-  const iosMainVideo = isIOS && !iosPlayer;
+  const iosMainVideo = isIOS && isMobileOnly && !iosPlayer;
 
   const player = iosPlayer
     ? store.get(iosFullscreenPlayerRefAtom)
