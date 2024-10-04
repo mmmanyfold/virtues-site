@@ -1,5 +1,4 @@
 import { useAtom } from "jotai";
-import { useEffect } from "react";
 import { Seekbar as Seek } from "react-seekbar";
 import {
   seekingPositionAtom,
