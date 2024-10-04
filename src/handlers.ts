@@ -297,23 +297,29 @@ export const handleSeek = ({
   play?: boolean;
 }) => {
   const isPlaying = store.get(isPlayingAtom);
-  const pauseAndPlay = !iosPlayer && isPlaying;
+  const iosMainVideo = isIOS && !iosPlayer;
 
   const player = iosPlayer
     ? store.get(iosFullscreenPlayerRefAtom)
     : store.get(playerRefAtom);
 
-  if (pauseAndPlay) {
+  if (iosMainVideo) {
     player.pause();
     store.set(isVideoLoadingAtom, true);
   }
+
   setCurrentTime(player, pos);
-  setTimeout(() => {
-    if (play || pauseAndPlay) {
-      player.play();
+
+  if (iosMainVideo) {
+    setTimeout(() => {
+      if (isPlaying) {
+        player.play();
+      }
       store.set(isVideoLoadingAtom, false);
-    }
-  }, 500);
+    }, 500);
+  } else if (play) {
+    player.play();
+  }
 };
 
 export const handleIosFullscreenExit = () => {
