@@ -72,7 +72,7 @@ export const handlePause = () => {
   player.pause();
 };
 
-const getIsShowcase = async () => {
+const isPlaylistShowcase = async () => {
   const playlists = await store.get(playlistsAtom);
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const currentPlaylist = playlists[currentPlaylistIndex];
@@ -86,7 +86,7 @@ export const handleFullscreen = async () => {
   if (isIOS && isMobileOnly && player && iosFullscreenPlayer) {
     player.pause();
 
-    const isShowcase = await getIsShowcase();
+    const isShowcase = await isPlaylistShowcase();
     const seekingPosition = store.get(seekingPositionAtom);
 
     if (isShowcase) {
@@ -144,7 +144,7 @@ const findChapterIndex = (chapters: VimeoChapter[], currentTime: number) => {
 
 export const handleTimeUpdate = async (currentTime: number) => {
   store.set(seekingPositionAtom, Math.trunc(currentTime));
-  const isShowcase = await getIsShowcase();
+  const isShowcase = await isPlaylistShowcase();
   if (!isShowcase) {
     const chapters = store.get(chaptersAtom);
     const currentChapterIndex = findChapterIndex(chapters, currentTime);
