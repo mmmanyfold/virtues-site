@@ -141,7 +141,7 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
           muted
           id="ios-fullscreen-video"
           ref={iosFullscreenVideoRef}
-          style={{ position: "absolute", height: "1px", zIndex: -100 }}
+          style={{ position: "fixed", zIndex: -100, ...style }}
           {...videoEvents}
         >
           <source src={defaultVideoLink} />
