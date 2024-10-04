@@ -11,7 +11,11 @@ import Menu from "./components/Menu.tsx";
 import Seekbar from "./components/Seekbar.tsx";
 
 import "./App.css";
-import { handleToggleMenu, handleIosFullscreenExit } from "./handlers.ts";
+import {
+  handleTimeUpdate,
+  handleToggleMenu,
+  handleIosFullscreenExit,
+} from "./handlers.ts";
 import {
   store,
   aboutPageAtom,
@@ -30,7 +34,6 @@ import {
   isVideoLoadingAtom,
   playerRefAtom,
   playlistsAtom,
-  seekingPositionAtom,
   setPlayerVideoData,
   videoSizeAtom,
   windowWidthAtom,
@@ -51,7 +54,6 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
   const [_iosFullscreenPlayerRef, setIosFullscreenPlayerRef] = useAtom(
     iosFullscreenPlayerRefAtom
   );
-  const [_seekingPosition, setSeekingPosition] = useAtom(seekingPositionAtom);
 
   const [playlists] = useAtom(playlistsAtom);
   const firstPlaylist = playlists[0];
@@ -109,7 +111,7 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
   const onTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     if (e.target instanceof HTMLVideoElement) {
       const currentTime = e.target.currentTime || 0;
-      setSeekingPosition(Math.trunc(currentTime));
+      handleTimeUpdate(currentTime);
     }
   };
 

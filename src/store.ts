@@ -134,7 +134,6 @@ store.sub(chapterIndexAtom, () => {
   const chapter = chapters[index];
 
   store.set(currentChapterAtom, { ...chapter, index });
-  store.set(chapterIndexAtom, index);
 });
 
 store.sub(windowWidthAtom, () => {

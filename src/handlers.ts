@@ -1,6 +1,7 @@
 // handlers
 // --------
 
+import { isIOS, isMobileOnly } from "react-device-detect";
 import {
   chaptersAtom,
   chapterIndexAtom,
@@ -22,7 +23,7 @@ import {
   showcaseItemIndexAtom,
   store,
 } from "./store.ts";
-import { isIOS, isMobileOnly } from "react-device-detect";
+import { VimeoChapter } from "./types.ts";
 
 export const handleToggleInfoPanel = () => {
   const isOpen = store.get(isInfoPanelOpenAtom);
@@ -76,7 +77,7 @@ const getIsShowcase = async () => {
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
   const currentPlaylist = playlists[currentPlaylistIndex];
   return !!currentPlaylist?.videoShowCasePayload?.data;
-}
+};
 
 export const handleFullscreen = async () => {
   const player = store.get(playerRefAtom);
@@ -124,7 +125,32 @@ export const handleFullscreen = async () => {
 const setCurrentTime = (player: any, time: number) => {
   player.currentTime = time;
   store.set(seekingPositionAtom, time);
-}
+};
+
+const findChapterIndex = (chapters: VimeoChapter[], currentTime: number) => {
+  for (let i = 0; i < chapters.length; i++) {
+    const chapter = chapters[i];
+    const nextChapter = chapters[i + 1];
+    // If this is the last chapter or x is less than the next chapter's timecode
+    if (!nextChapter || currentTime < nextChapter.timecode) {
+      if (currentTime >= chapter.timecode) {
+        return i;
+      }
+    }
+  }
+  // If x doesn't fit in any chapter, return -1 (this could mean x is out of bounds)
+  return -1;
+};
+
+export const handleTimeUpdate = async (currentTime: number) => {
+  store.set(seekingPositionAtom, Math.trunc(currentTime));
+  const isShowcase = await getIsShowcase();
+  if (!isShowcase) {
+    const chapters = store.get(chaptersAtom);
+    const currentChapterIndex = findChapterIndex(chapters, currentTime);
+    store.set(chapterIndexAtom, currentChapterIndex);
+  }
+};
 
 export const handlePreviousChapter = () => {
   const player = store.get(playerRefAtom);
@@ -271,23 +297,23 @@ export const handleSeek = ({
   play?: boolean;
 }) => {
   const isPlaying = store.get(isPlayingAtom);
-  const pauseAndPlay = !iosPlayer && isPlaying
+  const pauseAndPlay = !iosPlayer && isPlaying;
 
   const player = iosPlayer
     ? store.get(iosFullscreenPlayerRefAtom)
     : store.get(playerRefAtom);
-  
+
   if (pauseAndPlay) {
     player.pause();
     store.set(isVideoLoadingAtom, true);
   }
-  setCurrentTime(player, pos);  
+  setCurrentTime(player, pos);
   setTimeout(() => {
     if (play || pauseAndPlay) {
       player.play();
       store.set(isVideoLoadingAtom, false);
     }
-  }, 500)
+  }, 500);
 };
 
 export const handleIosFullscreenExit = () => {
