@@ -70,16 +70,6 @@ function SeekShowcase({ items }: { items: ShowcaseVideo[] }) {
   const [currentVideoIndex] = useAtom(showcaseItemIndexAtom);
   const [currentVideoSeekPosition] = useAtom(seekingPositionAtom);
 
-  useEffect(() => {
-    if (currentVideoSeekPosition === items[currentVideoIndex].duration - 1) {
-      const isLast = currentVideoIndex === items.length - 1;
-      handleSetCurrentShowcaseItem({
-        index: isLast ? 0 : currentVideoIndex + 1,
-        pos: 1,
-      });
-    }
-  }, [currentVideoSeekPosition, currentVideoIndex]);
-
   const videoStartTimes = items.map((_, index) => {
     return items.slice(0, index).reduce((acc, item) => {
       const sum = acc + item.duration;

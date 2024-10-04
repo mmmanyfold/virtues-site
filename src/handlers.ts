@@ -142,10 +142,28 @@ const findChapterIndex = (chapters: VimeoChapter[], currentTime: number) => {
   return -1;
 };
 
-export const handleTimeUpdate = async (currentTime: number) => {
+export const handleTimeUpdate = async (currentTime: number, iosPlayer: boolean) => {
   store.set(seekingPositionAtom, Math.trunc(currentTime));
-  const isShowcase = await isPlaylistShowcase();
-  if (!isShowcase) {
+
+  const playlists = await store.get(playlistsAtom);
+  const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
+  const currentPlaylist = playlists[currentPlaylistIndex];
+  const showcaseVideos = currentPlaylist?.videoShowCasePayload?.data;
+
+  if (showcaseVideos) {
+    const currentIndex = store.get(showcaseItemIndexAtom);
+    const isPlaying = store.get(isPlayingAtom);
+
+    if (currentTime >= showcaseVideos[currentIndex].duration - 1) {
+      const isLast = currentIndex === showcaseVideos.length - 1;
+      handleSetCurrentShowcaseItem({
+        index: isLast ? 0 : currentIndex + 1,
+        pos: 0.1,
+        iosPlayer,
+        play: isPlaying,
+      });
+    }
+  } else {
     const chapters = store.get(chaptersAtom);
     const currentChapterIndex = findChapterIndex(chapters, currentTime);
     store.set(chapterIndexAtom, currentChapterIndex);
@@ -322,18 +340,27 @@ export const handleSeek = ({
   }
 };
 
-export const handleIosFullscreenExit = () => {
+export const handleIosFullscreenExit = async () => {
   if (!document.fullscreenElement) {
     const iosPlayer = store.get(iosFullscreenPlayerRefAtom);
     const player = store.get(playerRefAtom);
-
     const isMuted = store.get(isMutedAtom);
     const pos = store.get(seekingPositionAtom);
 
     iosPlayer.pause();
-    setCurrentTime(player, pos);
     player.muted = isMuted;
-    player.play();
+
+    const isShowcase = await isPlaylistShowcase();
+    if (isShowcase) {
+      handleSetCurrentShowcaseItem({
+        index: store.get(showcaseItemIndexAtom),
+        play: true,
+        pos,
+      });
+    } else {
+      setCurrentTime(player, pos);
+      player.play();
+    }
     store.set(isVideoLoadingAtom, false);
   }
 };

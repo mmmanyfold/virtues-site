@@ -111,7 +111,8 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
   const onTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     if (e.target instanceof HTMLVideoElement) {
       const currentTime = e.target.currentTime || 0;
-      handleTimeUpdate(currentTime);
+      const iosPlayer = e.target === iosFullscreenPlayer;
+      handleTimeUpdate(currentTime, iosPlayer);
     }
   };
 
