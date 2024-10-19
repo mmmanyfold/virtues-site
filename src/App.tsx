@@ -2,7 +2,6 @@ import { useEffect, useRef, Suspense, CSSProperties } from "react";
 import { Provider, useAtom } from "jotai";
 import { X, Plus } from "@phosphor-icons/react";
 import { useWindowSize } from "@uidotdev/usehooks";
-import { isIOS, isMobileOnly } from "react-device-detect";
 
 import About from "./components/About.tsx";
 import Controls from "./components/Controls.tsx";
@@ -12,9 +11,11 @@ import Seekbar from "./components/Seekbar.tsx";
 
 import "./App.css";
 import {
+  autoplayOnFullscreenExit,
   handleTimeUpdate,
   handleToggleMenu,
-  handleIosFullscreenExit,
+  handleIPhoneFullscreenExit,
+  isIPhone
 } from "./handlers.ts";
 import {
   store,
@@ -23,7 +24,7 @@ import {
   displaySizeAtom,
   getPlaylistVideo,
   getVideoLink,
-  iosFullscreenPlayerRefAtom,
+  iPhoneFSPlayerRefAtom,
   isAboutOpenAtom,
   isInfoPanelOpenAtom,
   isMediaSmallAtom,
@@ -44,15 +45,15 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
   const iosFullscreenVideoRef = useRef<HTMLVideoElement>(null);
 
   const player = videoRef.current;
-  const iosFullscreenPlayer = iosFullscreenVideoRef.current;
+  const iPhoneFSPlayer = iosFullscreenVideoRef.current;
 
   const [_isMuted, setIsMuted] = useAtom(isMutedAtom);
   const [_isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
   const [_isSeekLoading, setIsSeekLoading] = useAtom(isSeekLoadingAtom);
   const [_isVideoLoading, setIsVideoLoading] = useAtom(isVideoLoadingAtom);
   const [_playerRef, setPlayerRef] = useAtom(playerRefAtom);
-  const [_iosFullscreenPlayerRef, setIosFullscreenPlayerRef] = useAtom(
-    iosFullscreenPlayerRefAtom
+  const [_iPhoneFSPlayerRef, setIPhoneFSPlayerRef] = useAtom(
+    iPhoneFSPlayerRefAtom
   );
 
   const [playlists] = useAtom(playlistsAtom);
@@ -63,22 +64,53 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
   useEffect(() => {
     if (player) {
       setPlayerRef(player);
+
+      if (!isIPhone) {
+        // needed for iPad specifically
+        player.addEventListener(
+          "webkitfullscreenchange",
+          autoplayOnFullscreenExit
+        );
+        player.addEventListener(
+          "webkitendfullscreen",
+          autoplayOnFullscreenExit
+        );
+        return () => {
+          player.removeEventListener(
+            "webkitfullscreenchange",
+            autoplayOnFullscreenExit
+          );
+          player.removeEventListener(
+            "webkitendfullscreen",
+            autoplayOnFullscreenExit
+          );
+        };
+      }
     }
 
-    if (player && iosFullscreenPlayer) {
-      setIosFullscreenPlayerRef(iosFullscreenPlayer);
-      iosFullscreenPlayer.addEventListener(
+    if (player && iPhoneFSPlayer) {
+      setIPhoneFSPlayerRef(iPhoneFSPlayer);
+
+      iPhoneFSPlayer.addEventListener(
+        "webkitfullscreenchange",
+        handleIPhoneFullscreenExit
+      );
+      iPhoneFSPlayer.addEventListener(
         "webkitendfullscreen",
-        handleIosFullscreenExit
+        handleIPhoneFullscreenExit
       );
       return () => {
-        iosFullscreenPlayer.removeEventListener(
+        iPhoneFSPlayer.removeEventListener(
+          "webkitfullscreenchange",
+          handleIPhoneFullscreenExit
+        );
+        iPhoneFSPlayer.removeEventListener(
           "webkitendfullscreen",
-          handleIosFullscreenExit
+          handleIPhoneFullscreenExit
         );
       };
     }
-  }, [player, iosFullscreenPlayer]);
+  }, [player, iPhoneFSPlayer]);
 
   useEffect(() => {
     if (defaultVideo) {
@@ -94,8 +126,8 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
   const onTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     if (e.target instanceof HTMLVideoElement) {
       const currentTime = e.target.currentTime || 0;
-      const iosPlayer = e.target === iosFullscreenPlayer;
-      handleTimeUpdate(currentTime, iosPlayer);
+      const isIPhoneFSPlayer = e.target === iPhoneFSPlayer;
+      handleTimeUpdate(currentTime, isIPhoneFSPlayer);
     }
   };
 
@@ -119,7 +151,7 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
 
   return (
     <>
-      {isIOS && isMobileOnly && (
+      {isIPhone && (
         <video
           muted
           id="ios-fullscreen-video"

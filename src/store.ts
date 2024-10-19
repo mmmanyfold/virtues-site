@@ -61,7 +61,7 @@ export const isPlayingAtom = atom(false);
 export const isSeekLoadingAtom = atom(false);
 export const isVideoLoadingAtom = atom(true);
 export const playerRefAtom = atom(Object.create(null));
-export const iosFullscreenPlayerRefAtom = atom<any>(null);
+export const iPhoneFSPlayerRefAtom = atom<any>(null);
 export const seekingPositionAtom = atom<number>(0);
 export const videoSizeAtom = atom<[number, number]>([0, 0]);
 export const windowWidthAtom = atom<number>(0);
@@ -102,7 +102,7 @@ store.sub(currentPlaylistIndexAtom, async () => {
   store.set(showcaseItemIndexAtom, 0);
 
   const player = store.get(playerRefAtom);
-  const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
+  const iPhoneFSPlayer = store.get(iPhoneFSPlayerRefAtom);
 
   const playlists = await store.get(playlistsAtom);
   const newIndex = store.get(currentPlaylistIndexAtom);
@@ -118,11 +118,11 @@ store.sub(currentPlaylistIndexAtom, async () => {
       player.load();
     }
 
-    if (iosFullscreenPlayer) {
-      const iosSourceElement = iosFullscreenPlayer.querySelector("source");
-      if (iosSourceElement) {
-        iosSourceElement.src = getVideoLink(video);
-        iosFullscreenPlayer.load();
+    if (iPhoneFSPlayer) {
+      const sourceEl = iPhoneFSPlayer.querySelector("source");
+      if (sourceEl) {
+        sourceEl.src = getVideoLink(video);
+        iPhoneFSPlayer.load();
       }
     }
   }

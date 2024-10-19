@@ -8,7 +8,7 @@ import {
   currentPlaylistIndexAtom,
   getPlaylistVideo,
   getVideoLink,
-  iosFullscreenPlayerRefAtom,
+  iPhoneFSPlayerRefAtom,
   isAboutOpenAtom,
   isInfoPanelOpenAtom,
   isMenuOpenAtom,
@@ -24,6 +24,8 @@ import {
   store,
 } from "./store.ts";
 import { VimeoChapter } from "./types.ts";
+
+export const isIPhone = isIOS && isMobileOnly
 
 export const handleToggleInfoPanel = () => {
   const isOpen = store.get(isInfoPanelOpenAtom);
@@ -44,7 +46,7 @@ export const handleOpenAbout = () => {
 
 export const handleMute = () => {
   const player = store.get(playerRefAtom);
-  const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
+  const iPhoneFSPlayer = store.get(iPhoneFSPlayerRefAtom);
 
   if (player) {
     if (player.muted) {
@@ -53,11 +55,11 @@ export const handleMute = () => {
       player.muted = true;
     }
   }
-  if (iosFullscreenPlayer) {
-    if (iosFullscreenPlayer.muted) {
-      iosFullscreenPlayer.muted = false;
+  if (iPhoneFSPlayer) {
+    if (iPhoneFSPlayer.muted) {
+      iPhoneFSPlayer.muted = false;
     } else {
-      iosFullscreenPlayer.muted = true;
+      iPhoneFSPlayer.muted = true;
     }
   }
 };
@@ -81,32 +83,9 @@ const isPlaylistShowcase = async () => {
 
 export const handleFullscreen = async () => {
   const player = store.get(playerRefAtom);
-  const iosFullscreenPlayer = store.get(iosFullscreenPlayerRefAtom);
+  const iPhoneFSPlayer = store.get(iPhoneFSPlayerRefAtom);
 
-  if (isIOS && isMobileOnly && player && iosFullscreenPlayer) {
-    player.pause();
-
-    const isShowcase = await isPlaylistShowcase();
-    const seekingPosition = store.get(seekingPositionAtom);
-
-    if (isShowcase) {
-      handleSetCurrentShowcaseItem({
-        index: store.get(showcaseItemIndexAtom),
-        pos: seekingPosition,
-        iosPlayer: true,
-        play: true,
-      });
-    } else {
-      handleSeek({
-        pos: seekingPosition,
-        iosPlayer: true,
-        play: true,
-      });
-    }
-    return;
-  }
-
-  if (player) {
+  if (player && !iPhoneFSPlayer) {
     if (player.requestFullscreen) {
       player.requestFullscreen();
     } else if (player.mozRequestFullScreen) {
@@ -119,6 +98,29 @@ export const handleFullscreen = async () => {
       // IE/Edge
       player.msRequestFullscreen();
     }
+  }
+  
+  if (player && iPhoneFSPlayer) {
+    player.pause();
+  
+    const isShowcase = await isPlaylistShowcase();
+    const seekingPosition = store.get(seekingPositionAtom);
+    
+    if (isShowcase) {
+      handleSetCurrentShowcaseItem({
+        index: store.get(showcaseItemIndexAtom),
+        pos: seekingPosition,
+        isIPhoneFSPlayer: true,
+        play: true,
+      });
+    } else {
+      handleSeek({
+        pos: seekingPosition,
+        isIPhoneFSPlayer: true,
+        play: true,
+      });
+    }
+    return;
   }
 };
 
@@ -144,7 +146,7 @@ const findChapterIndex = (chapters: VimeoChapter[], currentTime: number) => {
 
 export const handleTimeUpdate = async (
   currentTime: number,
-  iosPlayer: boolean
+  isIPhoneFSPlayer: boolean
 ) => {
   store.set(seekingPositionAtom, Math.trunc(currentTime));
 
@@ -162,7 +164,7 @@ export const handleTimeUpdate = async (
       handleSetCurrentShowcaseItem({
         index: isLast ? 0 : currentIndex + 1,
         pos: 0.1,
-        iosPlayer,
+        isIPhoneFSPlayer,
         play: isPlaying,
       });
     }
@@ -255,12 +257,12 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
 export const handleSetCurrentShowcaseItem = async ({
   index,
   pos = 0,
-  iosPlayer,
+  isIPhoneFSPlayer,
   play,
 }: {
   index: number;
   pos?: number;
-  iosPlayer?: boolean;
+  isIPhoneFSPlayer?: boolean;
   play?: boolean;
 }) => {
   const playFromBeginning = pos === 0;
@@ -271,8 +273,8 @@ export const handleSetCurrentShowcaseItem = async ({
     store.set(isSeekLoadingAtom, true);
   }
 
-  const player = iosPlayer
-    ? store.get(iosFullscreenPlayerRefAtom)
+  const player = isIPhoneFSPlayer
+    ? store.get(iPhoneFSPlayerRefAtom)
     : store.get(playerRefAtom);
 
   const currentPlaylistIndex = store.get(currentPlaylistIndexAtom);
@@ -310,28 +312,28 @@ export const handlePlaylistJump = async () => {
 
 export const handleSeek = ({
   pos,
-  iosPlayer,
+  isIPhoneFSPlayer,
   play,
 }: {
   pos: number;
-  iosPlayer?: boolean;
+  isIPhoneFSPlayer?: boolean;
   play?: boolean;
 }) => {
   const isPlaying = store.get(isPlayingAtom);
-  const iosMainVideo = isIOS && isMobileOnly && !iosPlayer;
+  const isIPhoneMainVideo = isIPhone && !isIPhoneFSPlayer;
 
-  const player = iosPlayer
-    ? store.get(iosFullscreenPlayerRefAtom)
+  const player = isIPhoneFSPlayer
+    ? store.get(iPhoneFSPlayerRefAtom)
     : store.get(playerRefAtom);
 
-  if (iosMainVideo) {
+  if (isIPhoneMainVideo) {
     player.pause();
     store.set(isVideoLoadingAtom, true);
   }
 
   setCurrentTime(player, pos);
 
-  if (iosMainVideo) {
+  if (isIPhoneMainVideo) {
     setTimeout(() => {
       if (isPlaying) {
         player.play();
@@ -343,14 +345,14 @@ export const handleSeek = ({
   }
 };
 
-export const handleIosFullscreenExit = async () => {
+export const handleIPhoneFullscreenExit = async () => {
   if (!document.fullscreenElement) {
-    const iosPlayer = store.get(iosFullscreenPlayerRefAtom);
+    const isIPhoneFSPlayer = store.get(iPhoneFSPlayerRefAtom);
     const player = store.get(playerRefAtom);
     const isMuted = store.get(isMutedAtom);
     const pos = store.get(seekingPositionAtom);
 
-    iosPlayer.pause();
+    isIPhoneFSPlayer.pause();
     player.muted = isMuted;
 
     const isShowcase = await isPlaylistShowcase();
@@ -367,3 +369,12 @@ export const handleIosFullscreenExit = async () => {
     store.set(isVideoLoadingAtom, false);
   }
 };
+
+export const autoplayOnFullscreenExit = () => {
+  if (!document.fullscreenElement) {
+    const player = store.get(playerRefAtom);
+    setTimeout(() => {
+      player.play();
+    }, 500)
+  }
+}
