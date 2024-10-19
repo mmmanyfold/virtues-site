@@ -152,15 +152,26 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
   return (
     <>
       {isIPhone && (
-        <video
-          muted
-          id="ios-fullscreen-video"
-          ref={iosFullscreenVideoRef}
-          style={{ position: "fixed", zIndex: -100, ...style }}
-          {...videoEvents}
-        >
-          <source src={defaultVideoLink} />
-        </video>
+        <>
+          <video
+            muted
+            id="ios-fullscreen-video"
+            ref={iosFullscreenVideoRef}
+            style={{ position: "fixed", zIndex: -100, ...style }}
+            {...videoEvents}
+          >
+            <source src={defaultVideoLink} />
+          </video>
+          <div 
+            style={{
+              position: "absolute",
+              width: "100vw", 
+              height: "100vh", 
+              zIndex: -99, 
+              backgroundColor: "black"
+            }}
+          ></div>
+        </>
       )}
       <video
         muted
