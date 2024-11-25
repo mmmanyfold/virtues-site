@@ -10,12 +10,14 @@ import Menu from "./components/Menu.tsx";
 import Seekbar from "./components/Seekbar.tsx";
 
 import "./App.css";
+import { useConnectionQuality } from "./useConnectionQuality.ts";
+import type { ConnectionQualityState } from "./useConnectionQuality";
 import {
   autoplayOnFullscreenExit,
   handleTimeUpdate,
   handleToggleMenu,
   handleIPhoneFullscreenExit,
-  isIPhone
+  isIPhone,
 } from "./handlers.ts";
 import {
   store,
@@ -40,7 +42,13 @@ import {
   windowWidthAtom,
 } from "./store.ts";
 
-function VideoPlayer({ style }: { style: CSSProperties }) {
+function VideoPlayer({
+  style,
+  connectionQuality,
+}: {
+  style: CSSProperties;
+  connectionQuality: ConnectionQualityState;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const iosFullscreenVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -59,7 +67,7 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
   const [playlists] = useAtom(playlistsAtom);
   const firstPlaylist = playlists[0];
   const defaultVideo = getPlaylistVideo(firstPlaylist);
-  const defaultVideoLink = getVideoLink(defaultVideo);
+  const defaultVideoLink = getVideoLink(defaultVideo, connectionQuality);
 
   useEffect(() => {
     if (player) {
@@ -145,7 +153,7 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
     onPause: () => setIsPlaying(false),
   };
 
-  if (!defaultVideoLink) {
+  if (!defaultVideoLink || connectionQuality.isLoading) {
     return null;
   }
 
@@ -162,13 +170,13 @@ function VideoPlayer({ style }: { style: CSSProperties }) {
           >
             <source src={defaultVideoLink} />
           </video>
-          <div 
+          <div
             style={{
               position: "absolute",
-              width: "100vw", 
-              height: "100vh", 
-              zIndex: -99, 
-              backgroundColor: "black"
+              width: "100vw",
+              height: "100vh",
+              zIndex: -99,
+              backgroundColor: "black",
             }}
           ></div>
         </>
@@ -301,7 +309,11 @@ function getDisplaySize({
   };
 }
 
-function VideoWrapper() {
+function VideoWrapper({
+  connectionQuality,
+}: {
+  connectionQuality: ConnectionQualityState;
+}) {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
   const [videoSize] = useAtom(videoSizeAtom);
@@ -346,7 +358,7 @@ function VideoWrapper() {
           height: "100%",
         }}
       >
-        <VideoPlayer style={videoStyle} />
+        <VideoPlayer style={videoStyle} connectionQuality={connectionQuality} />
       </div>
       {isInfoPanelOpen && <InfoPanel />}
     </>
@@ -354,11 +366,12 @@ function VideoWrapper() {
 }
 
 function App() {
+  const connectionQuality = useConnectionQuality();
   return (
     <Provider store={store}>
       <Title />
       <MenuToggle />
-      <VideoWrapper />
+      <VideoWrapper connectionQuality={connectionQuality} />
       <VideoFooter />
     </Provider>
   );

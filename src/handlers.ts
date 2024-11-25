@@ -25,7 +25,7 @@ import {
 } from "./store.ts";
 import { VimeoChapter } from "./types.ts";
 
-export const isIPhone = isIOS && isMobileOnly
+export const isIPhone = isIOS && isMobileOnly;
 
 export const handleToggleInfoPanel = () => {
   const isOpen = store.get(isInfoPanelOpenAtom);
@@ -99,13 +99,13 @@ export const handleFullscreen = async () => {
       player.msRequestFullscreen();
     }
   }
-  
+
   if (player && iPhoneFSPlayer) {
     player.pause();
-  
+
     const isShowcase = await isPlaylistShowcase();
     const seekingPosition = store.get(seekingPositionAtom);
-    
+
     if (isShowcase) {
       handleSetCurrentShowcaseItem({
         index: store.get(showcaseItemIndexAtom),
@@ -375,6 +375,6 @@ export const autoplayOnFullscreenExit = () => {
     const player = store.get(playerRefAtom);
     setTimeout(() => {
       player.play();
-    }, 500)
+    }, 500);
   }
-}
+};
