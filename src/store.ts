@@ -1,5 +1,6 @@
 import { atom, createStore } from "jotai";
 import { Playlist, VimeoChapter, Video } from "./types";
+import { ConnectionQualityState } from "./useConnectionQuality";
 
 export const getPlaylistVideo = (
   playlist: Playlist,
@@ -12,9 +13,14 @@ export const getPlaylistVideo = (
   return playlist.vimeoPlaybackPayload;
 };
 
-export const getVideoLink = (video: Video) => {
+export const getVideoLink = (
+  video: Video,
+  connectionQuality?: ConnectionQualityState
+) => {
   const files = video.files.sort((a, b) => b.width - a.width);
-  return files[0].link;
+  const { rendition } = connectionQuality || store.get(connectionQualityAtom);
+  const file = files.find((file) => file.rendition === rendition) || files[0];
+  return file.link;
 };
 
 // stores
@@ -53,6 +59,7 @@ export const externalLinksPageAtom = atom(async (_get, { signal }) => {
 });
 
 // player
+export const connectionQualityAtom = atom<any>(null);
 export const currentPlaylistIndexAtom = atom<number>(0);
 export const durationAtom = atom<number>(0);
 export const isFullscreenAtom = atom(false);
