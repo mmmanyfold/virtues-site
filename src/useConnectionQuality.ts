@@ -12,13 +12,15 @@ export enum Rendition {
 type EffectiveConnectionType = "4g" | "3g" | "2g" | "slow-2g";
 
 export interface ConnectionQualityState {
+  type: string | undefined;
+  effectiveType: EffectiveConnectionType | undefined;
   rendition: Rendition;
   isLoading: boolean;
-  mbps: number | null;
   timestamp: number | null;
 }
 
 interface NetworkInformation extends EventTarget {
+  type?: string | undefined;
   effectiveType: EffectiveConnectionType;
   addEventListener: (type: "change", callback: EventListener) => void;
   removeEventListener: (type: "change", callback: EventListener) => void;
@@ -46,21 +48,22 @@ function isNetworkInformation(
 
 export const useConnectionQuality = () => {
   const [connState, setConnState] = useState<ConnectionQualityState>({
+    type: undefined,
+    effectiveType: undefined,
     rendition: Rendition.HD720,
     isLoading: true,
-    mbps: null,
     timestamp: null,
   });
 
-  const getRenditionFromConnectionType = useCallback(
-    (type: EffectiveConnectionType): Rendition => {
-      switch (type) {
+  const getRenditionForConnection = useCallback(
+    (connection: NetworkInformation): Rendition => {
+      const { type, effectiveType } = connection;
+      // type only supported in chrome
+      switch (effectiveType) {
         case "4g":
-          return Rendition.HD720;
+          return type === "wifi" ? Rendition.HD720 : Rendition.SD540;
         case "3g":
-          return Rendition.SD540;
-        case "2g":
-        case "slow-2g":
+          return type === "wifi" ? Rendition.SD540 : Rendition.SD360;
         default:
           return Rendition.SD360;
       }
@@ -72,9 +75,10 @@ export const useConnectionQuality = () => {
     // Automatically set highest quality for desktop
     if (!isMobileOnly) {
       const newState = {
+        type: undefined,
+        effectiveType: undefined,
         rendition: Rendition.HD1080,
         isLoading: false,
-        mbps: null,
         timestamp: Date.now(),
       };
       setConnState(newState);
@@ -96,29 +100,29 @@ export const useConnectionQuality = () => {
     setConnState((prev) => ({ ...prev, isLoading: true }));
 
     // Check Network Information API
-    if (navigator.connection && isNetworkInformation(navigator.connection)) {
-      const rendition = getRenditionFromConnectionType(
-        navigator.connection.effectiveType
-      );
+    const connection = navigator.connection;
+    if (connection && isNetworkInformation(connection)) {
       const newState = {
-        rendition,
+        type: connection.type,
+        effectiveType: connection.effectiveType,
+        rendition: getRenditionForConnection(connection),
         isLoading: false,
-        mbps: null,
         timestamp: Date.now(),
       };
       setConnState(newState);
       store.set(connectionQualityAtom, newState);
     } else {
       const newState = {
-        rendition: Rendition.SD360,
+        type: undefined,
+        effectiveType: undefined,
+        rendition: Rendition.SD540,
         isLoading: false,
-        mbps: null,
         timestamp: Date.now(),
       };
       setConnState(newState);
       store.set(connectionQualityAtom, newState);
     }
-  }, [getRenditionFromConnectionType]);
+  }, [getRenditionForConnection]);
 
   useEffect(() => {
     // Run initial detection
@@ -132,12 +136,11 @@ export const useConnectionQuality = () => {
     ) {
       const connection = navigator.connection;
       const handleConnectionChange = () => {
-        const rendition = getRenditionFromConnectionType(
-          connection.effectiveType
-        );
         setConnState((prev) => ({
           ...prev,
-          rendition,
+          type: connection.type,
+          effectiveType: connection.effectiveType,
+          rendition: getRenditionForConnection(connection),
           timestamp: Date.now(),
         }));
       };
@@ -147,7 +150,7 @@ export const useConnectionQuality = () => {
         connection.removeEventListener("change", handleConnectionChange);
       };
     }
-  }, [detectConnectionSpeed, getRenditionFromConnectionType]);
+  }, [detectConnectionSpeed, getRenditionForConnection]);
 
   return connState;
 };
