@@ -30,16 +30,7 @@ declare global {
   }
 }
 
-const SPEED_THRESHOLDS = {
-  HD1080: 5, // 1080p typically needs 5-8 Mbps
-  HD720: 2.5, // 720p typically needs 2.5-4 Mbps
-  SD540: 1.5, // 540p typically needs 1.5-2 Mbps
-  SD360: 0.5, // 360p typically needs 0.7-1 Mbps
-} as const;
-
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
+const CACHE_DURATION = 60 * 1000; // 1 minute
 
 function isNetworkInformation(
   connection: unknown
@@ -55,18 +46,11 @@ function isNetworkInformation(
 
 export const useConnectionQuality = () => {
   const [connState, setConnState] = useState<ConnectionQualityState>({
-    rendition: Rendition.SD360,
+    rendition: Rendition.HD720,
     isLoading: true,
     mbps: null,
     timestamp: null,
   });
-
-  const getRenditionFromSpeed = useCallback((speedMbps: number): Rendition => {
-    if (speedMbps >= SPEED_THRESHOLDS.HD1080) return Rendition.HD1080;
-    if (speedMbps >= SPEED_THRESHOLDS.HD720) return Rendition.HD720;
-    if (speedMbps >= SPEED_THRESHOLDS.SD540) return Rendition.SD540;
-    return Rendition.SD360;
-  }, []);
 
   const getRenditionFromConnectionType = useCallback(
     (type: EffectiveConnectionType): Rendition => {
@@ -84,38 +68,22 @@ export const useConnectionQuality = () => {
     []
   );
 
-  const runSpeedTest = useCallback(async (retryCount = 0): Promise<number> => {
-    try {
-      const startTime = performance.now();
-      const response = await fetch("/test-file.txt", {
-        cache: "no-store",
-        signal: AbortSignal.timeout(5000),
-        headers: {
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const blob = await response.blob();
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-      const fileSizeInBits = blob.size * 8;
-      const speedMbps = ((fileSizeInBits / duration) * 1000) / (1024 * 1024);
-      return speedMbps;
-    } catch (error) {
-      if (retryCount < MAX_RETRIES) {
-        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
-        return runSpeedTest(retryCount + 1);
-      }
-      throw error;
-    }
-  }, []);
-
   const detectConnectionSpeed = useCallback(async () => {
+    // Automatically set highest quality for desktop
+    if (!isMobileOnly) {
+      const newState = {
+        rendition: Rendition.HD1080,
+        isLoading: false,
+        mbps: null,
+        timestamp: Date.now(),
+      };
+      setConnState(newState);
+      store.set(connectionQualityAtom, newState);
+      return;
+    }
+
+    // REST IS FOR MOBILE ONLY
+
     // Skip if we have a recent measurement
     if (
       connState.timestamp &&
@@ -127,42 +95,20 @@ export const useConnectionQuality = () => {
 
     setConnState((prev) => ({ ...prev, isLoading: true }));
 
-    try {
-      // On mobile, check Network Information API first
-      if (
-        isMobileOnly &&
-        navigator.connection &&
-        isNetworkInformation(navigator.connection)
-      ) {
-        const rendition = getRenditionFromConnectionType(
-          navigator.connection.effectiveType
-        );
-        const newState = {
-          rendition,
-          isLoading: false,
-          mbps: null,
-          timestamp: Date.now(),
-        };
-        setConnState(newState);
-        store.set(connectionQualityAtom, newState);
-        return;
-      }
-
-      // Fallback: Speed test
-      const speedMbps = await runSpeedTest();
+    // Check Network Information API
+    if (navigator.connection && isNetworkInformation(navigator.connection)) {
+      const rendition = getRenditionFromConnectionType(
+        navigator.connection.effectiveType
+      );
       const newState = {
-        rendition: getRenditionFromSpeed(speedMbps),
+        rendition,
         isLoading: false,
-        mbps: Number(speedMbps.toFixed(2)),
+        mbps: null,
         timestamp: Date.now(),
       };
       setConnState(newState);
       store.set(connectionQualityAtom, newState);
-    } catch (error) {
-      console.warn(
-        "Speed test failed, defaulting to low quality rendition:",
-        error
-      );
+    } else {
       const newState = {
         rendition: Rendition.SD360,
         isLoading: false,
@@ -172,7 +118,7 @@ export const useConnectionQuality = () => {
       setConnState(newState);
       store.set(connectionQualityAtom, newState);
     }
-  }, [getRenditionFromSpeed, getRenditionFromConnectionType, runSpeedTest]);
+  }, [getRenditionFromConnectionType]);
 
   useEffect(() => {
     // Run initial detection
