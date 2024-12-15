@@ -55,18 +55,10 @@ export const useConnectionQuality = () => {
     timestamp: null,
   });
 
-  const getRenditionForConnection = useCallback(
+  const getRenditionForMobileConnection = useCallback(
     (connection: NetworkInformation): Rendition => {
-      const { type, effectiveType } = connection;
-      // type only supported in chrome
-      switch (effectiveType) {
-        case "4g":
-          return type === "wifi" ? Rendition.HD720 : Rendition.SD540;
-        case "3g":
-          return type === "wifi" ? Rendition.SD540 : Rendition.SD360;
-        default:
-          return Rendition.SD360;
-      }
+      // type not supported by ios
+      return connection.type === "wifi" ? Rendition.SD540 : Rendition.SD360
     },
     []
   );
@@ -105,7 +97,7 @@ export const useConnectionQuality = () => {
       const newState = {
         type: connection.type,
         effectiveType: connection.effectiveType,
-        rendition: getRenditionForConnection(connection),
+        rendition: getRenditionForMobileConnection(connection),
         isLoading: false,
         timestamp: Date.now(),
       };
@@ -122,7 +114,7 @@ export const useConnectionQuality = () => {
       setConnState(newState);
       store.set(connectionQualityAtom, newState);
     }
-  }, [getRenditionForConnection]);
+  }, [getRenditionForMobileConnection]);
 
   useEffect(() => {
     // Run initial detection
@@ -140,7 +132,7 @@ export const useConnectionQuality = () => {
           ...prev,
           type: connection.type,
           effectiveType: connection.effectiveType,
-          rendition: getRenditionForConnection(connection),
+          rendition: getRenditionForMobileConnection(connection),
           timestamp: Date.now(),
         }));
       };
@@ -150,7 +142,7 @@ export const useConnectionQuality = () => {
         connection.removeEventListener("change", handleConnectionChange);
       };
     }
-  }, [detectConnectionSpeed, getRenditionForConnection]);
+  }, [detectConnectionSpeed, getRenditionForMobileConnection]);
 
   return connState;
 };
