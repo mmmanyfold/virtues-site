@@ -14,6 +14,7 @@ import {
   ArrowsDownUp,
   ArrowsOut,
   CircleNotch,
+  IconWeight,
 } from "@phosphor-icons/react";
 import {
   isMediaSmallAtom,
@@ -66,7 +67,7 @@ function ControlButton({
 function ControlInfoPanel({ iconClass }: { iconClass: string }) {
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
   const [isCalloutDismissed, setIsCalloutDismissed] = useState(true);
-  const [iconWeight, setIconWeight] = useState("light")
+  const [iconWeight, setIconWeight] = useState<IconWeight>("light")
 
   useEffect(() => {
     const dismissed = localStorage.getItem("infoCalloutDismissed") === "true";
@@ -74,7 +75,7 @@ function ControlInfoPanel({ iconClass }: { iconClass: string }) {
   }, []);
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
+    let intervalId: number;
 
     if (!isCalloutDismissed) {
       intervalId = setInterval(() => {
