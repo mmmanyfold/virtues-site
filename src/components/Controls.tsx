@@ -1,4 +1,5 @@
 import { useAtom } from "jotai";
+import { useState, useEffect } from "react";
 import { isIOS, isMobileOnly } from "react-device-detect";
 import {
   Info,
@@ -64,12 +65,42 @@ function ControlButton({
 
 function ControlInfoPanel({ iconClass }: { iconClass: string }) {
   const [isInfoPanelOpen] = useAtom(isInfoPanelOpenAtom);
+  const [isCalloutDismissed, setIsCalloutDismissed] = useState(true);
+  const [iconWeight, setIconWeight] = useState("light")
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem("infoCalloutDismissed") === "true";
+    setIsCalloutDismissed(dismissed);
+  }, []);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (!isCalloutDismissed) {
+      intervalId = setInterval(() => {
+        setIconWeight(prevWeight => prevWeight === "light" ? "fill" : "light");
+      }, 1000);
+    } else {
+      setIconWeight("light");
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isCalloutDismissed]);
+
   return (
     <ControlButton
       ariaLabel={isInfoPanelOpen ? "Close tracklist" : "Open tracklist"}
-      onClick={handleToggleInfoPanel}
+      onClick={() => {
+        handleToggleInfoPanel()
+        setIsCalloutDismissed(true)
+        localStorage.setItem("infoCalloutDismissed", "true")
+      }}
     >
-      <Info className={iconClass} weight="light" />
+      <Info className={iconClass} weight={iconWeight} />
     </ControlButton>
   );
 }
