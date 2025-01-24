@@ -1,4 +1,4 @@
-import "react";
+import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { ArrowUpRight } from "@phosphor-icons/react";
 import {
@@ -62,6 +62,12 @@ export default function Menu() {
     (a: PlaylistVideo, b: PlaylistVideo) => a.order - b.order
   );
   const [externalLinks] = useAtom(externalLinksPageAtom);
+
+  useEffect(() => {
+    window.gtag('event', 'modal_view', {
+      modal_name: 'Site Menu'
+    });
+  }, [])
 
   return (
     <div className="absolute z-30 w-[100%] h-[100dvh] bg-cream flex flex-col items-center justify-center text-2xl tracking-wide">

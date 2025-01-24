@@ -200,6 +200,12 @@ function InfoPanel() {
   const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
 
+  useEffect(() => {
+    window.gtag('event', 'modal_view', {
+      modal_name: 'Tracklist Panel'
+    });
+  }, [])
+
   const { videoTitle, notionChapters, videoShowCasePayload } =
     playlists[currentPlaylistIndex];
 
