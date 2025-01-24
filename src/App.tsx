@@ -118,13 +118,13 @@ function VideoPlayer({
         );
       };
     }
-  }, [player, iPhoneFSPlayer]);
+  }, [player, iPhoneFSPlayer, setPlayerRef, setIPhoneFSPlayerRef]);
 
   useEffect(() => {
     if (defaultVideo) {
       setPlayerVideoData(defaultVideo, firstPlaylist.vimeoChaptersPayload.data);
     }
-  }, [defaultVideo]);
+  }, [defaultVideo, firstPlaylist]);
 
   const onCanPlay = () => {
     setIsVideoLoading(false);

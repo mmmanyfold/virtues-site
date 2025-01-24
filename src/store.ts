@@ -37,6 +37,9 @@ export const playlistsAtom = atom(async (_get, { signal }) => {
     { signal }
   );
   const { rows } = await response.json();
+  window.gtag('event', 'playlist_view', {
+    playlist_title: rows[0].videoTitle
+  })
   return rows;
 });
 
