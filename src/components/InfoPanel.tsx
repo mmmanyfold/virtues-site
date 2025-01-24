@@ -201,8 +201,8 @@ function InfoPanel() {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
 
   useEffect(() => {
-    window.gtag('event', 'page_view', {
-      page_title: 'Tracklist Panel'
+    window.gtag('event', 'tracklist_view', {
+      playlist_title: playlists[currentPlaylistIndex].videoTitle
     });
   }, [])
 

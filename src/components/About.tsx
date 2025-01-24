@@ -62,9 +62,7 @@ export default function About({ blocks }: { blocks: any }) {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
 
   useEffect(() => {
-    window.gtag('event', 'page_view', {
-      page_title: 'About'
-    });
+    window.gtag('event', 'about_view', {});
   }, [])
 
   if (!blocks) {

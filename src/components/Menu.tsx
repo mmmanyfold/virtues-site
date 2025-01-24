@@ -47,6 +47,11 @@ function ExternalLink({ link, text }: { link: string; text: string }) {
       href={link}
       target="_blank"
       rel="noreferrer"
+      onClick={() => {
+        window.gtag('event', 'external_link_click', {
+          url: link
+        });
+      }}
     >
       {text}
       <ArrowUpRight size={24} weight="bold" />
@@ -64,9 +69,7 @@ export default function Menu() {
   const [externalLinks] = useAtom(externalLinksPageAtom);
 
   useEffect(() => {
-    window.gtag('event', 'page_view', {
-      page_title: 'Site Menu'
-    });
+    window.gtag('event', 'menu_open', {});
   }, [])
 
   return (
