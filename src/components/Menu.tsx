@@ -64,8 +64,8 @@ export default function Menu() {
   const [externalLinks] = useAtom(externalLinksPageAtom);
 
   useEffect(() => {
-    window.gtag('event', 'modal_view', {
-      modal_name: 'Site Menu'
+    window.gtag('event', 'page_view', {
+      page_title: 'Site Menu'
     });
   }, [])
 

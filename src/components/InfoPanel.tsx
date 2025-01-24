@@ -201,8 +201,8 @@ function InfoPanel() {
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
 
   useEffect(() => {
-    window.gtag('event', 'modal_view', {
-      modal_name: 'Tracklist Panel'
+    window.gtag('event', 'page_view', {
+      page_title: 'Tracklist Panel'
     });
   }, [])
 
