@@ -252,6 +252,11 @@ export const handleSetCurrentPlaylist = async (newIndex: number) => {
   store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
+
+  const playlists = await store.get(playlistsAtom);
+  window.gtag('event', 'playlist_view', {
+    playlist_title: playlists[newIndex].videoTitle
+  })
 };
 
 export const handleSetCurrentShowcaseItem = async ({
@@ -308,6 +313,10 @@ export const handlePlaylistJump = async () => {
   store.set(currentPlaylistIndexAtom, newIndex);
   store.set(isMenuOpenAtom, false);
   store.set(isAboutOpenAtom, false);
+
+  window.gtag('event', 'playlist_view', {
+    playlist_title: playlists[newIndex].videoTitle
+  })
 };
 
 export const handleSeek = ({

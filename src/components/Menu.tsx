@@ -1,4 +1,4 @@
-import "react";
+import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { ArrowUpRight } from "@phosphor-icons/react";
 import {
@@ -47,6 +47,11 @@ function ExternalLink({ link, text }: { link: string; text: string }) {
       href={link}
       target="_blank"
       rel="noreferrer"
+      onClick={() => {
+        window.gtag('event', 'external_link_click', {
+          url: link
+        });
+      }}
     >
       {text}
       <ArrowUpRight size={24} weight="bold" />
@@ -62,6 +67,10 @@ export default function Menu() {
     (a: PlaylistVideo, b: PlaylistVideo) => a.order - b.order
   );
   const [externalLinks] = useAtom(externalLinksPageAtom);
+
+  useEffect(() => {
+    window.gtag('event', 'menu_open', {});
+  }, [])
 
   return (
     <div className="absolute z-30 w-[100%] h-[100dvh] bg-cream flex flex-col items-center justify-center text-2xl tracking-wide">

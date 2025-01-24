@@ -164,3 +164,9 @@ export interface TimeUpdate {
   percent: number;
   seconds: number;
 }
+
+declare global {
+  interface Window {
+    gtag: (command: string, action: string, params: object) => void;
+  }
+}

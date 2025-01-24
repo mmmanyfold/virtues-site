@@ -1,4 +1,4 @@
-import "react";
+import { useEffect } from "react";
 import { RichTextObject } from "../components/Notion.tsx";
 import { useAtom } from "jotai";
 import { isMenuOpenAtom, isMediaSmallAtom } from "../store.ts";
@@ -60,6 +60,10 @@ function Section({
 export default function About({ blocks }: { blocks: any }) {
   const [isMenuOpen] = useAtom(isMenuOpenAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
+
+  useEffect(() => {
+    window.gtag('event', 'about_view', {});
+  }, [])
 
   if (!blocks) {
     return null;

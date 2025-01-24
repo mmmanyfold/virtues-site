@@ -200,6 +200,12 @@ function InfoPanel() {
   const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [isMediaSmall] = useAtom(isMediaSmallAtom);
 
+  useEffect(() => {
+    window.gtag('event', 'tracklist_view', {
+      playlist_title: playlists[currentPlaylistIndex].videoTitle
+    });
+  }, [])
+
   const { videoTitle, notionChapters, videoShowCasePayload } =
     playlists[currentPlaylistIndex];
 
