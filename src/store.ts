@@ -7,7 +7,7 @@ export const getPlaylistVideo = (
   showcaseIndex?: number
 ): Video => {
   if (playlist.videoShowCasePayload?.data?.length) {
-    let index = showcaseIndex || 0;
+    const index = showcaseIndex || 0;
     return playlist.videoShowCasePayload.data[index];
   }
   return playlist.vimeoPlaybackPayload;
@@ -73,7 +73,8 @@ export const isVideoLoadingAtom = atom(true);
 export const playerRefAtom = atom(Object.create(null));
 export const iPhoneFSPlayerRefAtom = atom<any>(null);
 export const seekingPositionAtom = atom<number>(0);
-export const videoSizeAtom = atom<[number, number]>([0, 0]);
+// Default to 16:9 aspect ratio to prevent zero-dimension issues before metadata loads
+export const videoSizeAtom = atom<[number, number]>([1920, 1080]);
 export const windowWidthAtom = atom<number>(0);
 export const displaySizeAtom = atom<{
   displayWidth: number;

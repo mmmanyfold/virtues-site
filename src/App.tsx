@@ -343,8 +343,9 @@ function VideoWrapper({
       ? 0
       : `-${(displayHeight - windowHeightWithoutControls) / 2}px`;
 
-  const videoStyle = {
+  const videoStyle: CSSProperties = {
     width: `${displayWidth}px`,
+    height: `${displayHeight}px`,
     left: positionLeft,
     top: positionTop,
   };
