@@ -58,7 +58,10 @@ export default function Menu() {
   const [playlists] = useAtom(playlistsAtom);
   const [currentPlaylistIndex] = useAtom(currentPlaylistIndexAtom);
   const [isAboutOpen] = useAtom(isAboutOpenAtom);
-  const orderedPlaylists = playlists.sort(
+  // Playlists arrive pre-sorted by `order` from the store; copy before
+  // sorting so we never mutate the shared atom array (which would desync
+  // currentPlaylistIndex from the playlist it points to).
+  const orderedPlaylists = [...playlists].sort(
     (a: PlaylistVideo, b: PlaylistVideo) => a.order - b.order
   );
   const [externalLinks] = useAtom(externalLinksPageAtom);
