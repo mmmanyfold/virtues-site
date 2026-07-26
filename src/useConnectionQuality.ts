@@ -128,13 +128,19 @@ export const useConnectionQuality = () => {
     ) {
       const connection = navigator.connection;
       const handleConnectionChange = () => {
-        setConnState((prev) => ({
-          ...prev,
-          type: connection.type,
-          effectiveType: connection.effectiveType,
-          rendition: getRenditionForMobileConnection(connection),
-          timestamp: Date.now(),
-        }));
+        setConnState((prev) => {
+          const newState = {
+            ...prev,
+            type: connection.type,
+            effectiveType: connection.effectiveType,
+            rendition: getRenditionForMobileConnection(connection),
+            timestamp: Date.now(),
+          };
+          // Keep the store atom in sync so getVideoLink() (which reads from
+          // the store, e.g. on playlist switch) picks the right rendition.
+          store.set(connectionQualityAtom, newState);
+          return newState;
+        });
       };
 
       connection.addEventListener("change", handleConnectionChange);
