@@ -17,7 +17,7 @@ export const getVideoLink = (
   video: Video,
   connectionQuality?: ConnectionQualityState
 ) => {
-  const files = video.files.sort((a, b) => b.width - a.width);
+  const files = [...video.files].sort((a, b) => b.width - a.width);
   const { rendition } = connectionQuality || store.get(connectionQualityAtom);
   const file = files.find((file) => file.rendition === rendition) || files[0];
   return file.link;
