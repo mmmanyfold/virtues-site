@@ -180,7 +180,7 @@ export const handlePreviousChapter = () => {
   const chapters = store.get(chaptersAtom);
   const chapterIndex = store.get(chapterIndexAtom);
 
-  if (chapters.length === 0 || chapterIndex === 0) {
+  if (chapters.length === 0 || chapterIndex <= 0) {
     return;
   }
 
@@ -212,7 +212,7 @@ export const handleRestartPlayback = () => {
 };
 
 export const getRandomIndex = (currentIndex: number, listLength: number) => {
-  if (listLength === 1) {
+  if (listLength <= 1) {
     return 0;
   }
   if (listLength === 2) {
@@ -226,8 +226,12 @@ export const getRandomIndex = (currentIndex: number, listLength: number) => {
 };
 
 export const handleRandomChapter = () => {
-  const player = store.get(playerRefAtom);
   const chapters = store.get(chaptersAtom);
+  if (chapters.length === 0) {
+    return;
+  }
+
+  const player = store.get(playerRefAtom);
   const currentChapterIndex = store.get(chapterIndexAtom);
   const randomChapterIndex = getRandomIndex(
     currentChapterIndex,
