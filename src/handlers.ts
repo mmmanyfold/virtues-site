@@ -144,6 +144,10 @@ const findChapterIndex = (chapters: VimeoChapter[], currentTime: number) => {
   return -1;
 };
 
+// Guards against the showcase auto-advance firing repeatedly while the
+// current item plays out its final second (see handleTimeUpdate below).
+let isAdvancingShowcase = false;
+
 export const handleTimeUpdate = async (
   currentTime: number,
   isIPhoneFSPlayer: boolean
@@ -158,8 +162,16 @@ export const handleTimeUpdate = async (
   if (showcaseVideos) {
     const currentIndex = store.get(showcaseItemIndexAtom);
     const isPlaying = store.get(isPlayingAtom);
+    const atEnd = currentTime >= showcaseVideos[currentIndex].duration - 1;
 
-    if (currentTime >= showcaseVideos[currentIndex].duration - 1) {
+    // timeupdate fires several times per second, so without this guard the
+    // last second of a showcase item queues multiple advances before the
+    // next item loads, skipping videos. Reset once the new item is playing
+    // below the threshold.
+    if (!atEnd) {
+      isAdvancingShowcase = false;
+    } else if (!isAdvancingShowcase) {
+      isAdvancingShowcase = true;
       const isLast = currentIndex === showcaseVideos.length - 1;
       handleSetCurrentShowcaseItem({
         index: isLast ? 0 : currentIndex + 1,

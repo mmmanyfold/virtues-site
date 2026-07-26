@@ -104,8 +104,12 @@ function ChapterList({
           const nextChapter =
             chapters.length >= metaNumber && chapters[metaNumber];
 
-          start = chapter.timecode;
-          end = nextChapter ? nextChapter.timecode - 1 : duration;
+          // Guard against notionChapters having more entries than the vimeo
+          // chapters payload, which would make `chapter` undefined here.
+          if (chapter) {
+            start = chapter.timecode;
+            end = nextChapter ? nextChapter.timecode - 1 : duration;
+          }
         }
 
         const isCurrentChapter = currentChapter?.index

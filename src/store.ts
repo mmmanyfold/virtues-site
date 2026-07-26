@@ -37,6 +37,10 @@ export const playlistsAtom = atom(async (_get, { signal }) => {
     { signal }
   );
   const { rows } = await response.json();
+  // Establish a single canonical ordering here so every index into this
+  // array (currentPlaylistIndexAtom, menu selection, etc.) agrees. Consumers
+  // must not re-sort this shared array in place.
+  rows.sort((a: Playlist, b: Playlist) => a.order - b.order);
   window.gtag('event', 'playlist_view', {
     playlist_title: rows[0].videoTitle
   })
